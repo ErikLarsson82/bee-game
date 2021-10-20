@@ -4,94 +4,6 @@
 
 // Mixing referencing sprites or data-model is confusing
 
-// 
-
-const OFFSET = 70
-const SIZE = 12
-
-const WIDTH_FLAT = 2 * SIZE
-const HEIGHT_FLAT = Math.sqrt(3) * SIZE
-
-const WIDTH_POINTY = Math.sqrt(3) * SIZE
-const HEIGHT_POINTY = 2 * SIZE
-
-// “odd-q” vertical layout, shoves odd columns down
-function toLocalCoordinateFlat(index) {
-  const { x, y } = index
-  const odd = x % 2
-
-  return {
-    x: (x * WIDTH_FLAT * (3/4)) + OFFSET,
-    y: (y * HEIGHT_FLAT) + OFFSET + (odd ? HEIGHT_FLAT/2 : 0)
-  } 
-}
-
-// “odd-r” horizontal layout, shoves odd rows right
-function toLocalCoordinatePointy(index) {
-  const { x, y } = index
-  const odd = y % 2
-
-  return {
-    x: (x * WIDTH_POINTY) + OFFSET + (odd ? WIDTH_POINTY/2 : 0),
-    y: (y * HEIGHT_POINTY * (3/4)) + OFFSET
-  }
-}
-
-function hexCornerFlat(center, size, i) {
-  const angle_deg = 60 * i
-  const angle_rad = Math.PI / 180 * angle_deg
-  
-  return { 
-    x: center.x + size * Math.cos(angle_rad),
-    y: center.y + size * Math.sin(angle_rad)
-  }
-}
-
-function hexCornerPointy(center, size, i) {
-  var angle_deg = 60 * i - 30
-  var angle_rad = Math.PI / 180 * angle_deg
-  
-  return {
-    x: center.x + size * Math.cos(angle_rad),
-    y: center.y + size * Math.sin(angle_rad)
-  }
-}
-    
-
-const DIRECTIONS_POINTY_ODD = {
-  'NW': { x: 0, y: -1},
-  'NE': { x: 1, y: -1},
-  'W': { x: -1, y: 0},
-  'E': { x: 1, y: 0},
-  'SW': { x: 0, y: 1},
-  'SE': { x: 1, y: 1},
-}
-const DIRECTIONS_POINTY_EVEN = {
-  'NW': { x: -1, y: -1},
-  'NE': { x: 0, y: -1},
-  'W': { x: -1, y: 0},
-  'E': { x: 1, y: 0},
-  'SW': { x: -1, y: 1},
-  'SE': { x: 0, y: 1},
-}
-
-const DIRECTIONS_FLAT_ODD = {
-  'N': { x: 0, y: -1},
-  'NE': { x: 1, y: 0 },
-  'NW': { x: -1, y: 0 },
-  'S': { x: 0, y: 1},
-  'SE': { x: 1, y: 1},
-  'SW': { x: -1, y: 1},
-}
-const DIRECTIONS_FLAT_EVEN = {
-  'NW': { x: -1, y: -1},
-  'NE': { x: 1, y: -1},
-  'N': { x: 0, y: -1},
-  'SW': { x: -1, y: 0},
-  'SE': { x: 1, y: 0},
-  'S': { x: 0, y: 1},
-}
-
 const fontConfig = {
     fontFamily: '"Lucida Console", Monaco, monospace',
     fontSize: 8,
@@ -142,15 +54,15 @@ const gameState = {
   paused: false,
 }
 
-const setSelected = (index, pixel) => {
-  if (index === null) {
+const setSelected = cell => {
+  if (cell === null) {
     gameState.selectedHex = null
     selected.visible = false
     panel.visible = false
   } else {
-    gameState.selectedHex = index
-    selected.position.x = pixel.x - 2
-    selected.position.y = pixel.y - 2
+    gameState.selectedHex = cell
+    selected.position.x = cell.content.sprite.position.x - 2
+    selected.position.y = cell.content.sprite.position.y - 2
     selected.visible = true
     panel.visible = true
   }
@@ -163,7 +75,7 @@ beehive.drawRect(120 / 2, 120 / 2, 120, 120)
 background.addChild(beehive)
 
 const hexGrid = new Array(5).fill().map((_, x) => 
-  new Array(5).fill().map((_, y) => hexagon(x, y))
+  new Array(5).fill().map((_, y) => cellCore(x, y))
 )
 const forEachHexagon = f => hexGrid.forEach(row => row.forEach(hex => f(hex)))
 const filterHexagon = f => {
@@ -192,7 +104,7 @@ function createQueen() {
   bees.addChild(queen)
 
   app.ticker.add(time => {
-    const emptyBroodCells = filterHexagon(hex => hex.getType() === 'brood' && !hex.isOccupied())
+    const emptyBroodCells = filterHexagon(hex => hex.type === 'brood' && !hex.isOccupied())
     if (emptyBroodCells.length > 0) {
       queen.position.x = emptyBroodCells[0].sprite.position.x
       queen.position.y = emptyBroodCells[0].sprite.position.y
@@ -217,7 +129,7 @@ function createBee() {
   bee.pollenSack = 0
   bee.state = 'idle'
   app.ticker.add(time => {
-    const pollenHex = filterHexagon(hex => hex.getType() === 'pollen' && !hex.isFull())
+    const pollenHex = filterHexagon(hex => hex.type === 'pollen' && !hex.isFull())
     if (bee.state === 'idle') {
       bee.position.x = 50
       bee.position.y = 50
@@ -307,53 +219,19 @@ const panel = Sprite.fromImage('ui-panel.png')
   ui.addChild(panel)
 }
 
-function hexagon(x, y) {
-  
-  let type = null
-  let pollen = 0
-  let contents = null
-
-  let fillColor = '#0f0'
-  let strokeColor = '#00f'
-
-  const setColor = color => {
-    if (color === 'red') {
-      fillColor = '#f00'
-      strokeColor = '#ff0'
-    } else if (color === 'blue') {
-      fillColor = '#00f'
-      strokeColor = '#0ff'
-    } else {
-      fillColor = '#0f0'
-      strokeColor = '#00f'
-    }
-  }
-
+function cellCore(x, y) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
-  
-  const hex = Sprite.fromImage('cell-empty.png')
-  hex.position.x = pixelCoordinate.x
-  hex.position.y = pixelCoordinate.y
-  hex.interactive = true
-  hex.buttonMode = true
-  hex.alpha = 1
-  hex.mouseover = () => hex.alpha = 0.2
-  hex.mouseout = () => hex.alpha = 1
-  hex.mousedown = () => setSelected({ x, y }, pixelCoordinate)
 
-  background.addChild(hex)
-
-  const odd = x % 2 // flat
-  const lookup = odd ? DIRECTIONS_FLAT_ODD : DIRECTIONS_FLAT_EVEN
-  
-  const getNeighbour = direction => {
-    const xD = lookup[direction].x
-    const yD = lookup[direction].y
-    const result = hexGrid[x + xD] && hexGrid[x + xD][y + yD]
-    return result || null
+  return {
+    x,
+    y,
+    pixelX: pixelCoordinate.x,
+    pixelY: pixelCoordinate.y,
+    content: emptyCell(pixelCoordinate)
   }
+}
 
-  const getNeighbours = () => Object.keys(lookup).map(getNeighbour).filter(x => x !== null)
+/*
 
   const setType = (_type) => {
     type = _type
@@ -379,74 +257,27 @@ function hexagon(x, y) {
   }
 
   const getType = () => type
+*/
 
-  const render = () => {
-    context.beginPath()
-    const pixelCoordinate = toLocalCoordinateFlat({ x, y })
-    {
-      const { x, y } = hexCornerFlat(pixelCoordinate, SIZE, 0)
-      context.moveTo(x, y)
+function emptyCell(pixelCoordinate) {
+  const hexSprite = Sprite.fromImage('cell-empty.png')
+  hexSprite.position.x = pixelCoordinate.x
+  hexSprite.position.y = pixelCoordinate.y
+  hexSprite.interactive = true
+  hexSprite.buttonMode = true
+  hexSprite.alpha = 1
+  hexSprite.mouseover = () => hexSprite.alpha = 0.2
+  hexSprite.mouseout = () => hexSprite.alpha = 1
 
-      for (var i = 1; i <= 5; i++) {
-        const { x, y } = hexCornerFlat(pixelCoordinate, SIZE, i)
-        context.lineTo(x, y)
-      }
-    }
-
-    context.fillStyle = fillColor
-    context.strokeStyle = strokeColor
-
-    context.closePath()
-    context.fill()
-    context.stroke()
+  const cell = {
+    type: 'empty',
+    sprite: hexSprite,
+    destroy: () => background.removeChild(hexSprite)
   }
-
-  return {
-    x,
-    y,
-    pixelX: pixelCoordinate.x,
-    pixelY: pixelCoordinate.y,
-    sprite: hex,
-    getNeighbour,
-    getNeighbours,
-    setType,
-    isOccupied,
-    setContents,
-    addPollen,
-    getType,
-    isFull,
-    render,
-    setColor,
-  }
+  hexSprite.mousedown = () => setSelected(cell)
+  background.addChild(hexSprite)
+  return cell
 }
-
-window.addEventListener('pointermove', evt => {
-  const { x, y } = evt
-  
-  let lowest = Infinity
-  let closest = null
-
-  forEachHexagon(hex => hex.setColor(null));
-
-  hexGrid.forEach(row => {
-    row.forEach(v => {
-      const xP = Math.abs(x - v.pixelX)
-      const yP = Math.abs(y - v.pixelY)
-      const dist = Math.sqrt((xP * 2) + (yP * 2))
-      if (dist < lowest && dist < (SIZE / 2.5)) {
-        lowest = dist
-        closest = v
-      }
-    })
-  })
-
-  if (closest === null) return
-  closest.setColor('red')
-
-  closest.getNeighbours().forEach(neighbor => neighbor.setColor('blue'))
-
-  drawGrid()
-})
 
 window.addEventListener('keydown', e => {
   if (e.keyCode === 32) {
@@ -455,21 +286,7 @@ window.addEventListener('keydown', e => {
   }
 })
 
-
-// Debug hex
-const canvas = document.querySelector('canvas')
-const context = canvas.getContext('2d')
-canvas.width = 600
-canvas.height = 300
-
-
-function drawGrid() {
-  context.clearRect(0, 0, canvas.width, canvas.height)
-  forEachHexagon(hex => hex.render())
-}
-
 for (var i = 0; i < 2; i++) {
   createBee()
 }
 createQueen()
-drawGrid()
