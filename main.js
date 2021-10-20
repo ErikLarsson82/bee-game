@@ -1,8 +1,68 @@
+// Everything in one file starts to be difficult to find what im looking for
+
+// Bees and hexes have state and different properties that does not scale well
+
+// Mixing referencing sprites or data-model is confusing
+
+// Cannot create more bees
+
+// Rename nectar to pollen, bees don't store nectar in hexagons (some do?)
+
+// Hexagon model should be converted to flat top :/
+
 const OFFSET = 70
 const SIZE = 12
-const WIDTH = Math.sqrt(3) * SIZE
-const HEIGHT = 2 * SIZE
-const DIRECTIONS_ODD = {
+
+const WIDTH_FLAT = 2 * SIZE
+const HEIGHT_FLAT = Math.sqrt(3) * SIZE
+
+const WIDTH_POINTY = Math.sqrt(3) * SIZE
+const HEIGHT_POINTY = 2 * SIZE
+
+// “odd-q” vertical layout, shoves odd columns down
+function toLocalCoordinateFlat(index) {
+  const { x, y } = index
+  const odd = x % 2
+
+  return {
+    x: (x * WIDTH_FLAT * (3/4)) + OFFSET,
+    y: (y * HEIGHT_FLAT) + OFFSET + (odd ? HEIGHT_FLAT/2 : 0)
+  } 
+}
+
+// “odd-r” horizontal layout, shoves odd rows right
+function toLocalCoordinatePointy(index) {
+  const { x, y } = index
+  const odd = y % 2
+
+  return {
+    x: (x * WIDTH_POINTY) + OFFSET + (odd ? WIDTH_POINTY/2 : 0),
+    y: (y * HEIGHT_POINTY * (3/4)) + OFFSET
+  }
+}
+
+function hexCornerFlat(center, size, i) {
+  const angle_deg = 60 * i
+  const angle_rad = Math.PI / 180 * angle_deg
+  
+  return { 
+    x: center.x + size * Math.cos(angle_rad),
+    y: center.y + size * Math.sin(angle_rad)
+  }
+}
+
+function hexCornerPointy(center, size, i) {
+  var angle_deg = 60 * i - 30
+  var angle_rad = Math.PI / 180 * angle_deg
+  
+  return {
+    x: center.x + size * Math.cos(angle_rad),
+    y: center.y + size * Math.sin(angle_rad)
+  }
+}
+    
+
+const DIRECTIONS_POINTY_ODD = {
   'NW': { x: 0, y: -1},
   'NE': { x: 1, y: -1},
   'W': { x: -1, y: 0},
@@ -10,13 +70,30 @@ const DIRECTIONS_ODD = {
   'SW': { x: 0, y: 1},
   'SE': { x: 1, y: 1},
 }
-const DIRECTIONS_EVEN = {
+const DIRECTIONS_POINTY_EVEN = {
   'NW': { x: -1, y: -1},
   'NE': { x: 0, y: -1},
   'W': { x: -1, y: 0},
   'E': { x: 1, y: 0},
   'SW': { x: -1, y: 1},
   'SE': { x: 0, y: 1},
+}
+
+const DIRECTIONS_FLAT_ODD = {
+  'N': { x: 0, y: -1},
+  'NE': { x: 1, y: 0 },
+  'NW': { x: -1, y: 0 },
+  'S': { x: 0, y: 1},
+  'SE': { x: 1, y: 1},
+  'SW': { x: -1, y: 1},
+}
+const DIRECTIONS_FLAT_EVEN = {
+  'NW': { x: -1, y: -1},
+  'NE': { x: 1, y: -1},
+  'N': { x: 0, y: -1},
+  'SW': { x: -1, y: 0},
+  'SE': { x: 1, y: 0},
+  'S': { x: 0, y: 1},
 }
 
 const l = console.log
@@ -192,7 +269,23 @@ function hexagon(x, y) {
   let type = null
   let nectar = 0
 
-  const pixelCoordinate = toLocalCoordinate({ x, y })
+  let fillColor = '#0f0';
+  let strokeColor = '#00f';
+
+  const setColor = color => {
+    if (color === 'red') {
+      fillColor = '#f00';
+      strokeColor = '#ff0';
+    } else if (color === 'blue') {
+      fillColor = '#00f';
+      strokeColor = '#0ff';
+    } else {
+      fillColor = '#0f0';
+      strokeColor = '#00f';
+    }
+  }
+
+  const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   
   const hex = Sprite.fromImage('cell-empty.png')
   hex.position.x = pixelCoordinate.x
@@ -206,8 +299,8 @@ function hexagon(x, y) {
 
   container.addChild(hex)
 
-  const odd = y % 2
-  const lookup = odd ? DIRECTIONS_ODD : DIRECTIONS_EVEN
+  const odd = x % 2 // flat
+  const lookup = odd ? DIRECTIONS_FLAT_ODD : DIRECTIONS_FLAT_EVEN
   
   const getNeighbour = direction => {
     const xD = lookup[direction].x
@@ -234,9 +327,32 @@ function hexagon(x, y) {
 
   const getType = () => type
 
+  const render = () => {
+    context.beginPath();
+    const pixelCoordinate = toLocalCoordinateFlat({ x, y })
+    {
+      const { x, y } = hexCornerFlat(pixelCoordinate, SIZE, 0);
+      context.moveTo(x, y);
+
+      for (var i = 1; i <= 5; i++) {
+        const { x, y } = hexCornerFlat(pixelCoordinate, SIZE, i);
+        context.lineTo(x, y);
+      }
+    }
+
+    context.fillStyle = fillColor;
+    context.strokeStyle = strokeColor;
+
+    context.closePath();
+    context.fill();
+    context.stroke();  
+  }
+
   return {
     x,
     y,
+    pixelX: pixelCoordinate.x,
+    pixelY: pixelCoordinate.y,
     sprite: hex,
     getNeighbour,
     getNeighbours,
@@ -244,36 +360,18 @@ function hexagon(x, y) {
     addNectar,
     getType,
     isFull,
+    render,
+    setColor,
   }
 }
-
-function toLocalCoordinate(index) {
-  const { x, y } = index
-  const odd = y % 2
-
-  return {
-    x: (x * WIDTH) + OFFSET + (odd ? WIDTH/2 : 0),
-    y: (y * HEIGHT * (3/4)) + OFFSET
-  }
-}
-
-
-function pointy_hex_corner(center, size, i) {
-  var angle_deg = 60 * i - 30
-  var angle_rad = Math.PI / 180 * angle_deg
-  
-  return {
-    x: center.x + size * Math.cos(angle_rad),
-    y: center.y + size * Math.sin(angle_rad)
-  }
-}
-    
 
 window.addEventListener('pointermove', evt => {
   const { x, y } = evt
 
   let lowest = Infinity
   let closest = null
+
+  forEachHexagon(hex => hex.setColor(null));
 
   hexGrid.forEach(row => {
     row.forEach(v => {
@@ -286,6 +384,13 @@ window.addEventListener('pointermove', evt => {
       }
     })
   })
+
+  if (closest === null) return;
+  closest.setColor('red');
+
+  closest.getNeighbours().forEach(neighbor => neighbor.setColor('blue'));
+
+  drawGrid();
 })
 
 window.addEventListener('keydown', e => {
@@ -294,3 +399,18 @@ window.addEventListener('keydown', e => {
     gameState.paused ? app.ticker.stop() : app.ticker.start()
   }
 })
+
+
+// Debug hex
+const canvas = document.querySelector('canvas');
+const context = canvas.getContext('2d');
+canvas.width = 600;
+canvas.height = 300;
+
+
+function drawGrid() {
+  context.clearRect(0, 0, canvas.width, canvas.height)
+  forEachHexagon(hex => hex.render())
+}
+
+drawGrid()
