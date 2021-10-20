@@ -4,12 +4,6 @@
 
 // Mixing referencing sprites or data-model is confusing
 
-// Cannot create more bees
-
-// Rename nectar to pollen, bees don't store nectar in hexagons (some do?)
-
-// Hexagon model should be converted to flat top :/
-
 const OFFSET = 70
 const SIZE = 12
 
@@ -100,7 +94,6 @@ const fontConfig = {
     fontFamily: '"Lucida Console", Monaco, monospace',
     fontSize: 8,
     fontWeight: 'bolder',
-    //fill: 0x6e341b
     fill: 'black'
 }
 
@@ -128,6 +121,16 @@ container.scale.x = 2
 container.scale.y = 2
 
 app.stage.addChild(container)
+
+const background = new Container()
+container.addChild(background)
+
+const bees = new Container()
+container.addChild(bees)
+
+const ui = new Container()
+container.addChild(ui)
+
 
 app.renderer.view.style.position = 'absolute'
 app.renderer.view.style.display = 'block'
@@ -167,51 +170,53 @@ const selected = Sprite.fromImage('cell-selected.png')
 selected.position.x = 100
 selected.position.y = 100
 selected.visible = false
-container.addChild(selected)
+background.addChild(selected)
 
 const flower = Sprite.fromImage('flower.png')
 flower.position.x = 30
 flower.position.y = 30
-container.addChild(flower)
+background.addChild(flower)
 
-const bee = PIXI.Sprite.fromImage('bee.png')
-bee.position.x = 50
-bee.position.y = 50
-bee.pollenSack = 0
-bee.state = 'idle'
-app.ticker.add(time => {
-  const pollenHex = filterHexagon(hex => hex.getType() === 'pollen' && !hex.isFull())
-  if (bee.state === 'idle') {
-    bee.position.x = 50
-    bee.position.y = 50
-    if (pollenHex.length > 0) {
-      bee.state = 'collecting'    
+function createBee() {
+  const bee = PIXI.Sprite.fromImage('bee.png')
+  bee.position.x = 50
+  bee.position.y = 50
+  bee.pollenSack = 0
+  bee.state = 'idle'
+  app.ticker.add(time => {
+    const pollenHex = filterHexagon(hex => hex.getType() === 'pollen' && !hex.isFull())
+    if (bee.state === 'idle') {
+      bee.position.x = 50
+      bee.position.y = 50
+      if (pollenHex.length > 0) {
+        bee.state = 'collecting'    
+      }
     }
-  }
-  if (bee.state === 'collecting') {
-    bee.position.x = flower.position.x
-    bee.position.y = flower.position.y      
-    bee.pollenSack += 0.1
-    if (bee.pollenSack >= 20) {
-      bee.state = 'depositing'      
+    if (bee.state === 'collecting') {
+      bee.position.x = flower.position.x
+      bee.position.y = flower.position.y      
+      bee.pollenSack += 0.1
+      if (bee.pollenSack >= 20) {
+        bee.state = 'depositing'      
+      }
     }
-  }
-  if (bee.state === 'depositing') {
-    if (pollenHex.length > 0) {
-      bee.position.x = pollenHex[0].sprite.position.x
-      bee.position.y = pollenHex[0].sprite.position.y
-    } else {
-      bee.state = 'idle'
-      return
+    if (bee.state === 'depositing') {
+      if (pollenHex.length > 0) {
+        bee.position.x = pollenHex[0].sprite.position.x
+        bee.position.y = pollenHex[0].sprite.position.y
+      } else {
+        bee.state = 'idle'
+        return
+      }
+      bee.pollenSack -= 0.1
+      pollenHex[0].addPollen(0.1)
+      if (pollenHex[0].isFull() || bee.pollenSack <= 0) {
+        bee.state = 'idle'
+      } 
     }
-    bee.pollenSack -= 0.1
-    pollenHex[0].addPollen(0.1)
-    if (pollenHex[0].isFull() || bee.pollenSack <= 0) {
-      bee.state = 'idle'
-    }
-  }
-})
-container.addChild(bee)
+  })
+  bees.addChild(bee)
+}
 
 const panel = Sprite.fromImage('ui-panel.png')
 {
@@ -246,7 +251,7 @@ const panel = Sprite.fromImage('ui-panel.png')
     panel.addChild(button)
   }
 
-  container.addChild(panel)
+  ui.addChild(panel)
 }
 
 function hexagon(x, y) {
@@ -282,7 +287,7 @@ function hexagon(x, y) {
   hex.mouseout = () => hex.alpha = 1
   hex.mousedown = () => setSelected({ x, y }, pixelCoordinate)
 
-  container.addChild(hex)
+  background.addChild(hex)
 
   const odd = x % 2 // flat
   const lookup = odd ? DIRECTIONS_FLAT_ODD : DIRECTIONS_FLAT_EVEN
@@ -398,4 +403,7 @@ function drawGrid() {
   forEachHexagon(hex => hex.render())
 }
 
+for (var i = 0; i < 2; i++) {
+  createBee()
+}
 drawGrid()
