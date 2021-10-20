@@ -96,6 +96,14 @@ const DIRECTIONS_FLAT_EVEN = {
   'S': { x: 0, y: 1},
 }
 
+const fontConfig = {
+    fontFamily: '"Lucida Console", Monaco, monospace',
+    fontSize: 8,
+    fontWeight: 'bolder',
+    //fill: 0x6e341b
+    fill: 'black'
+}
+
 const l = console.log
 
 const Container = PIXI.Container,
@@ -169,105 +177,82 @@ container.addChild(flower)
 const bee = PIXI.Sprite.fromImage('bee.png')
 bee.position.x = 50
 bee.position.y = 50
-bee.nectarSack = 0
+bee.pollenSack = 0
 bee.state = 'idle'
 app.ticker.add(time => {
-  const nectarHex = filterHexagon(hex => hex.getType() === 'nectar' && !hex.isFull())
+  const pollenHex = filterHexagon(hex => hex.getType() === 'pollen' && !hex.isFull())
   if (bee.state === 'idle') {
     bee.position.x = 50
     bee.position.y = 50
-    if (nectarHex.length > 0) {
+    if (pollenHex.length > 0) {
       bee.state = 'collecting'    
     }
   }
   if (bee.state === 'collecting') {
     bee.position.x = flower.position.x
     bee.position.y = flower.position.y      
-    bee.nectarSack += 0.1
-    if (bee.nectarSack >= 20) {
+    bee.pollenSack += 0.1
+    if (bee.pollenSack >= 20) {
       bee.state = 'depositing'      
     }
   }
   if (bee.state === 'depositing') {
-    if (nectarHex.length > 0) {
-      bee.position.x = nectarHex[0].sprite.position.x
-      bee.position.y = nectarHex[0].sprite.position.y
+    if (pollenHex.length > 0) {
+      bee.position.x = pollenHex[0].sprite.position.x
+      bee.position.y = pollenHex[0].sprite.position.y
     } else {
       bee.state = 'idle'
       return
     }
-    bee.nectarSack -= 0.1
-    nectarHex[0].addNectar(0.1)
-    if (nectarHex[0].isFull() || bee.nectarSack <= 0) {
+    bee.pollenSack -= 0.1
+    pollenHex[0].addPollen(0.1)
+    if (pollenHex[0].isFull() || bee.pollenSack <= 0) {
       bee.state = 'idle'
     }
   }
 })
 container.addChild(bee)
 
-const bee2 = PIXI.Sprite.fromImage('bee.png')
-bee2.position.x = 54
-bee2.position.y = 50
-bee2.nectarSack = 0
-bee2.state = 'idle'
-app.ticker.add(time => {
-  const nectarHex = filterHexagon(hex => hex.getType() === 'nectar' && !hex.isFull())
-  if (bee2.state === 'idle') {
-    bee2.position.x = 54
-    bee2.position.y = 50
-    if (nectarHex.length > 0) {
-      bee2.state = 'collecting'    
-    }
-  }
-  if (bee2.state === 'collecting') {
-    bee2.position.x = flower.position.x + 4
-    bee2.position.y = flower.position.y      
-    bee2.nectarSack += 0.1
-    if (bee2.nectarSack >= 20) {
-      bee2.state = 'depositing'      
-    }
-  }
-  if (bee2.state === 'depositing') {
-    if (nectarHex.length > 0) {
-      bee2.position.x = nectarHex[0].sprite.position.x + 4 
-      bee2.position.y = nectarHex[0].sprite.position.y
-    } else {
-      bee2.state = 'idle'
-      return
-    }
-    bee2.nectarSack -= 0.1
-    nectarHex[0].addNectar(0.1)
-    if (nectarHex[0].isFull() || bee2.nectarSack <= 0) {
-      bee2.state = 'idle'
-    }
-  }
-})
-container.addChild(bee2)
+const panel = Sprite.fromImage('ui-panel.png')
+{
+  panel.position.x = 200
+  panel.position.y = 20
+  panel.visible = false
 
-const panel = Sprite.fromImage('ui-panel-selected.png')
-panel.position.x = 200
-panel.position.y = 20
-panel.visible = false
-container.addChild(panel)
+  const panelText = new PIXI.Text('Empty cell', { ...fontConfig })
+  panelText.position.x = 6
+  panelText.position.y = 2
+  panel.addChild(panelText)
 
-const button = Sprite.fromImage('button-nectar.png')
-button.position.x = 5
-button.position.y = 50
-button.interactive = true
-button.buttonMode = true
-button.alpha = 0.5
-button.mouseover = () => button.alpha = 1
-button.mouseout = () => button.alpha = 0.5
-button.mousedown = () => {
-  selectedHexSprite().setNectarType()
-  setSelected(null)
+  {
+    const button = Sprite.fromImage('button.png')
+    button.position.x = 5
+    button.position.y = 50
+    button.interactive = true
+    button.buttonMode = true
+    button.alpha = 0.5
+    button.mouseover = () => button.alpha = 1
+    button.mouseout = () => button.alpha = 0.5
+    button.mousedown = () => {
+      selectedHexSprite().setPollenType()
+      setSelected(null)
+    }
+
+    const buttonText = new PIXI.Text('Pollen', { ...fontConfig })
+    buttonText.position.x = 7
+    buttonText.position.y = 3
+    button.addChild(buttonText)
+
+    panel.addChild(button)
+  }
+
+  container.addChild(panel)
 }
-panel.addChild(button)
 
 function hexagon(x, y) {
   
   let type = null
-  let nectar = 0
+  let pollen = 0
 
   let fillColor = '#0f0';
   let strokeColor = '#00f';
@@ -311,17 +296,17 @@ function hexagon(x, y) {
 
   const getNeighbours = () => Object.keys(lookup).map(getNeighbour).filter(x => x !== null)
 
-  const setNectarType = () => {
-    type = 'nectar'
-    hex.texture = Texture.fromImage('cell-nectar-empty.png')
+  const setPollenType = () => {
+    type = 'pollen'
+    hex.texture = Texture.fromImage('cell-pollen-empty.png')
   }
 
-  const isFull = () => nectar >= 50
+  const isFull = () => pollen >= 50
 
-  const addNectar = (amount) => {
-    nectar += amount
+  const addPollen = (amount) => {
+    pollen += amount
     if (isFull()) {
-      hex.texture = Texture.fromImage('cell-nectar-full.png')
+      hex.texture = Texture.fromImage('cell-pollen-full.png')
     }
   }
 
@@ -356,8 +341,8 @@ function hexagon(x, y) {
     sprite: hex,
     getNeighbour,
     getNeighbours,
-    setNectarType,
-    addNectar,
+    setPollenType,
+    addPollen,
     getType,
     isFull,
     render,
