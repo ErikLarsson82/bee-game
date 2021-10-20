@@ -157,6 +157,11 @@ const setSelected = (index, pixel) => {
   app.render()
 }
 
+const beehive = new Graphics()
+beehive.beginFill(0xffc83f)
+beehive.drawRect(120 / 2, 120 / 2, 120, 120)
+background.addChild(beehive)
+
 const hexGrid = new Array(5).fill().map((_, x) => 
   new Array(5).fill().map((_, y) => hexagon(x, y))
 )
@@ -179,8 +184,34 @@ flower.position.x = 30
 flower.position.y = 30
 background.addChild(flower)
 
+function createQueen() {
+  const queen = PIXI.Sprite.fromImage('bee-queen.png')
+  queen.position.x = 100
+  queen.position.y = 45
+  queen.delay = 600
+  bees.addChild(queen)
+
+  app.ticker.add(time => {
+    const emptyBroodCells = filterHexagon(hex => hex.getType() === 'brood' && !hex.isOccupied())
+    if (emptyBroodCells.length > 0) {
+      queen.position.x = emptyBroodCells[0].sprite.position.x
+      queen.position.y = emptyBroodCells[0].sprite.position.y
+      queen.delay--
+
+      if (queen.delay <= 0) {
+        emptyBroodCells[0].setContents('egg')
+        queen.delay = 600
+        queen.position.x = 100
+        queen.position.y = 45
+      }
+    } else {
+      queen.delay = 600 
+    }
+  })
+}
+
 function createBee() {
-  const bee = PIXI.Sprite.fromImage('bee.png')
+  const bee = PIXI.Sprite.fromImage('bee-drone.png')
   bee.position.x = 50
   bee.position.y = 50
   bee.pollenSack = 0
@@ -232,25 +263,45 @@ const panel = Sprite.fromImage('ui-panel.png')
   panel.addChild(panelText)
 
   {
-    const button = Sprite.fromImage('button.png')
-    button.position.x = 5
-    button.position.y = 50
-    button.interactive = true
-    button.buttonMode = true
-    button.alpha = 0.5
-    button.mouseover = () => button.alpha = 1
-    button.mouseout = () => button.alpha = 0.5
-    button.mousedown = () => {
-      selectedHexSprite().setPollenType()
+    const buttonPollen = Sprite.fromImage('button.png')
+    buttonPollen.position.x = 5
+    buttonPollen.position.y = 50
+    buttonPollen.interactive = true
+    buttonPollen.buttonMode = true
+    buttonPollen.alpha = 0.5
+    buttonPollen.mouseover = () => buttonPollen.alpha = 1
+    buttonPollen.mouseout = () => buttonPollen.alpha = 0.5
+    buttonPollen.mousedown = () => {
+      selectedHexSprite().setType('pollen')
       setSelected(null)
     }
 
-    const buttonText = new PIXI.Text('Pollen', { ...fontConfig })
-    buttonText.position.x = 7
-    buttonText.position.y = 3
-    button.addChild(buttonText)
+    const buttonPollenText = new PIXI.Text('Pollen', { ...fontConfig })
+    buttonPollenText.position.x = 7
+    buttonPollenText.position.y = 3
+    buttonPollen.addChild(buttonPollenText)
 
-    panel.addChild(button)
+    panel.addChild(buttonPollen)
+
+    const buttonBrood = Sprite.fromImage('button.png')
+    buttonBrood.position.x = 5
+    buttonBrood.position.y = 80
+    buttonBrood.interactive = true
+    buttonBrood.buttonMode = true
+    buttonBrood.alpha = 0.5
+    buttonBrood.mouseover = () => buttonBrood.alpha = 1
+    buttonBrood.mouseout = () => buttonBrood.alpha = 0.5
+    buttonBrood.mousedown = () => {
+      selectedHexSprite().setType('brood')
+      setSelected(null)
+    }
+
+    const buttonBroodText = new PIXI.Text('Brood', { ...fontConfig })
+    buttonBroodText.position.x = 7
+    buttonBroodText.position.y = 3
+    buttonBrood.addChild(buttonBroodText)
+
+    panel.addChild(buttonBrood)
   }
 
   ui.addChild(panel)
@@ -260,20 +311,21 @@ function hexagon(x, y) {
   
   let type = null
   let pollen = 0
+  let contents = null
 
-  let fillColor = '#0f0';
-  let strokeColor = '#00f';
+  let fillColor = '#0f0'
+  let strokeColor = '#00f'
 
   const setColor = color => {
     if (color === 'red') {
-      fillColor = '#f00';
-      strokeColor = '#ff0';
+      fillColor = '#f00'
+      strokeColor = '#ff0'
     } else if (color === 'blue') {
-      fillColor = '#00f';
-      strokeColor = '#0ff';
+      fillColor = '#00f'
+      strokeColor = '#0ff'
     } else {
-      fillColor = '#0f0';
-      strokeColor = '#00f';
+      fillColor = '#0f0'
+      strokeColor = '#00f'
     }
   }
 
@@ -303,12 +355,21 @@ function hexagon(x, y) {
 
   const getNeighbours = () => Object.keys(lookup).map(getNeighbour).filter(x => x !== null)
 
-  const setPollenType = () => {
-    type = 'pollen'
-    hex.texture = Texture.fromImage('cell-pollen-empty.png')
+  const setType = (_type) => {
+    type = _type
+    hex.texture = Texture.fromImage(`cell-${_type}-empty.png`)
   }
 
   const isFull = () => pollen >= 50
+
+  const isOccupied = () => contents !== null
+
+  const setContents = (what) => {
+    contents = what
+    if (what === 'egg') {
+      hex.texture = Texture.fromImage('cell-brood-egg.png')
+    }
+  }
 
   const addPollen = (amount) => {
     pollen += amount
@@ -320,24 +381,24 @@ function hexagon(x, y) {
   const getType = () => type
 
   const render = () => {
-    context.beginPath();
+    context.beginPath()
     const pixelCoordinate = toLocalCoordinateFlat({ x, y })
     {
-      const { x, y } = hexCornerFlat(pixelCoordinate, SIZE, 0);
-      context.moveTo(x, y);
+      const { x, y } = hexCornerFlat(pixelCoordinate, SIZE, 0)
+      context.moveTo(x, y)
 
       for (var i = 1; i <= 5; i++) {
-        const { x, y } = hexCornerFlat(pixelCoordinate, SIZE, i);
-        context.lineTo(x, y);
+        const { x, y } = hexCornerFlat(pixelCoordinate, SIZE, i)
+        context.lineTo(x, y)
       }
     }
 
-    context.fillStyle = fillColor;
-    context.strokeStyle = strokeColor;
+    context.fillStyle = fillColor
+    context.strokeStyle = strokeColor
 
-    context.closePath();
-    context.fill();
-    context.stroke();  
+    context.closePath()
+    context.fill()
+    context.stroke()
   }
 
   return {
@@ -348,7 +409,9 @@ function hexagon(x, y) {
     sprite: hex,
     getNeighbour,
     getNeighbours,
-    setPollenType,
+    setType,
+    isOccupied,
+    setContents,
     addPollen,
     getType,
     isFull,
@@ -359,7 +422,7 @@ function hexagon(x, y) {
 
 window.addEventListener('pointermove', evt => {
   const { x, y } = evt
-
+  
   let lowest = Infinity
   let closest = null
 
@@ -377,12 +440,12 @@ window.addEventListener('pointermove', evt => {
     })
   })
 
-  if (closest === null) return;
-  closest.setColor('red');
+  if (closest === null) return
+  closest.setColor('red')
 
-  closest.getNeighbours().forEach(neighbor => neighbor.setColor('blue'));
+  closest.getNeighbours().forEach(neighbor => neighbor.setColor('blue'))
 
-  drawGrid();
+  drawGrid()
 })
 
 window.addEventListener('keydown', e => {
@@ -394,10 +457,10 @@ window.addEventListener('keydown', e => {
 
 
 // Debug hex
-const canvas = document.querySelector('canvas');
-const context = canvas.getContext('2d');
-canvas.width = 600;
-canvas.height = 300;
+const canvas = document.querySelector('canvas')
+const context = canvas.getContext('2d')
+canvas.width = 600
+canvas.height = 300
 
 
 function drawGrid() {
@@ -408,4 +471,5 @@ function drawGrid() {
 for (var i = 0; i < 2; i++) {
   createBee()
 }
+createQueen()
 drawGrid()
