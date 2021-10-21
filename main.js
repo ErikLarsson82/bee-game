@@ -1,14 +1,3 @@
-// Everything in one file starts to be difficult to find what im looking for
-
-// Bees and hexes have state and different properties that does not scale well
-
-// Mixing referencing sprites or data-model is confusing
-
-// Everything should be clickable
-
-// Sprites should have game-data on them
-
-// Convert code to https://github.com/kittykatattack/learningPixi#gamestates
 
 const fontConfig = {
     fontFamily: '"Lucida Console", Monaco, monospace',
@@ -44,6 +33,7 @@ let selected = null
 let queen = null
 let panel = null
 let background = null
+let flower = null
 let hexGrid = []
 const bees = []
 
@@ -78,7 +68,7 @@ function setup() {
   selected.visible = false
   background.addChild(selected)
 
-  const flower = Sprite.fromImage('flower.png')
+  flower = Sprite.fromImage('flower.png')
   makeSelectable(flower, 'flower')
   flower.position.x = 30
   flower.position.y = 30
@@ -149,8 +139,8 @@ function createQueen(parent) {
   app.ticker.add(time => {
     const emptyBroodCells = filterHexagon(hexGrid, hex => hex.type === 'brood' && !hex.isOccupied())
     if (emptyBroodCells.length > 0) {
-      queenSprite.position.x = emptyBroodCells[0].sprite.position.x
-      queenSprite.position.y = emptyBroodCells[0].sprite.position.y
+      queenSprite.position.x = emptyBroodCells[0].position.x
+      queenSprite.position.y = emptyBroodCells[0].position.y
       queenSprite.delay--
 
       if (queenSprite.delay <= 0) {
@@ -175,6 +165,15 @@ function createBee(parent) {
   bee.position.y = 50
   bee.pollenSack = 0
   bee.state = 'idle'
+
+  bee.panelContent = () => {
+    const text = new PIXI.Text('Loading', { ...fontConfig })
+    text.position.x = 7
+    text.position.y = 50
+    app.ticker.add(time => text.text = 'Pollen sack' + Math.round(bee.pollenSack))
+    return text
+  }
+
   app.ticker.add(time => {
     const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && !hex.isFull())
     if (bee.state === 'idle') {
@@ -194,8 +193,8 @@ function createBee(parent) {
     }
     if (bee.state === 'depositing') {
       if (pollenHex.length > 0) {
-        bee.position.x = pollenHex[0].sprite.position.x
-        bee.position.y = pollenHex[0].sprite.position.y
+        bee.position.x = pollenHex[0].position.x
+        bee.position.y = pollenHex[0].position.y
       } else {
         bee.state = 'idle'
         return
@@ -211,20 +210,6 @@ function createBee(parent) {
   bees.push(bee)
   parent.addChild(bee)
 }
-
-/*
-function cellCore(parent, x, y) {
-  const pixelCoordinate = toLocalCoordinateFlat({ x, y })
-
-  return {
-    x,
-    y,
-    pixelX: pixelCoordinate.x,
-    pixelY: pixelCoordinate.y,
-    content: emptyCell(parent, pixelCoordinate)
-  }
-}
-*/
 
 function replaceSelectedHex(type) {
   hexGrid.forEach((row, xIdx) => row.forEach((hex, yIdx) => {
@@ -242,129 +227,88 @@ function replaceSelectedHex(type) {
   }))
 }
 
-/*
-
-  const panelText = new PIXI.Text('Empty cell', { ...fontConfig })
-  panelText.position.x = 6
-  panelText.position.y = 2
-  panel.addChild(panelText)
-
-  {
-    const buttonPollen = Sprite.fromImage('button.png')
-    buttonPollen.position.x = 5
-    buttonPollen.position.y = 50
-    buttonPollen.interactive = true
-    buttonPollen.buttonMode = true
-    buttonPollen.alpha = 0.5
-    buttonPollen.mouseover = () => buttonPollen.alpha = 1
-    buttonPollen.mouseout = () => buttonPollen.alpha = 0.5
-    buttonPollen.mousedown = () => {
-      //selectedHexSprite().setType('pollen')
-      replaceSelectedHex('pollen')
-      setSelected(null)
-    }
-
-    const buttonPollenText = new PIXI.Text('Pollen', { ...fontConfig })
-    buttonPollenText.position.x = 7
-    buttonPollenText.position.y = 3
-    buttonPollen.addChild(buttonPollenText)
-
-    panel.addChild(buttonPollen)
-
-    const buttonBrood = Sprite.fromImage('button.png')
-    buttonBrood.position.x = 5
-    buttonBrood.position.y = 80
-    buttonBrood.interactive = true
-    buttonBrood.buttonMode = true
-    buttonBrood.alpha = 0.5
-    buttonBrood.mouseover = () => buttonBrood.alpha = 1
-    buttonBrood.mouseout = () => buttonBrood.alpha = 0.5
-    buttonBrood.mousedown = () => {
-      //selectedHexSprite().setType('brood')
-      replaceSelectedHex('brood')
-      setSelected(null)
-    }
-
-    const buttonBroodText = new PIXI.Text('Brood', { ...fontConfig })
-    buttonBroodText.position.x = 7
-    buttonBroodText.position.y = 3
-    buttonBrood.addChild(buttonBroodText)
-
-    panel.addChild(buttonBrood)
-  }
-
-
-
-  const setType = (_type) => {
-    type = _type
-    hex.texture = Texture.fromImage(`cell-${_type}-empty.png`)
-  }
-
-  const isFull = () => pollen >= 50
-
-  const isOccupied = () => contents !== null
-
-  const setContents = (what) => {
-    contents = what
-    if (what === 'egg') {
-      hex.texture = Texture.fromImage('cell-brood-egg.png')
-    }
-  }
-
-  const addPollen = (amount) => {
-    pollen += amount
-    if (isFull()) {
-      hex.texture = Texture.fromImage('cell-pollen-full.png')
-    }
-  }
-
-  const getType = () => type
-*/
-
 function cellEmpty(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
-  const hexSprite = Sprite.fromImage('cell-empty.png')
-  makeSelectable(hexSprite, 'cell')
-  hexSprite.position.x = pixelCoordinate.x
-  hexSprite.position.y = pixelCoordinate.y
+  const emptySprite = Sprite.fromImage('cell-empty.png')
+  makeSelectable(emptySprite, 'cell')
+  emptySprite.position.x = pixelCoordinate.x
+  emptySprite.position.y = pixelCoordinate.y
 
   const callback = type => () => {
     replaceSelectedHex(type)
     setSelected(null)
   }
-  hexSprite.panelContent = () => {
+  emptySprite.panelContent = () => {
     const c = new Container()
     c.addChild(Button(5, 80, 'brood', callback('brood')))
     c.addChild(Button(5, 100, 'pollen', callback('pollen')))
     return c
   }
   
-  parent.addChild(hexSprite)
-  return hexSprite
+  parent.addChild(emptySprite)
+  return emptySprite
 }
 
 
 function cellBrood(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
-  const hexSprite = Sprite.fromImage('cell-brood-empty.png')
-  makeSelectable(hexSprite, 'brood')
-  hexSprite.position.x = pixelCoordinate.x
-  hexSprite.position.y = pixelCoordinate.y
+  const broodSprite = Sprite.fromImage('cell-brood-empty.png')
+  makeSelectable(broodSprite, 'brood')
+  broodSprite.type = 'brood'
+  broodSprite.position.x = pixelCoordinate.x
+  broodSprite.position.y = pixelCoordinate.y
+
+  broodSprite.content = null
+  broodSprite.isOccupied = () => !!broodSprite.content
+  broodSprite.setContents = item => {
+    broodSprite.content = item
+    if (item === 'egg') {
+      broodSprite.texture = Texture.fromImage('cell-brood-egg.png')
+    }
+  }
+
+  broodSprite.panelContent = () => {
+    const text = new PIXI.Text('Loading', { ...fontConfig })
+    text.position.x = 7
+    text.position.y = 50
+    app.ticker.add(time => text.text = 'Occupied ' + (broodSprite.content || 'empty'))
+    return text
+  }
   
-  parent.addChild(hexSprite)
-  return hexSprite
+  parent.addChild(broodSprite)
+  return broodSprite
 }
 
 
 function cellPollen(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
-  const hexSprite = Sprite.fromImage('cell-pollen-empty.png')
-  makeSelectable(hexSprite, 'pollen')
-  hexSprite.position.x = pixelCoordinate.x
-  hexSprite.position.y = pixelCoordinate.y
+  const pollenSprite = Sprite.fromImage('cell-pollen-empty.png')
+  makeSelectable(pollenSprite, 'pollen')
+  pollenSprite.type = 'pollen'
+  pollenSprite.position.x = pixelCoordinate.x
+  pollenSprite.position.y = pixelCoordinate.y
+
+  pollenSprite.pollen = 0
+  pollenSprite.isFull = () => pollenSprite.pollen >= 120
+  pollenSprite.addPollen = (amount) => {
+    pollenSprite.pollen += amount
+    if (pollenSprite.isFull()) {
+      pollenSprite.texture = Texture.fromImage('cell-pollen-full.png')
+    } else {
+      pollenSprite.texture = Texture.fromImage('cell-pollen-empty.png')
+    }
+  }
+
+  pollenSprite.panelContent = () => {
+    const text = new PIXI.Text('Loading', { ...fontConfig })
+    text.position.x = 7
+    text.position.y = 50
+    app.ticker.add(time => text.text = 'Pollen' + Math.round(pollenSprite.pollen))
+    return text
+  }
   
-  parent.addChild(hexSprite)
-  return hexSprite
+  parent.addChild(pollenSprite)
+  return pollenSprite
 }
 
 
