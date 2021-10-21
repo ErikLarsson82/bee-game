@@ -43,6 +43,7 @@ let paused = false
 let selected = null
 let queen = null
 let panel = null
+let background = null
 let hexGrid = []
 const bees = []
 
@@ -53,7 +54,7 @@ function setup() {
 
   app.stage.addChild(container)
 
-  const background = new Container()
+  background = new Container()
   container.addChild(background)
 
   const beeContainer = new Container()
@@ -68,7 +69,7 @@ function setup() {
   background.addChild(beehive)
 
   hexGrid = new Array(5).fill().map((_, x) => 
-    new Array(5).fill().map((_, y) => cellCore(background, x, y))
+    new Array(5).fill().map((_, y) => cellEmpty(x, y, background))
   )
   
   const selected = Sprite.fromImage('cell-selected.png')
@@ -87,6 +88,9 @@ function setup() {
   panel.position.x = 200
   panel.position.y = 20  
   panel.visible = true
+  const panelContent = new Container()
+  panel.content = panelContent
+  panel.addChild(panelContent)
 
   const panelText = new PIXI.Text('-', { ...fontConfig })
   panelText.position.x = 6
@@ -113,9 +117,16 @@ function gameLoop(delta) {
 }
 
 function setSelected(item) {
+  // start with cleanup of panel
+  panel.content.children.forEach(child => panel.content.removeChild(child))
+    
   selected = item || null
 
   panel.render(selected)
+
+  if (item && item.panelContent) {
+    panel.content.addChild(item.panelContent())
+  }
 }
 
 function makeSelectable(sprite, label) {
@@ -201,6 +212,7 @@ function createBee(parent) {
   parent.addChild(bee)
 }
 
+/*
 function cellCore(parent, x, y) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
 
@@ -212,10 +224,24 @@ function cellCore(parent, x, y) {
     content: emptyCell(parent, pixelCoordinate)
   }
 }
+*/
 
 function replaceSelectedHex(type) {
-
+  hexGrid.forEach((row, xIdx) => row.forEach((hex, yIdx) => {
+    if (hex === selected) {
+      background.removeChild(hex)
+      const f = {
+        brood: cellBrood,
+        pollen: cellPollen
+      }
+      if (!f[type]) {
+        console.error('No type!')
+      }
+      hexGrid[xIdx][yIdx] = f[type](xIdx, yIdx, background)
+    }
+  }))
 }
+
 /*
 
   const panelText = new PIXI.Text('Empty cell', { ...fontConfig })
@@ -295,14 +321,73 @@ function replaceSelectedHex(type) {
   const getType = () => type
 */
 
-function emptyCell(parent, pixelCoordinate) {
+function cellEmpty(x, y, parent) {
+  const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const hexSprite = Sprite.fromImage('cell-empty.png')
   makeSelectable(hexSprite, 'cell')
+  hexSprite.position.x = pixelCoordinate.x
+  hexSprite.position.y = pixelCoordinate.y
+
+  const callback = type => () => {
+    replaceSelectedHex(type)
+    setSelected(null)
+  }
+  hexSprite.panelContent = () => {
+    const c = new Container()
+    c.addChild(Button(5, 80, 'brood', callback('brood')))
+    c.addChild(Button(5, 100, 'pollen', callback('pollen')))
+    return c
+  }
+  
+  parent.addChild(hexSprite)
+  return hexSprite
+}
+
+
+function cellBrood(x, y, parent) {
+  const pixelCoordinate = toLocalCoordinateFlat({ x, y })
+  const hexSprite = Sprite.fromImage('cell-brood-empty.png')
+  makeSelectable(hexSprite, 'brood')
   hexSprite.position.x = pixelCoordinate.x
   hexSprite.position.y = pixelCoordinate.y
   
   parent.addChild(hexSprite)
   return hexSprite
+}
+
+
+function cellPollen(x, y, parent) {
+  const pixelCoordinate = toLocalCoordinateFlat({ x, y })
+  const hexSprite = Sprite.fromImage('cell-pollen-empty.png')
+  makeSelectable(hexSprite, 'pollen')
+  hexSprite.position.x = pixelCoordinate.x
+  hexSprite.position.y = pixelCoordinate.y
+  
+  parent.addChild(hexSprite)
+  return hexSprite
+}
+
+
+function Button(x, y, text, callback) {
+  const buttonSprite = Sprite.fromImage('button.png')
+  buttonSprite.position.x = x
+  buttonSprite.position.y = y
+  buttonSprite.interactive = true
+  buttonSprite.buttonMode = true
+  buttonSprite.alpha = 1
+  buttonSprite.mouseover = () => buttonSprite.alpha = 0.5
+  buttonSprite.mouseout = () => buttonSprite.alpha = 1
+  buttonSprite.mousedown = () => {
+    buttonSprite.alpha = 0.8
+    callback()    
+  }
+
+  const buttonText = new PIXI.Text(text, { ...fontConfig })
+  buttonText.position.x = 7
+  buttonText.position.y = 3
+  buttonSprite.addChild(buttonText)
+
+  return buttonSprite
 }
 
 window.addEventListener('keydown', e => {
