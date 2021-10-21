@@ -78,14 +78,25 @@ function setup() {
   background.addChild(selected)
 
   const flower = Sprite.fromImage('flower.png')
+  makeSelectable(flower, 'flower')
   flower.position.x = 30
   flower.position.y = 30
   background.addChild(flower)
 
   panel = Sprite.fromImage('ui-panel.png')
   panel.position.x = 200
-  panel.position.y = 20
-  panel.visible = false
+  panel.position.y = 20  
+  panel.visible = true
+
+  const panelText = new PIXI.Text('-', { ...fontConfig })
+  panelText.position.x = 6
+  panelText.position.y = 2
+  panel.addChild(panelText)
+
+  panel.render = target => {
+    panel.visible = !!target
+    panelText.text = target && target.label
+  }
 
   ui.addChild(panel)
 
@@ -104,21 +115,22 @@ function gameLoop(delta) {
 function setSelected(item) {
   selected = item || null
 
-  panel.visible = !!item
+  panel.render(selected)
 }
 
-function makeSelectable(sprite) {
+function makeSelectable(sprite, label) {
+  sprite.label = label || 'no name'
   sprite.interactive = true
   sprite.buttonMode = true
   sprite.alpha = 1
-  sprite.mouseover = () => buttonPollen.alpha = 0.7
-  sprite.mouseout = () => buttonPollen.alpha = 1
-  sprite.mousedown = () => select(sprite)
+  sprite.mouseover = () => sprite.alpha = 0.7
+  sprite.mouseout = () => sprite.alpha = 1
+  sprite.mousedown = () => setSelected(sprite)
 }
 
 function createQueen(parent) {
   const queenSprite = PIXI.Sprite.fromImage('bee-queen.png')
-  makeSelectable(queenSprite)
+  makeSelectable(queenSprite, 'queen')
   queenSprite.position.x = 100
   queenSprite.position.y = 45
   queenSprite.delay = 600
@@ -147,7 +159,7 @@ function createQueen(parent) {
 
 function createBee(parent) {
   const bee = PIXI.Sprite.fromImage('bee-drone.png')
-  makeSelectable(bee)
+  makeSelectable(bee, 'bee')
   bee.position.x = 50
   bee.position.y = 50
   bee.pollenSack = 0
@@ -285,21 +297,10 @@ function replaceSelectedHex(type) {
 
 function emptyCell(parent, pixelCoordinate) {
   const hexSprite = Sprite.fromImage('cell-empty.png')
+  makeSelectable(hexSprite, 'cell')
   hexSprite.position.x = pixelCoordinate.x
   hexSprite.position.y = pixelCoordinate.y
-  hexSprite.interactive = true
-  hexSprite.buttonMode = true
-  hexSprite.alpha = 1
-  hexSprite.mouseover = () => hexSprite.alpha = 0.2
-  hexSprite.mouseout = () => hexSprite.alpha = 1
-  /*
-  const cell = {
-    type: 'empty',
-    sprite: hexSprite,
-    destroy: () => background.removeChild(hexSprite)
-  }
-  */
-  hexSprite.mousedown = () => setSelected(hexSprite)
+  
   parent.addChild(hexSprite)
   return hexSprite
 }
