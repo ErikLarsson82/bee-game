@@ -84,3 +84,10 @@ const DIRECTIONS_FLAT_EVEN = {
   'SE': { x: 1, y: 0},
   'S': { x: 0, y: 1},
 }
+
+const forEachHexagon = (hexGrid, f) => hexGrid.forEach(row => row.forEach(hex => f(hex)))
+const filterHexagon = (hexGrid, f) => {
+  const result = []
+  hexGrid.forEach(row => row.forEach(hex => f(hex) && result.push(hex)))
+  return result
+}
