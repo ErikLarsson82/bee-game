@@ -1,4 +1,6 @@
 
+// Anchor everything at 0.5 to fix placements 
+
 const fontConfig = {
     fontFamily: '"Lucida Console", Monaco, monospace',
     fontSize: 8,
@@ -38,6 +40,7 @@ let panel = null
 let background = null
 let flower = null
 let pausedText = null
+let selectedSprite = null
 
 let hexGrid = []
 const bees = []
@@ -101,11 +104,22 @@ function setup() {
     new Array(5).fill().map((_, y) => cellEmpty(x, y, background))
   )
   
-  const selected = Sprite.fromImage('cell-selected.png')
-  selected.position.x = 100
-  selected.position.y = 100
-  selected.visible = false
-  background.addChild(selected)
+  selectedSprite = new Container()
+  selectedSprite.visible = false
+  const selectedSpriteSub = Sprite.fromImage('cell-selected.png')
+  selectedSpriteSub.position.x = -2
+  selectedSpriteSub.position.y = -2
+  selectedSprite.addChild(selectedSpriteSub)  
+  app.ticker.add(time => {
+    if (selected) {
+      selectedSprite.visible = true
+      selectedSprite.position.x = selected.position.x
+      selectedSprite.position.y = selected.position.y
+    } else {
+      selectedSprite.visible = false
+    }
+  })
+  background.addChild(selectedSprite)
 
   flower = Sprite.fromImage('flower.png')
   makeSelectable(flower, 'flower')
@@ -272,7 +286,9 @@ function replaceSelectedHex(type) {
       if (!f[type]) {
         console.error('No type!')
       }
-      hexGrid[xIdx][yIdx] = f[type](xIdx, yIdx, background)
+      const newHex = f[type](xIdx, yIdx, background)
+      hexGrid[xIdx][yIdx] = newHex
+      setSelected(newHex)
     }
   }))
 }
@@ -284,14 +300,10 @@ function cellEmpty(x, y, parent) {
   emptySprite.position.x = pixelCoordinate.x
   emptySprite.position.y = pixelCoordinate.y
 
-  const callback = type => () => {
-    replaceSelectedHex(type)
-    setSelected(null)
-  }
   emptySprite.panelContent = () => {
     const c = new Container()
-    c.addChild(Button(5, 80, 'brood', callback('brood')))
-    c.addChild(Button(5, 100, 'pollen', callback('pollen')))
+    c.addChild(Button(5, 80, 'brood', () => replaceSelectedHex('brood')))
+    c.addChild(Button(5, 100, 'pollen', () => replaceSelectedHex('pollen')))
     return c
   }
   
