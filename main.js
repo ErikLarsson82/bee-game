@@ -18,7 +18,7 @@ const Container = PIXI.Container,
     PictureSprite = PIXI.extras.PictureSprite
     settings = PIXI.settings
 
-const app = new PIXI.Application(800, 400, { antialias: false, sharedTicker: true })
+const app = new PIXI.Application(800, 400, { antialias: false })
 document.body.appendChild(app.view)
 
 app.renderer.view.style.imageRendering = 'pixelated'
@@ -29,11 +29,16 @@ app.renderer.view.style.position = 'absolute'
 app.renderer.view.style.display = 'block'
 
 let paused = false
+let day = 0
+let hour = 0
 let selected = null
 let queen = null
+
 let panel = null
 let background = null
 let flower = null
+let pausedText = null
+
 let hexGrid = []
 const bees = []
 
@@ -52,6 +57,40 @@ function setup() {
 
   const ui = new Container()
   container.addChild(ui)
+
+  {
+    const uiTopBar = new Graphics()
+    uiTopBar.beginFill(0x000000)
+    uiTopBar.drawRect(0, 0, 400, 20)
+    
+    const populationText = new PIXI.Text('Loading', { ...fontConfig, fill: 'white' })
+    populationText.position.x = 5
+    populationText.position.y = 2
+    uiTopBar.addChild(populationText)
+    app.ticker.add(time => {
+      populationText.text = 'Colony population ' + (bees.length + 1)
+    })
+    
+    const dayCycle = new PIXI.Text('Loading', { ...fontConfig, fill: 'white' })
+    dayCycle.position.x = 200
+    dayCycle.position.y = 2
+    uiTopBar.addChild(dayCycle)
+    app.ticker.add(time => {
+      dayCycle.text = 'Day ' + day + ' Hour ' + Math.round(hour)
+    })
+
+    pausedText = new PIXI.Text('Playing', { ...fontConfig, fill: 'white' })
+    pausedText.position.x = 300
+    pausedText.position.y = 2
+    uiTopBar.addChild(pausedText)
+    
+    ui.addChild(uiTopBar)
+  }
+
+  const grass = new Graphics()
+  grass.beginFill(0x6abe30)
+  grass.drawRect(0, 0, 60, 400)
+  background.addChild(grass)
 
   const beehive = new Graphics()
   beehive.beginFill(0xffc83f)
@@ -76,7 +115,7 @@ function setup() {
 
   panel = Sprite.fromImage('ui-panel.png')
   panel.position.x = 200
-  panel.position.y = 20  
+  panel.position.y = 30  
   panel.visible = true
   const panelContent = new Container()
   panel.content = panelContent
@@ -94,16 +133,23 @@ function setup() {
 
   ui.addChild(panel)
 
-  for (var i = 0; i < 2; i++) {
+  for (var i = 0; i < 1; i++) {
     createBee(beeContainer)
   }
   createQueen(beeContainer)
+
+  app.ticker.add((delta) => gameLoop(delta));
 }
 
 function gameLoop(delta) {
   if (paused) return
 
-  //Runs the current game `state` in a loop and renders the sprites
+  hour += 0.1
+
+  if (hour > 24) {
+    hour = 0
+    day++
+  }
 }
 
 function setSelected(item) {
@@ -137,6 +183,7 @@ function createQueen(parent) {
   queenSprite.delay = 600
 
   app.ticker.add(time => {
+    if (paused) return
     const emptyBroodCells = filterHexagon(hexGrid, hex => hex.type === 'brood' && !hex.isOccupied())
     if (emptyBroodCells.length > 0) {
       queenSprite.position.x = emptyBroodCells[0].position.x
@@ -170,11 +217,14 @@ function createBee(parent) {
     const text = new PIXI.Text('Loading', { ...fontConfig })
     text.position.x = 7
     text.position.y = 50
-    app.ticker.add(time => text.text = 'Pollen sack' + Math.round(bee.pollenSack))
+    app.ticker.add(time => {
+      text.text = 'Pollen sack' + Math.round(bee.pollenSack)
+    })
     return text
   }
 
   app.ticker.add(time => {
+    if (paused) return
     const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && !hex.isFull())
     if (bee.state === 'idle') {
       bee.position.x = 50
@@ -336,8 +386,13 @@ function Button(x, y, text, callback) {
 
 window.addEventListener('keydown', e => {
   if (e.keyCode === 32) {
-    gameState.paused = !gameState.paused
-    gameState.paused ? app.ticker.stop() : app.ticker.start()
+    paused = !paused
+
+    if (paused) {
+      pausedText.text = 'Paused'
+    } else {
+      pausedText.text = 'Playing'   
+    }
   }
 })
 
