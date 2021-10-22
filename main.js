@@ -58,6 +58,7 @@ let background = null
 let flower = null
 let pausedText = null
 let selectedSprite = null
+let beeContainer = null
 
 let hexGrid = []
 const bees = []
@@ -72,7 +73,7 @@ function setup() {
   background = new Container()
   container.addChild(background)
 
-  const beeContainer = new Container()
+  beeContainer = new Container()
   container.addChild(beeContainer)
 
   const ui = new Container()
@@ -164,9 +165,10 @@ function setup() {
 
   ui.addChild(panel)
 
-  for (var i = 0; i < 1; i++) {
-    createBee(beeContainer)
-  }
+  //for (var i = 0; i < 1; i++) {
+  //}
+  createBee(beeContainer, 'forager')
+  createBee(beeContainer, 'nurser')
   createQueen(beeContainer)
 
   app.ticker.add((delta) => gameLoop(delta))
@@ -206,6 +208,11 @@ function makeSelectable(sprite, label) {
   sprite.mousedown = () => setSelected(sprite)
 }
 
+function goIdle(bee) {
+  bee.position.x = bee.idle.x
+  bee.position.y = bee.idle.y
+}
+
 function createQueen(parent) {
   const queenSprite = PIXI.Sprite.fromImage('bee-queen.png')
   makeSelectable(queenSprite, 'queen')
@@ -236,12 +243,17 @@ function createQueen(parent) {
   parent.addChild(queenSprite)
 }
 
-function createBee(parent) {
+function createBee(parent, type) {
   const bee = PIXI.Sprite.fromImage('bee-drone.png')
   makeSelectable(bee, 'bee')
-  bee.position.x = 50
-  bee.position.y = 50
+  bee.idle = {
+    x: 50 - (bees.length * 7),
+    y: 50
+  }
+  goIdle(bee)
+  bee.POLLEN_SACK_CAPACITY = 20
   bee.pollenSack = 0
+  bee.type = type || 'unassigned'
   bee.state = 'idle'
 
   bee.panelContent = () => {
@@ -254,12 +266,10 @@ function createBee(parent) {
     return text
   }
 
-  app.ticker.add(time => {
-    if (paused) return
+  function forager() {
     const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && !hex.isFull())
     if (bee.state === 'idle') {
-      bee.position.x = 50
-      bee.position.y = 50
+      goIdle(bee)
       if (pollenHex.length > 0) {
         bee.state = 'collecting'    
       }
@@ -268,7 +278,7 @@ function createBee(parent) {
       bee.position.x = flower.position.x
       bee.position.y = flower.position.y      
       bee.pollenSack += 0.1
-      if (bee.pollenSack >= 20) {
+      if (bee.pollenSack >= bee.POLLEN_SACK_CAPACITY) {
         bee.state = 'depositing'      
       }
     }
@@ -281,11 +291,56 @@ function createBee(parent) {
         return
       }
       bee.pollenSack -= 0.1
-      pollenHex[0].addPollen(0.1)
+      pollenHex[0].pollen += 0.1
       if (pollenHex[0].isFull() || bee.pollenSack <= 0) {
         bee.state = 'idle'
       } 
     }
+  }
+
+  function nurser() {
+    const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && hex.pollen > 0.1)
+    const larvaeHex = filterHexagon(hexGrid, hex => hex.type === 'brood' && hex.content === 'larvae').sort((a, b) => a.nutrition > b.nutrition)
+
+    if (bee.state === 'idle') {
+      goIdle(bee)
+      if (pollenHex.length > 0 && larvaeHex.length > 0) {
+        bee.state = 'filling'        
+      }
+    }
+    if (bee.state === 'filling') {
+      bee.position.x = pollenHex[0].position.x
+      bee.position.y = pollenHex[0].position.y
+      bee.pollenSack += 0.1
+      pollenHex[0].pollen -= 0.1
+      if (bee.pollenSack >= bee.POLLEN_SACK_CAPACITY) {
+        bee.state = 'feed'
+      }
+    }
+    if (bee.state === 'feed') {
+      if (larvaeHex.length === 0) {
+        bee.state = 'idle'
+        return
+      }
+      bee.position.x = larvaeHex[0].position.x
+      bee.position.y = larvaeHex[0].position.y
+      bee.pollenSack -= 0.1
+      larvaeHex[0].nutrition += 0.1
+      if (bee.pollenSack <= 0) {
+        bee.state = 'idle'
+      }
+    }
+  }
+
+  app.ticker.add(time => {
+    if (paused) return
+    
+    if (type === 'unassigned') {
+      type = Math.random() < 0.5 ? 'forager' : 'nurser'
+    }
+
+    if (type === 'forager') forager()
+    if (type === 'nurser') nurser()
   })
 
   bees.push(bee)
@@ -343,11 +398,17 @@ function cellBrood(x, y, parent) {
   broodSprite.isOccupied = () => !!broodSprite.content
   broodSprite.setContents = item => {
     broodSprite.content = item
-    if (item === 'egg') {
+    if (item === 'empty') {
+      broodSprite.texture = Texture.fromImage('cell-brood-empty.png')
+      broodSprite.lifecycle = 0
+      broodSprite.content = null
+    } else if (item === 'egg') {
       broodSprite.texture = Texture.fromImage('cell-brood-egg.png')
     } else if (item === 'larvae') {
       broodSprite.nutrition = 5
       broodSprite.texture = Texture.fromImage('cell-brood-larvae.png')      
+    } else if (item === 'puppa') {
+      broodSprite.texture = Texture.fromImage('cell-brood-puppa.png')      
     } else if (item === 'dead') {
       broodSprite.texture = Texture.fromImage('cell-brood-dead.png')   
     }
@@ -355,11 +416,18 @@ function cellBrood(x, y, parent) {
 
   app.ticker.add(time => {
     if (paused) return
-    if (broodSprite.content === 'egg') {
-      broodSprite.lifecycle += 1
-      if (broodSprite.lifecycle > 1000) {
-        broodSprite.setContents('larvae')
-      }
+    if (!broodSprite.content) return
+    
+    broodSprite.lifecycle += 1
+    if (broodSprite.lifecycle > 1000) {
+      broodSprite.setContents('larvae')
+    }
+    if (broodSprite.lifecycle > 1500) {
+      broodSprite.setContents('puppa')
+    }
+    if (broodSprite.lifecycle > 2000) {
+      broodSprite.setContents('empty')
+      createBee(beeContainer)
     }
     if (broodSprite.content === 'larvae') {
       broodSprite.nutrition -= 0.01
@@ -373,7 +441,7 @@ function cellBrood(x, y, parent) {
     const text = new PIXI.Text('Loading', { ...fontConfig })
     text.position.x = 7
     text.position.y = 50
-    app.ticker.add(time => text.text = 'Occupied ' + (broodSprite.content || 'empty'))
+    app.ticker.add(time => text.text = (broodSprite.content || 'empty') + '\nNutrients ' + Math.ceil(broodSprite.nutrition) + '\nLifecycle ' + broodSprite.lifecycle)
     return text
   }
   
@@ -392,14 +460,14 @@ function cellPollen(x, y, parent) {
 
   pollenSprite.pollen = 0
   pollenSprite.isFull = () => pollenSprite.pollen >= 120
-  pollenSprite.addPollen = (amount) => {
-    pollenSprite.pollen += amount
+  pollenSprite.isEmpty = () => pollenSprite.pollen <= 0
+  app.ticker.add(time => {
     if (pollenSprite.isFull()) {
       pollenSprite.texture = Texture.fromImage('cell-pollen-full.png')
     } else {
       pollenSprite.texture = Texture.fromImage('cell-pollen-empty.png')
     }
-  }
+  })
 
   pollenSprite.panelContent = () => {
     const text = new PIXI.Text('Loading', { ...fontConfig })
