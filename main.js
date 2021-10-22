@@ -1,6 +1,23 @@
 
 // Anchor everything at 0.5 to fix placements 
 
+// Things should be globally pauseable
+
+// Bees should occupy flowers and cells
+
+// Implement seasons
+
+// Flower lifecycle
+
+// Speed 0, 1x, 2x and 4x
+
+// Either use decimals or not, but dont mix
+
+// Have worker bees convert hexes
+
+// Worker bees feed the larvae
+
+
 const fontConfig = {
     fontFamily: '"Lucida Console", Monaco, monospace',
     fontSize: 8,
@@ -152,13 +169,13 @@ function setup() {
   }
   createQueen(beeContainer)
 
-  app.ticker.add((delta) => gameLoop(delta));
+  app.ticker.add((delta) => gameLoop(delta))
 }
 
 function gameLoop(delta) {
   if (paused) return
 
-  hour += 0.1
+  hour += 0.01
 
   if (hour > 24) {
     hour = 0
@@ -320,14 +337,37 @@ function cellBrood(x, y, parent) {
   broodSprite.position.x = pixelCoordinate.x
   broodSprite.position.y = pixelCoordinate.y
 
+  broodSprite.lifecycle = 0
   broodSprite.content = null
+  broodSprite.nutrition = null
   broodSprite.isOccupied = () => !!broodSprite.content
   broodSprite.setContents = item => {
     broodSprite.content = item
     if (item === 'egg') {
       broodSprite.texture = Texture.fromImage('cell-brood-egg.png')
+    } else if (item === 'larvae') {
+      broodSprite.nutrition = 5
+      broodSprite.texture = Texture.fromImage('cell-brood-larvae.png')      
+    } else if (item === 'dead') {
+      broodSprite.texture = Texture.fromImage('cell-brood-dead.png')   
     }
   }
+
+  app.ticker.add(time => {
+    if (paused) return
+    if (broodSprite.content === 'egg') {
+      broodSprite.lifecycle += 1
+      if (broodSprite.lifecycle > 1000) {
+        broodSprite.setContents('larvae')
+      }
+    }
+    if (broodSprite.content === 'larvae') {
+      broodSprite.nutrition -= 0.01
+      if (broodSprite.nutrition <= 0) {
+        broodSprite.setContents('dead')
+      }
+    }
+  })
 
   broodSprite.panelContent = () => {
     const text = new PIXI.Text('Loading', { ...fontConfig })
