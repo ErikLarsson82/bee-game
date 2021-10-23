@@ -1,8 +1,4 @@
 
-// Anchor everything at 0.5 to fix placements 
-
-// Things should be globally pauseable
-
 // Bees should occupy flowers and cells
 
 // Implement seasons
@@ -15,8 +11,9 @@
 
 // Have worker bees convert hexes
 
-// Worker bees feed the larvae
+// Things should be globally pauseable
 
+// Anchor everything at 0.5 to fix placements 
 
 const fontConfig = {
     fontFamily: '"Lucida Console", Monaco, monospace',
@@ -309,6 +306,10 @@ function createBee(parent, type) {
       }
     }
     if (bee.state === 'filling') {
+      if (pollenHex.length === 0) {
+        bee.state = 'idle'
+        return
+      }
       bee.position.x = pollenHex[0].position.x
       bee.position.y = pollenHex[0].position.y
       bee.pollenSack += 0.1
@@ -335,12 +336,12 @@ function createBee(parent, type) {
   app.ticker.add(time => {
     if (paused) return
     
-    if (type === 'unassigned') {
-      type = Math.random() < 0.5 ? 'forager' : 'nurser'
+    if (bee.type === 'unassigned') {
+      bee.type = Math.random() < 0.5 ? 'forager' : 'nurser'
     }
 
-    if (type === 'forager') forager()
-    if (type === 'nurser') nurser()
+    if (bee.type === 'forager') forager()
+    if (bee.type === 'nurser') nurser()
   })
 
   bees.push(bee)
