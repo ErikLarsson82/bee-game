@@ -146,6 +146,7 @@ function setup() {
   background.addChild(selectedSprite)
 
   flower = Sprite.fromImage('flower.png')
+  makeOccupiable(flower)
   makeSelectable(flower, 'flower')
   flower.position.x = 30
   flower.position.y = 30
@@ -217,6 +218,18 @@ function makeSelectable(sprite, label) {
   sprite.mouseover = () => sprite.alpha = 0.7
   sprite.mouseout = () => sprite.alpha = 1
   sprite.mousedown = () => setSelected(sprite)
+}
+
+function makeOccupiable(parent) {
+  const spotClaimed = PIXI.Sprite.fromImage('spot-claimed.png')
+  parent.addChild(spotClaimed)
+
+  parent.slot = null
+  parent.isFree = () => !!parent.slot
+  parent.claimSlot = item => parent.slot = item
+  app.ticker.add(time => {
+    spotClaimed.visible = !!parent.slot
+  })
 }
 
 function goIdle(bee) {
