@@ -1,6 +1,4 @@
 
-// Fix the odd larvae bug
-
 // Bees need 4 resources, nectar, pollen, honey, wax
 
 // Implement honey cell
@@ -12,7 +10,7 @@
 // Bees need to eat to survive
 
 
-
+// Progress bars
 
 // Implement seasons
 
