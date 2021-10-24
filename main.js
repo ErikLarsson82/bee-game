@@ -173,15 +173,18 @@ function setup() {
   ui.addChild(panel)
 
   createBee(beeContainer, 'forager')
+  createBee(beeContainer, 'forager')
   createBee(beeContainer, 'nurser')
   createQueen(beeContainer)
 
   // select first (for debugging)
-  // setSelected(hexGrid[0][0])
+  setSelected(hexGrid[0][0])
   // create it as honey
-  // replaceSelectedHex('honey')
+  replaceSelectedHex('honey')
+  setSelected(hexGrid[0][1])
+  replaceSelectedHex('pollen')
   // deselect
-  // setSelected(null)
+  setSelected(null)
 
   app.ticker.add((delta) => gameLoop(delta))
 }
@@ -222,19 +225,87 @@ function makeSelectable(sprite, label) {
 
 function makeOccupiable(parent) {
   const spotClaimed = PIXI.Sprite.fromImage('spot-claimed.png')
+  spotClaimed.visible = false
   parent.addChild(spotClaimed)
 
   parent.slot = null
-  parent.isFree = () => !!parent.slot
-  parent.claimSlot = item => parent.slot = item
+  parent.slotCounter = 0
+  parent.isUnclaimed = (attemptee) => parent.slot === null || parent.slot === attemptee
+  parent.claimSlot = item => {
+    parent.slot = item
+    parent.slotCounter = secondsToTicks(1)
+  }
   app.ticker.add(time => {
-    spotClaimed.visible = !!parent.slot
+    if (parent.slot) {
+      parent.slotCounter--
+      if (parent.slotCounter <= 0) {
+        parent.slot = null
+      }
+    }
+    // spotClaimed.visible = !!parent.slot // enable for debug
   })
+}
+
+function makeFlyable(sprite) {
+  sprite.flyTo = (targetSprite) => {
+    if (!targetSprite) {
+      targetSprite = {
+        position: {
+          x: sprite.idle.x,
+          y: sprite.idle.y
+        }
+      }
+    }
+    sprite.vx = targetSprite.position.x < sprite.position.x ? -0.1 : 0.1
+    sprite.vy = targetSprite.position.y < sprite.position.y ? -0.1 : 0.1
+    sprite.position.x += sprite.vx
+    sprite.position.y += sprite.vy
+    snapTo(sprite, targetSprite)
+  }  
 }
 
 function goIdle(bee) {
   bee.position.x = bee.idle.x
   bee.position.y = bee.idle.y
+}
+
+function samePosition(a, b) {
+  if (b) {
+    return a.position.x === b.position.x && a.position.y === b.position.y
+  } else {
+    return function prepared(c) {
+      return a.position.x === c.position.x && a.position.y === c.position.y
+    }
+  } 
+}
+
+function snapTo(a, b) {
+  const x2 = Math.abs(a.position.x - b.position.x) * 2
+  const y2 = Math.abs(a.position.y - b.position.y) * 2
+  const distance = Math.sqrt(x2 + y2)
+  if (distance < 0.5) {
+    a.position.x = b.position.x
+    a.position.y = b.position.y
+  }
+}
+
+function replaceSelectedHex(type) {
+  hexGrid.forEach((row, xIdx) => row.forEach((hex, yIdx) => {
+    if (hex === selected) {
+      background.removeChild(hex)
+      const f = {
+        brood: cellBrood,
+        pollen: cellPollen,
+        honey: cellHoney
+      }
+      if (!f[type]) {
+        console.error('No type!')
+      }
+      const newHex = f[type](xIdx, yIdx, background)
+      hexGrid[xIdx][yIdx] = newHex
+      setSelected(newHex)
+    }
+  }))
 }
 
 function createQueen(parent) {
@@ -270,20 +341,24 @@ function createQueen(parent) {
 function createBee(parent, type) {
   const bee = PIXI.Sprite.fromImage('bee-drone.png')
   makeSelectable(bee, 'bee')
+  const isAt = samePosition(bee)
   bee.idle = {
     x: 35,
     y: 60 + (bees.length * 15)
   }
   goIdle(bee)
+  makeFlyable(bee)
+  bee.vx = 0
+  bee.vy = 0
+  bee.NECTAR_SACK_CAPACITY = 20
   bee.POLLEN_SACK_CAPACITY = 20
   bee.HUNGER_CAPACITY = secondsToTicks(120)
   bee.pollenSack = 0
   bee.waxSack = 0
   bee.nectarSack = 0
   bee.honeySack = 0
-  bee.hunger = Math.min(secondsToTicks(5 + (bees.length * 20)), bee.HUNGER_CAPACITY)
+  bee.hunger = Math.min(secondsToTicks(60 + (bees.length * 20)), bee.HUNGER_CAPACITY)
   bee.type = type || 'unassigned'
-  bee.state = 'idle'
   bee.isDead = () => bee.hunger <= 0
 
   bee.panelContent = () => {
@@ -305,35 +380,42 @@ function createBee(parent, type) {
 
   function forager() {
     const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && !hex.isFull())
-    if (bee.state === 'idle') {
-      goIdle(bee)
-      if (pollenHex.length > 0) {
-        bee.state = 'collecting'    
-      }
+    const unClaimedPollenHex = pollenHex.filter(hex => hex.isUnclaimed(bee))
+    const isBeeFull = bee.pollenSack >= bee.POLLEN_SACK_CAPACITY
+    const isBeeEmpty = !(bee.pollenSack > 0)
+
+    if (pollenHex.length === 0) {
+      bee.flyTo(null)
+      return 
     }
-    if (bee.state === 'collecting') {
+ 
+    if (isAt(flower) && !isBeeFull) {
       flower.claimSlot(bee)
-      bee.position.x = flower.position.x
-      bee.position.y = flower.position.y      
       bee.pollenSack += 0.1
-      if (bee.pollenSack >= bee.POLLEN_SACK_CAPACITY) {
-        bee.state = 'depositing'      
+      if (isBeeFull) {
+        bee.position.x = flower.position.x + 5
       }
+      return
     }
-    if (bee.state === 'depositing') {
-      if (pollenHex.length > 0) {
-        bee.position.x = pollenHex[0].position.x
-        bee.position.y = pollenHex[0].position.y
-      } else {
-        bee.state = 'idle'
-        return
-      }
+
+    if (isAt(pollenHex[0]) && !isBeeEmpty && !pollenHex[0].isFull()) {
+      pollenHex[0].claimSlot(bee)
       bee.pollenSack -= 0.1
       pollenHex[0].pollen += 0.1
-      if (pollenHex[0].isFull() || bee.pollenSack <= 0) {
-        bee.state = 'idle'
-      } 
+      return
     }
+ 
+    if (isBeeFull && unClaimedPollenHex.length > 0 && unClaimedPollenHex[0].isUnclaimed(bee)) {
+      unClaimedPollenHex[0].claimSlot(bee)
+      bee.flyTo(unClaimedPollenHex[0])
+      return
+    }
+    if (!isBeeFull && flower.isUnclaimed(bee)) {
+      flower.claimSlot(bee)
+      bee.flyTo(flower)
+      return
+    }
+    bee.flyTo(null)
   }
 
   function nurser() {
@@ -412,25 +494,6 @@ function createBee(parent, type) {
 
   bees.push(bee)
   parent.addChild(bee)
-}
-
-function replaceSelectedHex(type) {
-  hexGrid.forEach((row, xIdx) => row.forEach((hex, yIdx) => {
-    if (hex === selected) {
-      background.removeChild(hex)
-      const f = {
-        brood: cellBrood,
-        pollen: cellPollen,
-        honey: cellHoney
-      }
-      if (!f[type]) {
-        console.error('No type!')
-      }
-      const newHex = f[type](xIdx, yIdx, background)
-      hexGrid[xIdx][yIdx] = newHex
-      setSelected(newHex)
-    }
-  }))
 }
 
 function cellEmpty(x, y, parent) {
@@ -574,6 +637,7 @@ function cellPollen(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const pollenSprite = Sprite.fromImage('cell-pollen-empty.png')
   makeSelectable(pollenSprite, 'pollen')
+  makeOccupiable(pollenSprite)
   pollenSprite.position.x = pixelCoordinate.x
   pollenSprite.position.y = pixelCoordinate.y
 
@@ -593,7 +657,7 @@ function cellPollen(x, y, parent) {
     const text = new PIXI.Text('Loading', { ...fontConfig })
     text.position.x = 7
     text.position.y = 50
-    app.ticker.add(time => text.text = 'Pollen' + Math.round(pollenSprite.pollen))
+    app.ticker.add(time => text.text = 'Pollen   ' + Math.round(pollenSprite.pollen))
     return text
   }
   
