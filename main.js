@@ -230,7 +230,13 @@ function makeOccupiable(parent) {
 
   parent.slot = null
   parent.slotCounter = 0
-  parent.isUnclaimed = (attemptee) => parent.slot === null || parent.slot === attemptee
+  parent.isUnclaimed = attemptee => {
+    if (!attemptee) {
+      console.error('Needs input')
+      return
+    }
+    return parent.slot === null || parent.slot === attemptee
+  }
   parent.claimSlot = item => {
     parent.slot = item
     parent.slotCounter = secondsToTicks(1)
@@ -357,7 +363,7 @@ function createBee(parent, type) {
   bee.waxSack = 0
   bee.nectarSack = 0
   bee.honeySack = 0
-  bee.hunger = Math.min(secondsToTicks(60 + (bees.length * 20)), bee.HUNGER_CAPACITY)
+  bee.hunger = Math.min(secondsToTicks(10 + (bees.length * 10)), bee.HUNGER_CAPACITY)
   bee.type = type || 'unassigned'
   bee.isDead = () => bee.hunger <= 0
 
@@ -467,23 +473,29 @@ function createBee(parent, type) {
       }
       return
     }
-    const honeyHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.honey > 0)
-    
-    if (honeyHex.length > 0 && bee.position.x === honeyHex[0].position.x && bee.position.y === honeyHex[0].position.y) {
-      bee.hunger += 10
+
+    const honeyHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.honey > 0 && hex.isUnclaimed(bee))
+    const beeIsWellFed = () => bee.hunger >= bee.HUNGER_CAPACITY
+
+    if (honeyHex.length > 0 && isAt(honeyHex[0]) && !beeIsWellFed()) {
+      honeyHex[0].claimSlot(bee)
+      bee.hunger += 30
+      bee.hunger = Math.min(bee.hunger, bee.HUNGER_CAPACITY)
       honeyHex[0].honey -= 0.01
-      if (bee.hunger >= bee.HUNGER_CAPACITY) goIdle(bee)
+      if (beeIsWellFed()) {
+        bee.position.x = honeyHex[0].position.x + 5
+      }
       return
     } else {
       bee.hunger -= 1
     }
 
-    if (bee.hunger < secondsToTicks(30) && honeyHex.length > 0) {
-      bee.position.x = honeyHex[0].position.x
-      bee.position.y = honeyHex[0].position.y      
+    if (honeyHex.length > 0 && bee.hunger < secondsToTicks(30)) {
+      honeyHex[0].claimSlot(bee)
+      bee.flyTo(honeyHex[0])
       return
     }
-    
+
     if (bee.type === 'unassigned') {
       bee.type = Math.random() < 0.5 ? 'forager' : 'nurser'
     }
@@ -518,6 +530,7 @@ function cellHoney(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const honeySprite = Sprite.fromImage('cell-honey-full.png')
   makeSelectable(honeySprite, 'honey')
+  makeOccupiable(honeySprite)
   honeySprite.position.x = pixelCoordinate.x
   honeySprite.position.y = pixelCoordinate.y
 
