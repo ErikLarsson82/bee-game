@@ -173,7 +173,7 @@ function setup() {
   ui.addChild(panel)
 
   createBee(beeContainer, 'forager')
-  createBee(beeContainer, 'forager')
+  // createBee(beeContainer, 'forager')
   createBee(beeContainer, 'nurser')
   createQueen(beeContainer)
 
@@ -181,8 +181,11 @@ function setup() {
   setSelected(hexGrid[0][0])
   // create it as honey
   replaceSelectedHex('honey')
-  setSelected(hexGrid[0][1])
-  replaceSelectedHex('pollen')
+  // setSelected(hexGrid[0][1])
+  // replaceSelectedHex('pollen')
+  // setSelected(hexGrid[0][2])
+  // replaceSelectedHex('pollen')
+  // hexGrid[0][2].pollen = 20
   // deselect
   setSelected(null)
 
@@ -248,7 +251,7 @@ function makeOccupiable(parent) {
         parent.slot = null
       }
     }
-    // spotClaimed.visible = !!parent.slot // enable for debug
+    spotClaimed.visible = !!parent.slot // enable for debug
   })
 }
 
@@ -262,8 +265,9 @@ function makeFlyable(sprite) {
         }
       }
     }
-    sprite.vx = targetSprite.position.x < sprite.position.x ? -0.1 : 0.1
-    sprite.vy = targetSprite.position.y < sprite.position.y ? -0.1 : 0.1
+    const SPEED = 0.1
+    sprite.vx = targetSprite.position.x < sprite.position.x ? -SPEED : SPEED
+    sprite.vy = targetSprite.position.y < sprite.position.y ? -SPEED : SPEED
     sprite.position.x += sprite.vx
     sprite.position.y += sprite.vy
     snapTo(sprite, targetSprite)
@@ -289,7 +293,7 @@ function snapTo(a, b) {
   const x2 = Math.abs(a.position.x - b.position.x) * 2
   const y2 = Math.abs(a.position.y - b.position.y) * 2
   const distance = Math.sqrt(x2 + y2)
-  if (distance < 0.5) {
+  if (distance < 2) {
     a.position.x = b.position.x
     a.position.y = b.position.y
   }
@@ -363,9 +367,12 @@ function createBee(parent, type) {
   bee.waxSack = 0
   bee.nectarSack = 0
   bee.honeySack = 0
-  bee.hunger = Math.min(secondsToTicks(10 + (bees.length * 10)), bee.HUNGER_CAPACITY)
+  bee.hunger = Math.min(secondsToTicks(120 + (bees.length * 20)), bee.HUNGER_CAPACITY)
   bee.type = type || 'unassigned'
   bee.isDead = () => bee.hunger <= 0
+
+  const isPollenSackFull = () => bee.pollenSack >= bee.POLLEN_SACK_CAPACITY
+  const isPollenSackEmpty = () => !(bee.pollenSack > 0)
 
   bee.panelContent = () => {
     const text = new PIXI.Text('Loading', { ...fontConfig })
@@ -387,36 +394,34 @@ function createBee(parent, type) {
   function forager() {
     const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && !hex.isFull())
     const unClaimedPollenHex = pollenHex.filter(hex => hex.isUnclaimed(bee))
-    const isBeeFull = bee.pollenSack >= bee.POLLEN_SACK_CAPACITY
-    const isBeeEmpty = !(bee.pollenSack > 0)
-
+    
     if (pollenHex.length === 0) {
       bee.flyTo(null)
       return 
     }
  
-    if (isAt(flower) && !isBeeFull) {
+    if (isAt(flower) && !isPollenSackFull()) {
       flower.claimSlot(bee)
       bee.pollenSack += 0.1
-      if (isBeeFull) {
+      if (isPollenSackFull()) {
         bee.position.x = flower.position.x + 5
       }
       return
     }
 
-    if (isAt(pollenHex[0]) && !isBeeEmpty && !pollenHex[0].isFull()) {
+    if (isAt(pollenHex[0]) && !isPollenSackEmpty() && !pollenHex[0].isFull()) {
       pollenHex[0].claimSlot(bee)
       bee.pollenSack -= 0.1
       pollenHex[0].pollen += 0.1
       return
     }
  
-    if (isBeeFull && unClaimedPollenHex.length > 0 && unClaimedPollenHex[0].isUnclaimed(bee)) {
+    if (isPollenSackFull() && unClaimedPollenHex.length > 0 && unClaimedPollenHex[0].isUnclaimed(bee)) {
       unClaimedPollenHex[0].claimSlot(bee)
       bee.flyTo(unClaimedPollenHex[0])
       return
     }
-    if (!isBeeFull && flower.isUnclaimed(bee)) {
+    if (!isPollenSackFull() && flower.isUnclaimed(bee)) {
       flower.claimSlot(bee)
       bee.flyTo(flower)
       return
@@ -425,41 +430,45 @@ function createBee(parent, type) {
   }
 
   function nurser() {
-    const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && hex.pollen > 0.1)
-    const larvaeHex = filterHexagon(hexGrid, hex => hex.type === 'brood' && hex.content === 'larvae').sort((a, b) => a.nutrition > b.nutrition)
+    const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && hex.pollen > 0 && hex.isUnclaimed(bee))
+    const isAtAnyLarvae = filterHexagon(hexGrid, hex => hex.type === 'brood' && hex.content === 'larvae' && hex.isUnclaimed(bee) && isAt(hex))
+    const larvaeHex = filterHexagon(hexGrid, hex => 
+      hex.type === 'brood' &&
+      hex.content === 'larvae' &&
+      hex.isUnclaimed(bee) && 
+      !hex.isWellFed()
+    ).sort((a, b) => a.nutrition > b.nutrition ? 1 : -1)
 
-    if (bee.state === 'idle') {
-      goIdle(bee)
-      if (pollenHex.length > 0 && larvaeHex.length > 0) {
-        bee.state = 'filling'        
-      }
-    }
-    if (bee.state === 'filling') {
-      if (pollenHex.length === 0) {
-        bee.state = 'idle'
-        return
-      }
-      bee.position.x = pollenHex[0].position.x
-      bee.position.y = pollenHex[0].position.y
+    if (pollenHex.length > 0 && isAt(pollenHex[0])) {
+      pollenHex[0].claimSlot(bee)
       bee.pollenSack += 0.1
       pollenHex[0].pollen -= 0.1
-      if (bee.pollenSack >= bee.POLLEN_SACK_CAPACITY) {
-        bee.state = 'feed'
+      if (isPollenSackFull()) {
+        bee.position.x = pollenHex[0].position.x + 5
       }
+      return
     }
-    if (bee.state === 'feed') {
-      if (larvaeHex.length === 0) {
-        bee.state = 'idle'
-        return
-      }
-      bee.position.x = larvaeHex[0].position.x
-      bee.position.y = larvaeHex[0].position.y
+
+    if (larvaeHex.length > 0 && isAtAnyLarvae.length > 0 && !isPollenSackEmpty()) {
+      isAtAnyLarvae[0].claimSlot(bee)
       bee.pollenSack -= 0.1
-      larvaeHex[0].nutrition += 0.1
-      if (bee.pollenSack <= 0) {
-        bee.state = 'idle'
-      }
+      isAtAnyLarvae[0].nutrition += 1
+      return
     }
+
+    if (!isPollenSackFull() && pollenHex.length > 0) {
+      pollenHex[0].claimSlot(bee)
+      bee.flyTo(pollenHex[0])
+      return
+    }
+      
+    if (larvaeHex.length > 0 && !isPollenSackEmpty()) {
+      larvaeHex[0].claimSlot(bee)
+      bee.flyTo(larvaeHex[0])
+      return
+    }
+
+    bee.flyTo(null)
   }
 
   app.ticker.add(time => {
@@ -570,12 +579,14 @@ function cellBrood(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const broodSprite = Sprite.fromImage('cell-brood-empty.png')
   makeSelectable(broodSprite, 'brood')
+  makeOccupiable(broodSprite)
   broodSprite.position.x = pixelCoordinate.x
   broodSprite.position.y = pixelCoordinate.y
 
   broodSprite.type = 'brood'
   broodSprite.lifecycle = 0
   broodSprite.content = 'empty'
+  broodSprite.NUTRITION_CAPACITY = secondsToTicks(60)
   broodSprite.nutrition = null
   broodSprite.isOccupied = () => broodSprite.content !== 'empty'
   broodSprite.setContents = item => {
@@ -583,9 +594,10 @@ function cellBrood(x, y, parent) {
     broodSprite.content = item
     if (item === 'egg') {
       broodSprite.lifecycle = 0
-      broodSprite.nutrition = 2
+      broodSprite.nutrition = 100
     }
   }
+  broodSprite.isWellFed = () => broodSprite.nutrition >= broodSprite.NUTRITION_CAPACITY
 
   const setTexture = () => {
     const item = broodSprite.content
@@ -611,18 +623,18 @@ function cellBrood(x, y, parent) {
     broodSprite.lifecycle += 1
 
     // Transitions
-    if (broodSprite.lifecycle > secondsToTicks(5) && broodSprite.content === 'egg') {
+    if (broodSprite.lifecycle > secondsToTicks(1 /* 5 */) && broodSprite.content === 'egg') {
       broodSprite.setContents('larvae')      
-    } else if (broodSprite.lifecycle > secondsToTicks(10) && broodSprite.content === 'larvae') {
+    } else if (broodSprite.lifecycle > secondsToTicks(1000) && broodSprite.content === 'larvae') {
       broodSprite.setContents('puppa')
-    } else if (broodSprite.lifecycle > secondsToTicks(20) && broodSprite.content === 'puppa') {
+    } else if (broodSprite.lifecycle > secondsToTicks(2000) && broodSprite.content === 'puppa') {
       broodSprite.setContents('empty')
       createBee(beeContainer)
     }
 
     // States
     if (broodSprite.content === 'larvae') {
-      broodSprite.nutrition -= 0.005
+      broodSprite.nutrition -= 0.01
       if (broodSprite.nutrition <= 0) {
         broodSprite.setContents('dead')
       }
