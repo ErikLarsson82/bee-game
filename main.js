@@ -102,7 +102,7 @@ function setup() {
     populationText.position.y = 2
     uiTopBar.addChild(populationText)
     app.ticker.add(time => {
-      populationText.text = 'Colony population ' + (bees.length + 1)
+      populationText.text = 'Colony population ' + (bees.filter(b => !b.isDead()).length + 1)
     })
     
     const dayCycle = new PIXI.Text('Loading', { ...fontConfig, fill: 'white' })
@@ -183,11 +183,11 @@ function setup() {
   createQueen(beeContainer)
 
   // select first (for debugging)
-  setSelected(hexGrid[0][0])
+  // setSelected(hexGrid[0][0])
   // create it as honey
-  replaceSelectedHex('honey')
+  // replaceSelectedHex('honey')
   // deselect
-  setSelected(null)
+  // setSelected(null)
 
   app.ticker.add((delta) => gameLoop(delta))
 }
@@ -275,9 +275,10 @@ function createBee(parent, type) {
   bee.waxSack = 0
   bee.nectarSack = 0
   bee.honeySack = 0
-  bee.hunger = Math.min(secondsToTicks(35 + (bees.length * 20)), bee.HUNGER_CAPACITY)
+  bee.hunger = Math.min(secondsToTicks(5 + (bees.length * 20)), bee.HUNGER_CAPACITY)
   bee.type = type || 'unassigned'
   bee.state = 'idle'
+  bee.isDead = () => bee.hunger <= 0
 
   bee.panelContent = () => {
     const text = new PIXI.Text('Loading', { ...fontConfig })
@@ -285,6 +286,7 @@ function createBee(parent, type) {
     text.position.y = 50
     app.ticker.add(time => {
       let str = ''
+      str += bee.isDead() ? 'Dead ;_;\n\n' : ''
       str += 'Pollen  ' + Math.round(bee.pollenSack) + '\n'
       str += 'Nectar  ' + Math.round(bee.nectarSack) + '\n'
       str += 'Wax     ' + Math.round(bee.waxSack) + '\n'
@@ -368,11 +370,19 @@ function createBee(parent, type) {
   app.ticker.add(time => {
     if (paused) return
 
+    if (bee.isDead()) {
+      bee.texture = Texture.fromImage('bee-drone-dead.png')
+      if (bee.position.y !== 25) {
+        bee.position.x = 65 + (Math.random() * 100)
+        bee.position.y = 25
+      }
+      return
+    }
     const honeyHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.honey > 0)
     
     if (honeyHex.length > 0 && bee.position.x === honeyHex[0].position.x && bee.position.y === honeyHex[0].position.y) {
       bee.hunger += 10
-      honeyHex[0].honey -= 1
+      honeyHex[0].honey -= 0.01
       if (bee.hunger >= bee.HUNGER_CAPACITY) goIdle(bee)
       return
     } else {
@@ -443,11 +453,31 @@ function cellHoney(x, y, parent) {
 
   honeySprite.type = 'honey'
   honeySprite.honey = 30
+  honeySprite.isFull = () => honeySprite.honey >= 30
+  
+  app.ticker.add(time => {
+    if (honeySprite.isFull()) {
+      honeySprite.texture = Texture.fromImage('cell-honey-full.png')
+    } else {
+      honeySprite.texture = Texture.fromImage('cell-honey-empty.png')
+    }
+  })
 
+  /*
   app.ticker.add(time => {
     // always replenish honey store
     honeySprite.honey = 30
   })
+  */
+
+  honeySprite.panelContent = () => {
+    const text = new PIXI.Text('Loading', { ...fontConfig })
+    text.position.x = 7
+    text.position.y = 50
+    app.ticker.add(time => text.text = 'Honey stored  ' + Math.round(honeySprite.honey))
+    return text
+  }
+
   parent.addChild(honeySprite)
   return honeySprite
 }
