@@ -1,5 +1,18 @@
 
+// Fix the odd larvae bug
+
+// Bees need 4 resources, nectar, pollen, honey, wax
+
+// Implement honey cell
+
 // Bees should occupy flowers and cells
+
+// Bees should harvest both nectar and pollen
+
+// Bees need to eat to survive
+
+
+
 
 // Implement seasons
 
@@ -23,6 +36,11 @@ const fontConfig = {
 }
 
 const l = console.log
+const pretty = number => Math.round(number/1000)
+
+const FPS = 144
+const fpsToSeconds = number => Math.round(number/FPS)
+const secondsToFps = number => number * FPS
 
 const Container = PIXI.Container,
     autoDetectRenderer = PIXI.autoDetectRenderer,
@@ -394,19 +412,25 @@ function cellBrood(x, y, parent) {
   broodSprite.position.y = pixelCoordinate.y
 
   broodSprite.lifecycle = 0
-  broodSprite.content = null
+  broodSprite.content = 'empty'
   broodSprite.nutrition = null
-  broodSprite.isOccupied = () => !!broodSprite.content
+  broodSprite.isOccupied = () => broodSprite.content !== 'empty'
   broodSprite.setContents = item => {
+    // empty -> egg -> (larvae -> puppa) || dead
     broodSprite.content = item
-    if (item === 'empty') {
-      broodSprite.texture = Texture.fromImage('cell-brood-empty.png')
+    if (item === 'egg') {
       broodSprite.lifecycle = 0
-      broodSprite.content = null
+      broodSprite.nutrition = 2
+    }
+  }
+
+  const setTexture = () => {
+    const item = broodSprite.content
+    if (item === 'empty') {
+      broodSprite.texture = Texture.fromImage('cell-brood-empty.png')      
     } else if (item === 'egg') {
       broodSprite.texture = Texture.fromImage('cell-brood-egg.png')
-    } else if (item === 'larvae') {
-      broodSprite.nutrition = 5
+    } else if (item === 'larvae') {      
       broodSprite.texture = Texture.fromImage('cell-brood-larvae.png')      
     } else if (item === 'puppa') {
       broodSprite.texture = Texture.fromImage('cell-brood-puppa.png')      
@@ -417,21 +441,25 @@ function cellBrood(x, y, parent) {
 
   app.ticker.add(time => {
     if (paused) return
+    setTexture()
     if (!broodSprite.content) return
+    if (['dead', 'empty'].includes(broodSprite.content)) return
     
     broodSprite.lifecycle += 1
-    if (broodSprite.lifecycle > 1000) {
-      broodSprite.setContents('larvae')
-    }
-    if (broodSprite.lifecycle > 1500) {
+
+    // Transitions
+    if (broodSprite.lifecycle > secondsToFps(5) && broodSprite.content === 'egg') {
+      broodSprite.setContents('larvae')      
+    } else if (broodSprite.lifecycle > secondsToFps(10) && broodSprite.content === 'larvae') {
       broodSprite.setContents('puppa')
-    }
-    if (broodSprite.lifecycle > 2000) {
+    } else if (broodSprite.lifecycle > secondsToFps(20) && broodSprite.content === 'puppa') {
       broodSprite.setContents('empty')
       createBee(beeContainer)
     }
+
+    // States
     if (broodSprite.content === 'larvae') {
-      broodSprite.nutrition -= 0.01
+      broodSprite.nutrition -= 0.005
       if (broodSprite.nutrition <= 0) {
         broodSprite.setContents('dead')
       }
@@ -442,7 +470,11 @@ function cellBrood(x, y, parent) {
     const text = new PIXI.Text('Loading', { ...fontConfig })
     text.position.x = 7
     text.position.y = 50
-    app.ticker.add(time => text.text = (broodSprite.content || 'empty') + '\nNutrients ' + Math.ceil(broodSprite.nutrition) + '\nLifecycle ' + broodSprite.lifecycle)
+    app.ticker.add(time => {
+      const line2 = broodSprite.content === 'larvae' ? '\nNutrients: ' + Math.ceil(broodSprite.nutrition) : ''
+      const line3 = ['egg', 'larvae', 'puppa'].includes(broodSprite.content) ? '\nLifecycle: ' + fpsToSeconds(broodSprite.lifecycle) : ''
+      text.text = broodSprite.content + line2 + line3
+    })
     return text
   }
   
