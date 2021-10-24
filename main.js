@@ -312,6 +312,7 @@ function createBee(parent, type) {
       }
     }
     if (bee.state === 'collecting') {
+      flower.claimSlot(bee)
       bee.position.x = flower.position.x
       bee.position.y = flower.position.y      
       bee.pollenSack += 0.1
