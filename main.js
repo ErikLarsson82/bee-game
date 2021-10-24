@@ -1,14 +1,7 @@
 
-// Bees need 4 resources, nectar, pollen, honey, wax
-
-// Implement honey cell
-
 // Bees should occupy flowers and cells
 
 // Bees should harvest both nectar and pollen
-
-// Bees need to eat to survive
-
 
 // Progress bars
 
