@@ -37,8 +37,8 @@ const l = console.log
 const pretty = number => Math.round(number/1000)
 
 const FPS = 144
-const fpsToSeconds = number => Math.round(number/FPS)
-const secondsToFps = number => number * FPS
+const ticksToSeconds = number => Math.round(number/FPS)
+const secondsToTicks = number => number * FPS
 
 const Container = PIXI.Container,
     autoDetectRenderer = PIXI.autoDetectRenderer,
@@ -134,7 +134,7 @@ function setup() {
   hexGrid = new Array(5).fill().map((_, x) => 
     new Array(5).fill().map((_, y) => cellEmpty(x, y, background))
   )
-  
+
   selectedSprite = new Container()
   selectedSprite.visible = false
   const selectedSpriteSub = Sprite.fromImage('cell-selected.png')
@@ -178,11 +178,16 @@ function setup() {
 
   ui.addChild(panel)
 
-  //for (var i = 0; i < 1; i++) {
-  //}
   createBee(beeContainer, 'forager')
   createBee(beeContainer, 'nurser')
   createQueen(beeContainer)
+
+  // select first (for debugging)
+  setSelected(hexGrid[0][0])
+  // create it as honey
+  replaceSelectedHex('honey')
+  // deselect
+  setSelected(null)
 
   app.ticker.add((delta) => gameLoop(delta))
 }
@@ -260,12 +265,17 @@ function createBee(parent, type) {
   const bee = PIXI.Sprite.fromImage('bee-drone.png')
   makeSelectable(bee, 'bee')
   bee.idle = {
-    x: 50 - (bees.length * 7),
-    y: 50
+    x: 35,
+    y: 60 + (bees.length * 15)
   }
   goIdle(bee)
   bee.POLLEN_SACK_CAPACITY = 20
+  bee.HUNGER_CAPACITY = secondsToTicks(120)
   bee.pollenSack = 0
+  bee.waxSack = 0
+  bee.nectarSack = 0
+  bee.honeySack = 0
+  bee.hunger = Math.min(secondsToTicks(35 + (bees.length * 20)), bee.HUNGER_CAPACITY)
   bee.type = type || 'unassigned'
   bee.state = 'idle'
 
@@ -274,7 +284,13 @@ function createBee(parent, type) {
     text.position.x = 7
     text.position.y = 50
     app.ticker.add(time => {
-      text.text = 'Pollen sack' + Math.round(bee.pollenSack)
+      let str = ''
+      str += 'Pollen  ' + Math.round(bee.pollenSack) + '\n'
+      str += 'Nectar  ' + Math.round(bee.nectarSack) + '\n'
+      str += 'Wax     ' + Math.round(bee.waxSack) + '\n'
+      str += 'Honey   ' + Math.round(bee.honeySack) + '\n\n'
+      str += 'Hunger  ' + ticksToSeconds(bee.hunger)
+      text.text = str
     })
     return text
   }
@@ -351,6 +367,23 @@ function createBee(parent, type) {
 
   app.ticker.add(time => {
     if (paused) return
+
+    const honeyHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.honey > 0)
+    
+    if (honeyHex.length > 0 && bee.position.x === honeyHex[0].position.x && bee.position.y === honeyHex[0].position.y) {
+      bee.hunger += 10
+      honeyHex[0].honey -= 1
+      if (bee.hunger >= bee.HUNGER_CAPACITY) goIdle(bee)
+      return
+    } else {
+      bee.hunger -= 1
+    }
+
+    if (bee.hunger < secondsToTicks(30) && honeyHex.length > 0) {
+      bee.position.x = honeyHex[0].position.x
+      bee.position.y = honeyHex[0].position.y      
+      return
+    }
     
     if (bee.type === 'unassigned') {
       bee.type = Math.random() < 0.5 ? 'forager' : 'nurser'
@@ -370,7 +403,8 @@ function replaceSelectedHex(type) {
       background.removeChild(hex)
       const f = {
         brood: cellBrood,
-        pollen: cellPollen
+        pollen: cellPollen,
+        honey: cellHoney
       }
       if (!f[type]) {
         console.error('No type!')
@@ -400,15 +434,33 @@ function cellEmpty(x, y, parent) {
   return emptySprite
 }
 
+function cellHoney(x, y, parent) {
+  const pixelCoordinate = toLocalCoordinateFlat({ x, y })
+  const honeySprite = Sprite.fromImage('cell-honey-full.png')
+  makeSelectable(honeySprite, 'honey')
+  honeySprite.position.x = pixelCoordinate.x
+  honeySprite.position.y = pixelCoordinate.y
+
+  honeySprite.type = 'honey'
+  honeySprite.honey = 30
+
+  app.ticker.add(time => {
+    // always replenish honey store
+    honeySprite.honey = 30
+  })
+  parent.addChild(honeySprite)
+  return honeySprite
+}
+
 
 function cellBrood(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const broodSprite = Sprite.fromImage('cell-brood-empty.png')
   makeSelectable(broodSprite, 'brood')
-  broodSprite.type = 'brood'
   broodSprite.position.x = pixelCoordinate.x
   broodSprite.position.y = pixelCoordinate.y
 
+  broodSprite.type = 'brood'
   broodSprite.lifecycle = 0
   broodSprite.content = 'empty'
   broodSprite.nutrition = null
@@ -446,11 +498,11 @@ function cellBrood(x, y, parent) {
     broodSprite.lifecycle += 1
 
     // Transitions
-    if (broodSprite.lifecycle > secondsToFps(5) && broodSprite.content === 'egg') {
+    if (broodSprite.lifecycle > secondsToTicks(5) && broodSprite.content === 'egg') {
       broodSprite.setContents('larvae')      
-    } else if (broodSprite.lifecycle > secondsToFps(10) && broodSprite.content === 'larvae') {
+    } else if (broodSprite.lifecycle > secondsToTicks(10) && broodSprite.content === 'larvae') {
       broodSprite.setContents('puppa')
-    } else if (broodSprite.lifecycle > secondsToFps(20) && broodSprite.content === 'puppa') {
+    } else if (broodSprite.lifecycle > secondsToTicks(20) && broodSprite.content === 'puppa') {
       broodSprite.setContents('empty')
       createBee(beeContainer)
     }
@@ -470,7 +522,7 @@ function cellBrood(x, y, parent) {
     text.position.y = 50
     app.ticker.add(time => {
       const line2 = broodSprite.content === 'larvae' ? '\nNutrients: ' + Math.ceil(broodSprite.nutrition) : ''
-      const line3 = ['egg', 'larvae', 'puppa'].includes(broodSprite.content) ? '\nLifecycle: ' + fpsToSeconds(broodSprite.lifecycle) : ''
+      const line3 = ['egg', 'larvae', 'puppa'].includes(broodSprite.content) ? '\nLifecycle: ' + ticksToSeconds(broodSprite.lifecycle) : ''
       text.text = broodSprite.content + line2 + line3
     })
     return text
@@ -485,10 +537,10 @@ function cellPollen(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const pollenSprite = Sprite.fromImage('cell-pollen-empty.png')
   makeSelectable(pollenSprite, 'pollen')
-  pollenSprite.type = 'pollen'
   pollenSprite.position.x = pixelCoordinate.x
   pollenSprite.position.y = pixelCoordinate.y
 
+  pollenSprite.type = 'pollen'
   pollenSprite.pollen = 0
   pollenSprite.isFull = () => pollenSprite.pollen >= 120
   pollenSprite.isEmpty = () => pollenSprite.pollen <= 0
