@@ -173,7 +173,7 @@ function setup() {
   ui.addChild(panel)
 
   createBee(beeContainer, 'forager')
-  // createBee(beeContainer, 'forager')
+  createBee(beeContainer, 'forager')
   createBee(beeContainer, 'nurser')
   createQueen(beeContainer)
 
@@ -256,6 +256,7 @@ function makeOccupiable(parent) {
 }
 
 function makeFlyable(sprite) {
+  sprite.timeOfFlight = 0
   sprite.flyTo = (targetSprite) => {
     if (!targetSprite) {
       targetSprite = {
@@ -265,9 +266,21 @@ function makeFlyable(sprite) {
         }
       }
     }
-    const SPEED = 0.1
-    sprite.vx = targetSprite.position.x < sprite.position.x ? -SPEED : SPEED
-    sprite.vy = targetSprite.position.y < sprite.position.y ? -SPEED : SPEED
+    const SPEED = 0.01
+    sprite.timeOfFlight += 20
+
+    if (sprite.vx === 0 && sprite.vy === 0) {
+      sprite.timeOfFlight = 0
+      // sprite.vx = (Math.random() - 0.5) * 3
+      // sprite.vy = (Math.random() - 0.5) * 3
+    }
+    sprite.vx += targetSprite.position.x < sprite.position.x ? -SPEED : SPEED  
+    sprite.vy += targetSprite.position.y < sprite.position.y ? -SPEED : SPEED
+    
+    if (sprite.timeOfFlight > 144) {
+      sprite.vx = sprite.vx * 0.97
+      sprite.vy = sprite.vy * 0.97
+    }    
     sprite.position.x += sprite.vx
     sprite.position.y += sprite.vy
     snapTo(sprite, targetSprite)
@@ -296,6 +309,8 @@ function snapTo(a, b) {
   if (distance < 2) {
     a.position.x = b.position.x
     a.position.y = b.position.y
+    a.vx = 0
+    a.vy = 0
   }
 }
 
@@ -349,7 +364,9 @@ function createQueen(parent) {
 }
 
 function createBee(parent, type) {
-  const bee = PIXI.Sprite.fromImage('bee-drone.png')
+  const bee = Sprite.fromImage('bee-drone-body.png')
+  const beeAddon = Sprite.fromImage('bee-drone-legs.png')
+  bee.addChild(beeAddon)
   makeSelectable(bee, 'bee')
   const isAt = samePosition(bee)
   bee.idle = {
@@ -360,6 +377,7 @@ function createBee(parent, type) {
   makeFlyable(bee)
   bee.vx = 0
   bee.vy = 0
+  bee.wingAnimationTicker = Math.random() * 100
   bee.NECTAR_SACK_CAPACITY = 20
   bee.POLLEN_SACK_CAPACITY = 20
   bee.HUNGER_CAPACITY = secondsToTicks(120)
@@ -473,6 +491,18 @@ function createBee(parent, type) {
 
   app.ticker.add(time => {
     if (paused) return
+
+    if (bee.vx !== 0 || bee.vy !== 0) {
+      (bee.vx >= -0.15 || bee.vx === 0) ? bee.scale.set(1, 1) : bee.scale.set(-1, 1) //
+      bee.wingAnimationTicker += 0.4
+      if (Math.sin(bee.wingAnimationTicker) > 0) {
+        beeAddon.texture = Texture.fromImage('bee-drone-wings.png')
+      } else {
+        beeAddon.texture = Texture.fromImage('bee-drone-wings-flapped.png')
+      }
+    } else {
+      beeAddon.texture = Texture.fromImage('bee-drone-legs.png')
+    }
 
     if (bee.isDead()) {
       bee.texture = Texture.fromImage('bee-drone-dead.png')
@@ -667,12 +697,17 @@ function cellPollen(x, y, parent) {
   pollenSprite.position.y = pixelCoordinate.y
 
   pollenSprite.type = 'pollen'
+  pollenSprite.POLLEN_HEX_CAPACITY = 120
   pollenSprite.pollen = 0
-  pollenSprite.isFull = () => pollenSprite.pollen >= 120
+  pollenSprite.isFull = () => pollenSprite.pollen >= pollenSprite.POLLEN_HEX_CAPACITY
   pollenSprite.isEmpty = () => pollenSprite.pollen <= 0
   app.ticker.add(time => {
     if (pollenSprite.isFull()) {
       pollenSprite.texture = Texture.fromImage('cell-pollen-full.png')
+    } else if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.66) {
+      pollenSprite.texture = Texture.fromImage('cell-pollen-filling.png')
+    } else if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.33) {
+      pollenSprite.texture = Texture.fromImage('cell-pollen-partial.png')
     } else {
       pollenSprite.texture = Texture.fromImage('cell-pollen-empty.png')
     }
