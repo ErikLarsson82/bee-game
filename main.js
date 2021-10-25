@@ -1,6 +1,4 @@
 
-// Bees should occupy flowers and cells
-
 // Bees should harvest both nectar and pollen
 
 // Progress bars
@@ -18,6 +16,10 @@
 // Things should be globally pauseable
 
 // Anchor everything at 0.5 to fix placements 
+
+// Dont flap wings when dead
+
+// Dont occupy the pollen hexes when they are empty
 
 const fontConfig = {
     fontFamily: '"Lucida Console", Monaco, monospace',
@@ -172,9 +174,9 @@ function setup() {
 
   ui.addChild(panel)
 
-  createBee(beeContainer, 'forager')
-  createBee(beeContainer, 'forager')
   createBee(beeContainer, 'nurser')
+  createBee(beeContainer, 'forager')
+  // createBee(beeContainer, 'forager')
   createQueen(beeContainer)
 
   // select first (for debugging)
@@ -251,7 +253,7 @@ function makeOccupiable(parent) {
         parent.slot = null
       }
     }
-    spotClaimed.visible = !!parent.slot // enable for debug
+    // spotClaimed.visible = !!parent.slot // enable for debug
   })
 }
 
@@ -470,7 +472,7 @@ function createBee(parent, type) {
     if (larvaeHex.length > 0 && isAtAnyLarvae.length > 0 && !isPollenSackEmpty()) {
       isAtAnyLarvae[0].claimSlot(bee)
       bee.pollenSack -= 0.1
-      isAtAnyLarvae[0].nutrition += 1
+      isAtAnyLarvae[0].nutrition += 10
       return
     }
 
@@ -501,6 +503,7 @@ function createBee(parent, type) {
         beeAddon.texture = Texture.fromImage('bee-drone-wings-flapped.png')
       }
     } else {
+      bee.scale.set(1, 1)
       beeAddon.texture = Texture.fromImage('bee-drone-legs.png')
     }
 
@@ -624,7 +627,7 @@ function cellBrood(x, y, parent) {
     broodSprite.content = item
     if (item === 'egg') {
       broodSprite.lifecycle = 0
-      broodSprite.nutrition = 100
+      broodSprite.nutrition = secondsToTicks(10)
     }
   }
   broodSprite.isWellFed = () => broodSprite.nutrition >= broodSprite.NUTRITION_CAPACITY
@@ -653,18 +656,18 @@ function cellBrood(x, y, parent) {
     broodSprite.lifecycle += 1
 
     // Transitions
-    if (broodSprite.lifecycle > secondsToTicks(1 /* 5 */) && broodSprite.content === 'egg') {
+    if (broodSprite.lifecycle > secondsToTicks(5) && broodSprite.content === 'egg') {
       broodSprite.setContents('larvae')      
-    } else if (broodSprite.lifecycle > secondsToTicks(1000) && broodSprite.content === 'larvae') {
+    } else if (broodSprite.lifecycle > secondsToTicks(30) && broodSprite.content === 'larvae') {
       broodSprite.setContents('puppa')
-    } else if (broodSprite.lifecycle > secondsToTicks(2000) && broodSprite.content === 'puppa') {
+    } else if (broodSprite.lifecycle > secondsToTicks(60) && broodSprite.content === 'puppa') {
       broodSprite.setContents('empty')
       createBee(beeContainer)
     }
 
     // States
     if (broodSprite.content === 'larvae') {
-      broodSprite.nutrition -= 0.01
+      broodSprite.nutrition -= 1
       if (broodSprite.nutrition <= 0) {
         broodSprite.setContents('dead')
       }
@@ -676,7 +679,7 @@ function cellBrood(x, y, parent) {
     text.position.x = 7
     text.position.y = 50
     app.ticker.add(time => {
-      const line2 = broodSprite.content === 'larvae' ? '\nNutrients: ' + Math.ceil(broodSprite.nutrition) : ''
+      const line2 = broodSprite.content === 'larvae' ? '\nNutrients: ' + ticksToSeconds(broodSprite.nutrition) : ''
       const line3 = ['egg', 'larvae', 'puppa'].includes(broodSprite.content) ? '\nLifecycle: ' + ticksToSeconds(broodSprite.lifecycle) : ''
       text.text = broodSprite.content + line2 + line3
     })
