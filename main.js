@@ -105,11 +105,15 @@ function setup() {
     populationText.position.y = 2
     uiTopBar.addChild(populationText)
     app.ticker.add(time => {
-      populationText.text = 'Colony population ' + (bees.filter(b => !b.isDead()).length + 1)
+      const aliveBees = bees.filter(b => !b.isDead())
+      const foragers = aliveBees.filter(b => b.type === 'forager').length
+      const nurses = aliveBees.filter(b => b.type === 'nurser').length
+      const workers = aliveBees.filter(b => b.type === 'worker').length
+      populationText.text = `Colony population ${ aliveBees.length + 1 }    ${ foragers } / ${ nurses } / ${ workers }` 
     })
     
     const dayCycle = new PIXI.Text('Loading', { ...fontConfig, fill: 'white' })
-    dayCycle.position.x = 200
+    dayCycle.position.x = 230
     dayCycle.position.y = 2
     uiTopBar.addChild(dayCycle)
     app.ticker.add(time => {
@@ -117,7 +121,7 @@ function setup() {
     })
 
     pausedText = new PIXI.Text('Playing', { ...fontConfig, fill: 'white' })
-    pausedText.position.x = 300
+    pausedText.position.x = 330
     pausedText.position.y = 2
     uiTopBar.addChild(pausedText)
     
@@ -184,20 +188,10 @@ function setup() {
 
   createBee(beeContainer, 'nurser')
   createBee(beeContainer, 'forager')
-  // createBee(beeContainer, 'forager')
+  createBee(beeContainer, 'worker')
   createQueen(beeContainer)
 
-  // select first (for debugging)
-  setSelected(hexGrid[0][0])
-  // create it as honey
-  replaceSelectedHex('honey')
-  // setSelected(hexGrid[0][1])
-  // replaceSelectedHex('pollen')
-  // setSelected(hexGrid[0][2])
-  // replaceSelectedHex('pollen')
-  // hexGrid[0][2].pollen = 20
-  // deselect
-  setSelected(null)
+  createMap()
 
   app.ticker.add((delta) => gameLoop(delta))
 }
@@ -211,6 +205,20 @@ function gameLoop(delta) {
     hour = 0
     day++
   }
+}
+
+function createMap() {
+  // select first (for debugging)
+  setSelected(hexGrid[0][0])
+  // create it as honey
+  replaceSelectedHex('honey')
+  // setSelected(hexGrid[0][1])
+  // replaceSelectedHex('pollen')
+  // setSelected(hexGrid[0][2])
+  // replaceSelectedHex('pollen')
+  // hexGrid[0][2].pollen = 20
+  // deselect
+  setSelected(null)
 }
 
 function setSelected(item) {
@@ -329,6 +337,7 @@ function replaceSelectedHex(type) {
     if (hex === selected) {
       background.removeChild(hex)
       const f = {
+        converter: cellConverter,
         brood: cellBrood,
         pollen: cellPollen,
         honey: cellHoney
@@ -499,6 +508,10 @@ function createBee(parent, type) {
     bee.flyTo(null)
   }
 
+  function worker() {
+    // l('im working')
+  }
+
   app.ticker.add(time => {
     if (paused) return
 
@@ -548,11 +561,19 @@ function createBee(parent, type) {
     }
 
     if (bee.type === 'unassigned') {
-      bee.type = Math.random() < 0.5 ? 'forager' : 'nurser'
+      const rand = Math.random()
+      if (rand < 0.3) {
+        bee.type = 'forager'
+      } else if (rand < 0.6) {
+        bee.type = 'nurser'
+      } else {
+        bee.type = 'worker'
+      }      
     }
 
     if (bee.type === 'forager') forager()
     if (bee.type === 'nurser') nurser()
+    if (bee.type === 'worker') worker()
   })
 
   bees.push(bee)
@@ -568,8 +589,9 @@ function cellEmpty(x, y, parent) {
 
   emptySprite.panelContent = () => {
     const c = new Container()
-    c.addChild(Button(5, 80, 'brood', () => replaceSelectedHex('brood')))
-    c.addChild(Button(5, 100, 'pollen', () => replaceSelectedHex('pollen')))
+    c.addChild(Button(5, 60, 'brood', () => replaceSelectedHex('brood')))
+    c.addChild(Button(5, 80, 'pollen', () => replaceSelectedHex('pollen')))
+    c.addChild(Button(5, 100, 'converter', () => replaceSelectedHex('converter')))
     return c
   }
   
@@ -612,6 +634,21 @@ function cellHoney(x, y, parent) {
 
   parent.addChild(honeySprite)
   return honeySprite
+}
+
+
+function cellConverter(x, y, parent) {
+  const pixelCoordinate = toLocalCoordinateFlat({ x, y })
+  const converterSprite = Sprite.fromImage('cell-converter.png')
+  makeSelectable(converterSprite, 'converter')
+  makeOccupiable(converterSprite)
+  converterSprite.position.x = pixelCoordinate.x
+  converterSprite.position.y = pixelCoordinate.y
+
+  converterSprite.type = 'converter'
+  
+  parent.addChild(converterSprite)
+  return converterSprite
 }
 
 
