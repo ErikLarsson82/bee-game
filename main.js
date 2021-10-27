@@ -1,4 +1,10 @@
 
+// Slider to determine the amount of pollenation and bringing resources back to base
+
+// Too much focus on pollenation -> no resources (but many flowers)
+
+// Focus on gathering resources -> no or reduced amount of flowers (but short term resource gains)
+
 // Bees should harvest both nectar and pollen
 
 // Progress bars
@@ -20,6 +26,8 @@
 // Dont flap wings when dead
 
 // Dont occupy the pollen hexes when they are empty
+
+// Eventlog
 
 const fontConfig = {
     fontFamily: '"Lucida Console", Monaco, monospace',
@@ -387,7 +395,7 @@ function createBee(parent, type) {
   bee.waxSack = 0
   bee.nectarSack = 0
   bee.honeySack = 0
-  bee.hunger = Math.min(secondsToTicks(120 + (bees.length * 20)), bee.HUNGER_CAPACITY)
+  bee.hunger = Math.min(secondsToTicks(10 + (bees.length * 20)), bee.HUNGER_CAPACITY)
   bee.type = type || 'unassigned'
   bee.isDead = () => bee.hunger <= 0
 
@@ -494,6 +502,16 @@ function createBee(parent, type) {
   app.ticker.add(time => {
     if (paused) return
 
+    if (bee.isDead()) {
+      bee.texture = Texture.fromImage('bee-drone-dead.png')
+      beeAddon.visible = false
+      if (bee.position.y !== 25) {
+        bee.position.x = 65 + (Math.random() * 100)
+        bee.position.y = 25
+      }
+      return
+    }
+
     if (bee.vx !== 0 || bee.vy !== 0) {
       (bee.vx >= -0.15 || bee.vx === 0) ? bee.scale.set(1, 1) : bee.scale.set(-1, 1) //
       bee.wingAnimationTicker += 0.4
@@ -505,15 +523,6 @@ function createBee(parent, type) {
     } else {
       bee.scale.set(1, 1)
       beeAddon.texture = Texture.fromImage('bee-drone-legs.png')
-    }
-
-    if (bee.isDead()) {
-      bee.texture = Texture.fromImage('bee-drone-dead.png')
-      if (bee.position.y !== 25) {
-        bee.position.x = 65 + (Math.random() * 100)
-        bee.position.y = 25
-      }
-      return
     }
 
     const honeyHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.honey > 0 && hex.isUnclaimed(bee))
@@ -577,23 +586,21 @@ function cellHoney(x, y, parent) {
   honeySprite.position.y = pixelCoordinate.y
 
   honeySprite.type = 'honey'
+  honeySprite.HONEY_HEX_CAPACITY = 30
   honeySprite.honey = 30
-  honeySprite.isFull = () => honeySprite.honey >= 30
+  honeySprite.isFull = () => honeySprite.honey >= honeySprite.HONEY_HEX_CAPACITY
   
   app.ticker.add(time => {
-    if (honeySprite.isFull()) {
+    if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.75) {
       honeySprite.texture = Texture.fromImage('cell-honey-full.png')
+    } else if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.50) {
+      honeySprite.texture = Texture.fromImage('cell-honey-filling.png')
+    } else if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.25) {
+      honeySprite.texture = Texture.fromImage('cell-honey-partial.png')
     } else {
       honeySprite.texture = Texture.fromImage('cell-honey-empty.png')
     }
   })
-
-  /*
-  app.ticker.add(time => {
-    // always replenish honey store
-    honeySprite.honey = 30
-  })
-  */
 
   honeySprite.panelContent = () => {
     const text = new PIXI.Text('Loading', { ...fontConfig })
@@ -705,11 +712,11 @@ function cellPollen(x, y, parent) {
   pollenSprite.isFull = () => pollenSprite.pollen >= pollenSprite.POLLEN_HEX_CAPACITY
   pollenSprite.isEmpty = () => pollenSprite.pollen <= 0
   app.ticker.add(time => {
-    if (pollenSprite.isFull()) {
+    if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.75) {
       pollenSprite.texture = Texture.fromImage('cell-pollen-full.png')
-    } else if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.66) {
+    } else if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.50) {
       pollenSprite.texture = Texture.fromImage('cell-pollen-filling.png')
-    } else if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.33) {
+    } else if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.25) {
       pollenSprite.texture = Texture.fromImage('cell-pollen-partial.png')
     } else {
       pollenSprite.texture = Texture.fromImage('cell-pollen-empty.png')
