@@ -189,6 +189,7 @@ function setup() {
   createBee(beeContainer, 'nurser')
   createBee(beeContainer, 'forager')
   createBee(beeContainer, 'worker')
+  createBee(beeContainer, 'worker')
   createQueen(beeContainer)
 
   createMap()
@@ -269,7 +270,7 @@ function makeOccupiable(parent) {
         parent.slot = null
       }
     }
-    // spotClaimed.visible = !!parent.slot // enable for debug
+    spotClaimed.visible = !!parent.slot // enable for debug
   })
 }
 
@@ -402,14 +403,17 @@ function createBee(parent, type) {
   bee.HUNGER_CAPACITY = secondsToTicks(120)
   bee.pollenSack = 0
   bee.waxSack = 0
-  bee.nectarSack = 0
+  bee.nectarSack = type === 'forager' ? 20 : 0
   bee.honeySack = 0
-  bee.hunger = Math.min(secondsToTicks(10 + (bees.length * 20)), bee.HUNGER_CAPACITY)
+  bee.hunger = Math.min(secondsToTicks(10 + (bees.length * 5)), bee.HUNGER_CAPACITY)
   bee.type = type || 'unassigned'
   bee.isDead = () => bee.hunger <= 0
 
   const isPollenSackFull = () => bee.pollenSack >= bee.POLLEN_SACK_CAPACITY
   const isPollenSackEmpty = () => !(bee.pollenSack > 0)
+
+  const isNectarSackFull = () => bee.nectarSack >= bee.NECTAR_SACK_CAPACITY
+  const isNectarSackEmpty = () => !(bee.nectarSack > 0)
 
   bee.panelContent = () => {
     const text = new PIXI.Text('Loading', { ...fontConfig })
@@ -428,41 +432,70 @@ function createBee(parent, type) {
     return text
   }
 
-  function forager() {
-    const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && !hex.isFull())
-    const unClaimedPollenHex = pollenHex.filter(hex => hex.isUnclaimed(bee))
+  function depositNectar() {
+    if (isNectarSackEmpty()) return false
+
+    const converterNeedsNectar = filterHexagon(hexGrid, hex => hex.type === 'converter' && !hex.isFull() && hex.isUnclaimed(bee))
     
-    if (pollenHex.length === 0) {
-      bee.flyTo(null)
-      return 
+    if (converterNeedsNectar.length === 0) return false
+
+    converterNeedsNectar[0].claimSlot(bee)
+    
+    if (isAt(converterNeedsNectar[0])) {
+
+      bee.nectarSack -= 0.1
+      converterNeedsNectar[0].nectar += 0.1
+      return true
     }
- 
+
+    bee.flyTo(converterNeedsNectar[0])
+
+    return true
+  }
+
+  function pollinateFlower() {
     if (isAt(flower) && !isPollenSackFull()) {
       flower.claimSlot(bee)
       bee.pollenSack += 0.1
+      bee.nectarSack += 0.1
       if (isPollenSackFull()) {
         bee.position.x = flower.position.x + 5
       }
-      return
+      return true
     }
+    if (!isPollenSackFull() && flower.isUnclaimed(bee)) {
+      flower.claimSlot(bee)
+      bee.flyTo(flower)
+      return true
+    }
+    return false
+  }
 
+  function depositPollen() {
+    const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && !hex.isFull())
+    const unClaimedPollenHex = pollenHex.filter(hex => hex.isUnclaimed(bee))
+    
+    if (pollenHex.length === 0) return false
+    
     if (isAt(pollenHex[0]) && !isPollenSackEmpty() && !pollenHex[0].isFull()) {
       pollenHex[0].claimSlot(bee)
       bee.pollenSack -= 0.1
       pollenHex[0].pollen += 0.1
-      return
+      return true
     }
  
     if (isPollenSackFull() && unClaimedPollenHex.length > 0 && unClaimedPollenHex[0].isUnclaimed(bee)) {
       unClaimedPollenHex[0].claimSlot(bee)
       bee.flyTo(unClaimedPollenHex[0])
-      return
+      return true
     }
-    if (!isPollenSackFull() && flower.isUnclaimed(bee)) {
-      flower.claimSlot(bee)
-      bee.flyTo(flower)
-      return
-    }
+    return false
+  }
+
+  function forager() {
+    if (depositNectar()) return
+    if (pollinateFlower()) return
+    if (depositPollen()) return    
     bee.flyTo(null)
   }
 
@@ -509,11 +542,27 @@ function createBee(parent, type) {
   }
 
   function worker() {
-    // l('im working')
+    const converterHex = filterHexagon(hexGrid, hex => hex.type === 'converter' && hex.isUnclaimed(bee) && hex.nectar > 0)
+
+    if (converterHex.length === 0) {
+      bee.flyTo(null)
+      return
+    }
+
+    converterHex[0].claimSlot(bee)
+    if (!isAt(converterHex[0])) {
+      bee.flyTo(converterHex[0])      
+      bee.visible = true
+    } else {
+      converterHex[0].convert()
+      bee.visible = false
+    }
   }
 
   app.ticker.add(time => {
     if (paused) return
+
+    bee.visible = true
 
     if (bee.isDead()) {
       bee.texture = Texture.fromImage('bee-drone-dead.png')
@@ -644,6 +693,32 @@ function cellConverter(x, y, parent) {
   makeOccupiable(converterSprite)
   converterSprite.position.x = pixelCoordinate.x
   converterSprite.position.y = pixelCoordinate.y
+  converterSprite.NECTAR_CAPACITY = 20
+  converterSprite.nectar = 0
+  converterSprite.honey = 0
+  converterSprite.isFull = () => converterSprite.nectar >= converterSprite.NECTAR_CAPACITY
+  converterSprite.convert = () => {
+    converterSprite.honey += 0.1
+    converterSprite.nectar -= 0.1
+  }
+
+  converterSprite.panelContent = () => {
+    const text = new PIXI.Text('Loading', { ...fontConfig })
+    text.position.x = 7
+    text.position.y = 50
+    app.ticker.add(time => {
+      text.text = `Nectar   ${ Math.round(converterSprite.nectar) }\nHoney   ${ Math.round(converterSprite.honey) }`
+    })
+    return text
+  }
+
+  app.ticker.add(time => {
+    if (bees.filter(samePosition(converterSprite)).length > 0) {
+      converterSprite.texture = Texture.fromImage('cell-converter-occupied.png')   
+    } else {
+      converterSprite.texture = Texture.fromImage('cell-converter.png')   
+    }
+  })
 
   converterSprite.type = 'converter'
   
