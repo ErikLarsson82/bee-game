@@ -228,7 +228,7 @@ function setup() {
   })
   foreground.addChild(nightDimmer)
 
-  //createBee(beeContainer, 'nurser')
+  createBee(beeContainer, 'nurser')
   createBee(beeContainer, 'forager')
   //createBee(beeContainer, 'worker')
   //createBee(beeContainer, 'worker')
@@ -257,9 +257,9 @@ function createMap() {
   replaceSelectedHex('honey')
   // setSelected(hexGrid[0][1])
   // replaceSelectedHex('pollen')
-  // setSelected(hexGrid[0][2])
-  // replaceSelectedHex('pollen')
-  // hexGrid[0][2].pollen = 20
+  setSelected(hexGrid[0][2])
+  replaceSelectedHex('pollen')
+  hexGrid[0][2].pollen = 20
   // deselect
   setSelected(null)
 }
@@ -522,7 +522,7 @@ function createQueen(parent) {
   parent.addChild(queenSprite)
 }
 
-function createBee(parent, type) {
+function createBee(parent, type, startPosition) {
   const bee = Sprite.fromImage('bee-drone-body.png')
   const beeAddon = Sprite.fromImage('bee-drone-legs.png')
   bee.addChild(beeAddon)
@@ -539,6 +539,10 @@ function createBee(parent, type) {
     y: 60 + (bees.length * 15)
   }
   goIdle(bee)
+  if (startPosition) {
+    bee.position.x = startPosition.x
+    bee.position.y = startPosition.y
+  }
   makeFlyable(bee)
   makeHexDetectable(bee)
   bee.animationTicker = Math.random() * 100
@@ -546,7 +550,7 @@ function createBee(parent, type) {
   bee.POLLEN_SACK_CAPACITY = 20
   bee.HONEY_SACK_CAPACITY = 10
   
-  bee.pollenSack = 0
+  bee.pollenSack = 20
   bee.waxSack = 0
   bee.nectarSack = 0
   bee.honeySack = 0
@@ -602,8 +606,8 @@ function createBee(parent, type) {
   function pollinateFlower() {
     if (isAt(flower) && !isPollenSackFull()) {
       flower.claimSlot(bee)
-      bee.pollenSack += 0.1
-      bee.nectarSack += 0.1
+      bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(30)
+      bee.nectarSack += transferTo(bee.NECTAR_SACK_CAPACITY).inSeconds(30)
       bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
       bee.nectarSack = cap(0, bee.NECTAR_SACK_CAPACITY)(bee.nectarSack)
       if (isPollenSackFull() && isNectarSackFull()) {
@@ -622,9 +626,10 @@ function createBee(parent, type) {
   function depositPollen() {
     const hex = bee.isAtType('pollen')
     if (!hex) return false
-    hex.claimSlot(bee)
-    bee.pollenSack -= 0.1
-    hex.pollen += 0.1
+    hex.claimSlot(bee)  
+    bee.pollenSack -= transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(30)
+    hex.pollen += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(30)
+    hex.pollen = cap(0, hex.POLLEN_HEX_CAPACITY)(hex.pollen)
     if (isPollenSackEmpty() || hex.isPollenFull()) {
       bee.position.y = hex.position.y - 5
     }
@@ -662,18 +667,19 @@ function createBee(parent, type) {
 
     if (pollenHex.length > 0 && isAt(pollenHex[0])) {
       pollenHex[0].claimSlot(bee)
-      bee.pollenSack += 0.1
-      pollenHex[0].pollen -= 0.1
+      bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(30)
+      pollenHex[0].pollen -= transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(30)
       if (isPollenSackFull()) {
-        bee.position.x = pollenHyx[0].position.y - 5
+        bee.position.y = pollenHex[0].position.y - 5
       }
       return
     }
 
     if (larvaeHex.length > 0 && isAtAnyLarvae.length > 0 && !isPollenSackEmpty()) {
       isAtAnyLarvae[0].claimSlot(bee)
-      bee.pollenSack -= 0.1
-      isAtAnyLarvae[0].nutrition += 10
+      bee.pollenSack -= transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(20)
+      isAtAnyLarvae[0].nutrition += transferTo(isAtAnyLarvae[0].NUTRITION_CAPACITY).inSeconds(10)
+      isAtAnyLarvae[0].nutrition = cap(0, isAtAnyLarvae[0].NUTRITION_CAPACITY)(isAtAnyLarvae[0].nutrition)
       return
     }
 
@@ -942,18 +948,18 @@ function cellBrood(x, y, parent) {
     broodSprite.lifecycle += transferTo(225).inSeconds(225)
 
     // Transitions
-    if (broodSprite.lifecycle > 40 && broodSprite.content === 'egg') {
+    if (broodSprite.lifecycle > 20 && broodSprite.content === 'egg') {
       broodSprite.setContents('larvae')      
-    } else if (broodSprite.lifecycle > 85 && broodSprite.content === 'larvae') {
+    } else if (broodSprite.lifecycle > 20 + 105 && broodSprite.content === 'larvae') {
       broodSprite.setContents('puppa')
-    } else if (broodSprite.lifecycle > 100 && broodSprite.content === 'puppa') {
+    } else if (broodSprite.lifecycle > 20 + 105 + 50 && broodSprite.content === 'puppa') {
       broodSprite.setContents('empty')
-      createBee(beeContainer)
+      createBee(beeContainer, null, { x: broodSprite.position.x, y: broodSprite.position.y - 5 })
     }
 
     // States
     if (broodSprite.content === 'larvae') {
-      broodSprite.nutrition -= transferTo(broodSprite.NUTRITION_CAPACITY).inSeconds(30)
+      broodSprite.nutrition -= transferTo(broodSprite.NUTRITION_CAPACITY).inSeconds(60)
       if (broodSprite.nutrition <= 0) {
         broodSprite.setContents('dead')
       }
