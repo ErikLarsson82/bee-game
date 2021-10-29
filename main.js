@@ -77,6 +77,7 @@ let background = null
 let flower = null
 let selectedSprite = null
 let beeContainer = null
+let nightDimmer = null
 
 let hexGrid = []
 const bees = []
@@ -94,6 +95,9 @@ function setup() {
   beeContainer = new Container()
   container.addChild(beeContainer)
 
+  foreground = new Container()
+  container.addChild(foreground)
+  
   const ui = new Container()
   container.addChild(ui)
 
@@ -128,7 +132,7 @@ function setup() {
     uiTopBar.addChild(pausedText)
 
     const pauseFrame = new Graphics()
-    pauseFrame.lineStyle(5, 0x000000);
+    pauseFrame.lineStyle(10, 0x000000);
     pauseFrame.drawRect(0, 0, WIDTH / 2, HEIGHT / 2)
     ui.addChild(pauseFrame)
 
@@ -209,6 +213,16 @@ function setup() {
 
   ui.addChild(panel)
 
+  nightDimmer = new Graphics()
+  nightDimmer.beginFill(0x000000)
+  nightDimmer.drawRect(0, 0, WIDTH / 2, HEIGHT / 2)
+  nightDimmer.alpha = 0.4
+  nightDimmer.visible = false
+  app.ticker.add(time => {
+    nightDimmer.visible = hour > 22
+  })
+  foreground.addChild(nightDimmer)
+
   //createBee(beeContainer, 'nurser')
   createBee(beeContainer, 'forager')
   //createBee(beeContainer, 'worker')
@@ -223,7 +237,7 @@ function setup() {
 function gameLoop(delta) {
   if (paused) return
 
-  hour += 0.01
+  hour += transferTo(24).inMinutes(5)
 
   if (hour > 24) {
     hour = 0
