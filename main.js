@@ -322,7 +322,7 @@ function makeFlyable(sprite) {
         }
       }
     }
-    const SPEED = 0.01
+    const SPEED = 0.001 * gameSpeed
     sprite.timeOfFlight += 20
 
     if (sprite.vx === 0 && sprite.vy === 0) {
@@ -333,7 +333,7 @@ function makeFlyable(sprite) {
     sprite.vx += targetSprite.position.x < sprite.position.x ? -SPEED : SPEED  
     sprite.vy += targetSprite.position.y < sprite.position.y ? -SPEED : SPEED
     
-    if (sprite.timeOfFlight > 144) {
+    if (sprite.timeOfFlight > FPS) {
       sprite.vx = sprite.vx * 0.97
       sprite.vy = sprite.vy * 0.97
     }    
@@ -511,7 +511,7 @@ function createBee(parent, type) {
   makeHexDetectable(bee)
   bee.vx = 0
   bee.vy = 0
-  bee.wingAnimationTicker = Math.random() * 100
+  bee.animationTicker = Math.random() * 100
   bee.NECTAR_SACK_CAPACITY = 20
   bee.POLLEN_SACK_CAPACITY = 20
   bee.HONEY_SACK_CAPACITY = 10
@@ -724,17 +724,22 @@ function createBee(parent, type) {
 
     beeExclamation.visible = bee.isHungry()
 
+    bee.animationTicker += 0.1 * gameSpeed
+    
     if (bee.vx !== 0 || bee.vy !== 0) {
       (bee.vx >= -0.15 || bee.vx === 0) ? bee.scale.set(1, 1) : bee.scale.set(-1, 1) //
-      bee.wingAnimationTicker += 0.4
-      if (Math.sin(bee.wingAnimationTicker) > 0) {
+      if (Math.sin(bee.animationTicker) > 0) {
         beeAddon.texture = Texture.fromImage('bee-drone-wings.png')
       } else {
         beeAddon.texture = Texture.fromImage('bee-drone-wings-flapped.png')
       }
     } else {
       bee.scale.set(1, 1)
-      beeAddon.texture = Texture.fromImage('bee-drone-legs.png')
+      if (bee.position.x === 35 || Math.sin(bee.animationTicker) > 0) {
+        beeAddon.texture = Texture.fromImage('bee-drone-legs.png')
+      } else {
+        beeAddon.texture = Texture.fromImage('bee-drone-legs-jerk.png')
+      }
     }
 
     if (bee.type === 'unassigned') {
