@@ -516,22 +516,6 @@ function createQueen(parent) {
     }
     queenSprite.flyTo(null)
     return false
-    /*
-    if (emptyBroodCells.length > 0) {
-      queenSprite.position.x = emptyBroodCells[0].position.x
-      queenSprite.position.y = emptyBroodCells[0].position.y
-      queenSprite.delay--
-
-      if (queenSprite.delay <= 0) {
-        emptyBroodCells[0].setContents('egg')
-        queenSprite.delay = 600
-        queenSprite.position.x = 100
-        queenSprite.position.y = 45
-      }
-    } else {
-      queenSprite.delay = 600 
-    }
-    */
   })
 
   queen = queenSprite
@@ -916,9 +900,12 @@ function cellBrood(x, y, parent) {
   broodSprite.position.y = pixelCoordinate.y
 
   broodSprite.type = 'brood'
+  
+  // Stored in seconds for easy transitions
   broodSprite.lifecycle = 0
+  
   broodSprite.content = 'empty'
-  broodSprite.NUTRITION_CAPACITY = secondsToTicks(60)
+  broodSprite.NUTRITION_CAPACITY = 100
   broodSprite.nutrition = null
   broodSprite.isOccupiedWithOffspring = () => broodSprite.content !== 'empty'
   broodSprite.setContents = item => {
@@ -926,7 +913,7 @@ function cellBrood(x, y, parent) {
     broodSprite.content = item
     if (item === 'egg') {
       broodSprite.lifecycle = 0
-      broodSprite.nutrition = secondsToTicks(10)
+      broodSprite.nutrition = 50
     }
   }
   broodSprite.isWellFed = () => broodSprite.nutrition >= broodSprite.NUTRITION_CAPACITY
@@ -952,21 +939,21 @@ function cellBrood(x, y, parent) {
     if (!broodSprite.content) return
     if (['dead', 'empty'].includes(broodSprite.content)) return
     
-    broodSprite.lifecycle += 1
+    broodSprite.lifecycle += transferTo(225).inSeconds(225)
 
     // Transitions
-    if (broodSprite.lifecycle > secondsToTicks(5) && broodSprite.content === 'egg') {
+    if (broodSprite.lifecycle > 40 && broodSprite.content === 'egg') {
       broodSprite.setContents('larvae')      
-    } else if (broodSprite.lifecycle > secondsToTicks(30) && broodSprite.content === 'larvae') {
+    } else if (broodSprite.lifecycle > 85 && broodSprite.content === 'larvae') {
       broodSprite.setContents('puppa')
-    } else if (broodSprite.lifecycle > secondsToTicks(60) && broodSprite.content === 'puppa') {
+    } else if (broodSprite.lifecycle > 100 && broodSprite.content === 'puppa') {
       broodSprite.setContents('empty')
       createBee(beeContainer)
     }
 
     // States
     if (broodSprite.content === 'larvae') {
-      broodSprite.nutrition -= 1
+      broodSprite.nutrition -= transferTo(broodSprite.NUTRITION_CAPACITY).inSeconds(30)
       if (broodSprite.nutrition <= 0) {
         broodSprite.setContents('dead')
       }
@@ -978,8 +965,8 @@ function cellBrood(x, y, parent) {
     text.position.x = 7
     text.position.y = 50
     app.ticker.add(time => {
-      const line2 = broodSprite.content === 'larvae' ? '\nNutrients: ' + ticksToSeconds(broodSprite.nutrition) : ''
-      const line3 = ['egg', 'larvae', 'puppa'].includes(broodSprite.content) ? '\nLifecycle: ' + ticksToSeconds(broodSprite.lifecycle) : ''
+      const line2 = broodSprite.content === 'larvae' ? '\nNutrients: ' + Math.round(broodSprite.nutrition) : ''
+      const line3 = ['egg', 'larvae', 'puppa'].includes(broodSprite.content) ? '\nLifecycle: ' + Math.round(broodSprite.lifecycle) : ''
       text.text = broodSprite.content + line2 + line3
     })
     return text
