@@ -470,6 +470,38 @@ function makeHungry(bee) {
   }
 }
 
+function makeParticleCreator(bee) {
+  bee.particleDelay = 0
+  let transferRate = 0
+
+  app.ticker.add(time => {
+    if (paused) return
+
+    if (bee.pollenSack < bee.POLLEN_SACK_CAPACITY) return
+
+    if (bee.particleDelay <= 0) {
+      transferRate = Math.random() * 1
+      bee.particleDelay = 1
+
+      const pollenPixel = Sprite.fromImage('pollen-pixel.png')
+      pollenPixel.position.x = bee.position.x + 2 + (Math.random() * 4)
+      pollenPixel.position.y = bee.position.y + 4
+      let lifetime = 0
+      app.ticker.add(time => {
+        if (paused) return
+        pollenPixel.position.y += 0.0003 * FPS * gameSpeed
+        lifetime += transferTo(1).inSeconds(1)
+        if (lifetime > 1) {
+          background.removeChild(pollenPixel)
+        }
+      })
+      background.addChild(pollenPixel)
+      return
+    }
+    bee.particleDelay -= transferTo(1).inSeconds(transferRate)
+  })
+}
+
 function createQueen(parent) {
   const queenSprite = PIXI.Sprite.fromImage('bee-queen.png')
   makeSelectable(queenSprite, 'queen')
@@ -536,6 +568,7 @@ function createBee(parent, type, startPosition) {
   bee.addChild(beeExclamation)
   makeSelectable(bee, 'bee')
   makeHungry(bee)
+  makeParticleCreator(bee)
   const isAt = samePosition(bee)
   bee.idle = {
     x: 35,
