@@ -1,4 +1,6 @@
 
+// Speed 0, 1x, 2x and 4x
+
 // Slider to determine the amount of pollenation and bringing resources back to base
 
 // Too much focus on pollenation -> no resources (but many flowers)
@@ -13,8 +15,6 @@
 
 // Flower lifecycle
 
-// Speed 0, 1x, 2x and 4x
-
 // Either use decimals or not, but dont mix
 
 // Have worker bees convert hexes
@@ -22,8 +22,6 @@
 // Things should be globally pauseable
 
 // Anchor everything at 0.5 to fix placements 
-
-// Dont flap wings when dead
 
 // Dont occupy the pollen hexes when they are empty
 
@@ -42,6 +40,13 @@ const pretty = number => Math.round(number/1000)
 const FPS = 144
 const ticksToSeconds = number => Math.round(number/FPS)
 const secondsToTicks = number => number * FPS
+
+const speeds = {
+  1: 0.4,
+  4: 0.6,
+  8: 1,
+  64: 2
+}
 
 const Container = PIXI.Container,
     autoDetectRenderer = PIXI.autoDetectRenderer,
@@ -312,6 +317,8 @@ function makeOccupiable(parent) {
 }
 
 function makeFlyable(sprite) {
+  sprite.vx = 0
+  sprite.vy = 0
   sprite.timeOfFlight = 0
   sprite.flyTo = (targetSprite) => {
     if (!targetSprite) {
@@ -398,36 +405,6 @@ function replaceSelectedHex(type) {
   }))
 }
 
-function createQueen(parent) {
-  const queenSprite = PIXI.Sprite.fromImage('bee-queen.png')
-  makeSelectable(queenSprite, 'queen')
-  queenSprite.position.x = 100
-  queenSprite.position.y = 45
-  queenSprite.delay = 600
-
-  app.ticker.add(time => {
-    if (paused) return
-    const emptyBroodCells = filterHexagon(hexGrid, hex => hex.type === 'brood' && !hex.isOccupied())
-    if (emptyBroodCells.length > 0) {
-      queenSprite.position.x = emptyBroodCells[0].position.x
-      queenSprite.position.y = emptyBroodCells[0].position.y
-      queenSprite.delay--
-
-      if (queenSprite.delay <= 0) {
-        emptyBroodCells[0].setContents('egg')
-        queenSprite.delay = 600
-        queenSprite.position.x = 100
-        queenSprite.position.y = 45
-      }
-    } else {
-      queenSprite.delay = 600 
-    }
-  })
-
-  queen = queenSprite
-  parent.addChild(queenSprite)
-}
-
 function cap(min, max) {
   return value => Math.max(Math.min(max, value), min)
 }
@@ -456,7 +433,7 @@ function transferTo(capacity) {
 
 function makeHungry(bee) {
   const HUNGER_CAPACITY = 100
-  bee.hunger = 20
+  bee.hunger = HUNGER_CAPACITY
   bee.isDead = () => bee.hunger <= 0
   bee.isWellFed = () => bee.hunger >= HUNGER_CAPACITY
   bee.isHungry = () => bee.hunger < 30
@@ -490,6 +467,77 @@ function makeHungry(bee) {
   }
 }
 
+function createQueen(parent) {
+  const queenSprite = PIXI.Sprite.fromImage('bee-queen.png')
+  makeSelectable(queenSprite, 'queen')
+  
+  const queenWingAddon = Sprite.fromImage('bee-queen-wings-flapped.png')
+  queenWingAddon.visible = false
+  queenSprite.addChild(queenWingAddon)
+  
+  const queenLegAddon = Sprite.fromImage('bee-queen-legs-jerk.png')
+  queenLegAddon.visible = false
+  queenSprite.addChild(queenLegAddon)
+  
+  queenSprite.idle = {
+    x: 100,
+    y: 45
+  }
+  goIdle(queenSprite)
+  queenSprite.animationTicker = Math.random() * 100
+  queenSprite.delay = 0
+
+  makeFlyable(queenSprite)
+  makeHexDetectable(queenSprite)
+
+  app.ticker.add(time => {
+    if (paused) return
+    
+    queenSprite.animationTicker += speeds[gameSpeed]
+    
+    const targetBrood = queenSprite.isAtType('brood')
+    
+    queenWingAddon.visible = (queenSprite.vx !== 0 || queenSprite.vy !== 0) && Math.sin(queenSprite.animationTicker) > 0
+    queenLegAddon.visible = (queenSprite.vx === 0 && queenSprite.vy === 0 && targetBrood) && Math.sin(queenSprite.animationTicker) > 0
+
+    if (targetBrood) {
+      queenSprite.delay += transferTo(1).inSeconds(10)
+      if (queenSprite.delay < 1) return true
+      queenSprite.delay = 0
+      targetBrood.setContents('egg')
+      queenSprite.position.y = queenSprite.position.y - 5
+      return true
+    }
+
+    const emptyBroodCells = filterHexagon(hexGrid, hex => hex.type === 'brood' && !hex.isOccupiedWithOffspring())
+    if (emptyBroodCells.length > 0) {
+      queenSprite.flyTo(emptyBroodCells[0])
+      return true
+    }
+    queenSprite.flyTo(null)
+    return false
+    /*
+    if (emptyBroodCells.length > 0) {
+      queenSprite.position.x = emptyBroodCells[0].position.x
+      queenSprite.position.y = emptyBroodCells[0].position.y
+      queenSprite.delay--
+
+      if (queenSprite.delay <= 0) {
+        emptyBroodCells[0].setContents('egg')
+        queenSprite.delay = 600
+        queenSprite.position.x = 100
+        queenSprite.position.y = 45
+      }
+    } else {
+      queenSprite.delay = 600 
+    }
+    */
+  })
+
+  queen = queenSprite
+  parent.addChild(queenSprite)
+}
+
 function createBee(parent, type) {
   const bee = Sprite.fromImage('bee-drone-body.png')
   const beeAddon = Sprite.fromImage('bee-drone-legs.png')
@@ -509,15 +557,14 @@ function createBee(parent, type) {
   goIdle(bee)
   makeFlyable(bee)
   makeHexDetectable(bee)
-  bee.vx = 0
-  bee.vy = 0
   bee.animationTicker = Math.random() * 100
   bee.NECTAR_SACK_CAPACITY = 20
   bee.POLLEN_SACK_CAPACITY = 20
   bee.HONEY_SACK_CAPACITY = 10
+  
   bee.pollenSack = 0
   bee.waxSack = 0
-  bee.nectarSack = type === 'forager' ? 20 : 0
+  bee.nectarSack = 0
   bee.honeySack = 0
   bee.type = type || 'unassigned'
   
@@ -573,6 +620,8 @@ function createBee(parent, type) {
       flower.claimSlot(bee)
       bee.pollenSack += 0.1
       bee.nectarSack += 0.1
+      bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
+      bee.nectarSack = cap(0, bee.NECTAR_SACK_CAPACITY)(bee.nectarSack)
       if (isPollenSackFull() && isNectarSackFull()) {
         bee.position.y = flower.position.y - 5
       }
@@ -723,15 +772,9 @@ function createBee(parent, type) {
     }
 
     beeExclamation.visible = bee.isHungry()
-
-    const speeds = {
-      1: 0.4,
-      4: 0.6,
-      8: 1,
-      64: 2
-    }
-    bee.animationTicker += speeds[gameSpeed]
     
+    bee.animationTicker += speeds[gameSpeed]
+
     if (bee.vx !== 0 || bee.vy !== 0) {
       (bee.vx >= -0.15 || bee.vx === 0) ? bee.scale.set(1, 1) : bee.scale.set(-1, 1) //
       if (Math.sin(bee.animationTicker) > 0) {
@@ -877,7 +920,7 @@ function cellBrood(x, y, parent) {
   broodSprite.content = 'empty'
   broodSprite.NUTRITION_CAPACITY = secondsToTicks(60)
   broodSprite.nutrition = null
-  broodSprite.isOccupied = () => broodSprite.content !== 'empty'
+  broodSprite.isOccupiedWithOffspring = () => broodSprite.content !== 'empty'
   broodSprite.setContents = item => {
     // empty -> egg -> (larvae -> puppa) || dead
     broodSprite.content = item
