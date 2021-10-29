@@ -306,6 +306,14 @@ function makeFlyable(sprite) {
   }  
 }
 
+function makeHexDetectable(bee) {
+  bee.isAt = type => {
+    const result = filterHexagon(hexGrid, hex => hex.type === type && samePosition(bee, hex))
+    if (result.length > 0) return result[0]
+    return null
+  }
+}
+
 function goIdle(bee) {
   bee.position.x = bee.idle.x
   bee.position.y = bee.idle.y
@@ -395,17 +403,19 @@ function createBee(parent, type) {
   }
   goIdle(bee)
   makeFlyable(bee)
+  makeHexDetectable(bee)
   bee.vx = 0
   bee.vy = 0
   bee.wingAnimationTicker = Math.random() * 100
   bee.NECTAR_SACK_CAPACITY = 20
   bee.POLLEN_SACK_CAPACITY = 20
+  bee.HONEY_SACK_CAPACITY = 10
   bee.HUNGER_CAPACITY = secondsToTicks(120)
   bee.pollenSack = 0
   bee.waxSack = 0
   bee.nectarSack = type === 'forager' ? 20 : 0
   bee.honeySack = 0
-  bee.hunger = Math.min(secondsToTicks(10 + (bees.length * 5)), bee.HUNGER_CAPACITY)
+  bee.hunger = Math.min(secondsToTicks(60 + (bees.length * 5)), bee.HUNGER_CAPACITY)
   bee.type = type || 'unassigned'
   bee.isDead = () => bee.hunger <= 0
 
@@ -414,6 +424,9 @@ function createBee(parent, type) {
 
   const isNectarSackFull = () => bee.nectarSack >= bee.NECTAR_SACK_CAPACITY
   const isNectarSackEmpty = () => !(bee.nectarSack > 0)
+
+  const isHoneySackFull = () => bee.honeySack >= bee.HONEY_SACK_CAPACITY
+  const isHoneySackEmpty = () => !(bee.honeySack > 0)
 
   bee.panelContent = () => {
     const text = new PIXI.Text('Loading', { ...fontConfig })
@@ -435,7 +448,7 @@ function createBee(parent, type) {
   function depositNectar() {
     if (isNectarSackEmpty()) return false
 
-    const converterNeedsNectar = filterHexagon(hexGrid, hex => hex.type === 'converter' && !hex.isFull() && hex.isUnclaimed(bee))
+    const converterNeedsNectar = filterHexagon(hexGrid, hex => hex.type === 'converter' && !hex.isNectarFull() && hex.isUnclaimed(bee))
     
     if (converterNeedsNectar.length === 0) return false
 
@@ -458,7 +471,7 @@ function createBee(parent, type) {
       flower.claimSlot(bee)
       bee.pollenSack += 0.1
       bee.nectarSack += 0.1
-      if (isPollenSackFull()) {
+      if (isPollenSackFull() && isNectarSackFull()) {
         bee.position.x = flower.position.x + 5
       }
       return true
@@ -472,34 +485,62 @@ function createBee(parent, type) {
   }
 
   function depositPollen() {
-    const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && !hex.isFull())
-    const unClaimedPollenHex = pollenHex.filter(hex => hex.isUnclaimed(bee))
-    
-    if (pollenHex.length === 0) return false
-    
-    if (isAt(pollenHex[0]) && !isPollenSackEmpty() && !pollenHex[0].isFull()) {
-      pollenHex[0].claimSlot(bee)
-      bee.pollenSack -= 0.1
-      pollenHex[0].pollen += 0.1
-      return true
+    const hex = bee.isAt('pollen')
+    if (!hex) return false
+    hex.claimSlot(bee)
+    bee.pollenSack -= 0.1
+    hex.pollen += 0.1
+    if (isPollenSackEmpty() || hex.isPollenFull()) {
+      bee.position.x = hex.position.x + 5
     }
- 
-    if (isPollenSackFull() && unClaimedPollenHex.length > 0 && unClaimedPollenHex[0].isUnclaimed(bee)) {
-      unClaimedPollenHex[0].claimSlot(bee)
-      bee.flyTo(unClaimedPollenHex[0])
+    return true
+  }
+
+
+  function flyToPollen() {
+    const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && hex.isUnclaimed(bee) && !hex.isPollenFull())
+    if (pollenHex.length === 0 || !isPollenSackFull()) return false
+    pollenHex[0].claimSlot(bee)
+    bee.flyTo(pollenHex[0])      
+    return true
+  }
+
+  function feedBee() {    
+    const honeyHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.honey > 0 && hex.isUnclaimed(bee))
+    const beeIsWellFed = () => bee.hunger >= bee.HUNGER_CAPACITY
+
+    if (honeyHex.length > 0 && isAt(honeyHex[0]) && !beeIsWellFed()) {
+      honeyHex[0].claimSlot(bee)
+      bee.hunger += 30
+      bee.hunger = Math.min(bee.hunger, bee.HUNGER_CAPACITY)
+      honeyHex[0].honey -= 0.01
+      if (beeIsWellFed()) {
+        bee.position.x = honeyHex[0].position.x + 5
+      }
+      return true
+    } else {
+      bee.hunger -= 1
+    }
+
+    if (honeyHex.length > 0 && bee.hunger < secondsToTicks(30)) {
+      honeyHex[0].claimSlot(bee)
+      bee.flyTo(honeyHex[0])
       return true
     }
     return false
   }
 
   function forager() {
+    if (feedBee()) return
     if (depositNectar()) return
-    if (pollinateFlower()) return
     if (depositPollen()) return    
+    if (pollinateFlower()) return
+    if (flyToPollen()) return    
     bee.flyTo(null)
   }
 
   function nurser() {
+    if (feedBee()) return
     const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && hex.pollen > 0 && hex.isUnclaimed(bee))
     const isAtAnyLarvae = filterHexagon(hexGrid, hex => hex.type === 'brood' && hex.content === 'larvae' && hex.isUnclaimed(bee) && isAt(hex))
     const larvaeHex = filterHexagon(hexGrid, hex => 
@@ -541,22 +582,52 @@ function createBee(parent, type) {
     bee.flyTo(null)
   }
 
-  function worker() {
-    const converterHex = filterHexagon(hexGrid, hex => hex.type === 'converter' && hex.isUnclaimed(bee) && hex.nectar > 0)
-
-    if (converterHex.length === 0) {
-      bee.flyTo(null)
-      return
+  function convertNectar() {
+    const hex = bee.isAt('converter')
+    if (!hex || isHoneySackFull()) return false
+    hex.claimSlot(bee)
+    hex.nectar -= 0.1
+    bee.honeySack += 0.1
+    if (isHoneySackFull() || hex.isNectarEmpty()) {
+      bee.position.x = hex.position.x + 5
     }
+    return true
+  }
 
+  function flyToConverter() {
+    const converterHex = filterHexagon(hexGrid, hex => hex.type === 'converter' && hex.isUnclaimed(bee) && !hex.isNectarEmpty())
+    if (converterHex.length === 0 || isHoneySackFull()) return false
     converterHex[0].claimSlot(bee)
-    if (!isAt(converterHex[0])) {
-      bee.flyTo(converterHex[0])      
-      bee.visible = true
-    } else {
-      converterHex[0].convert()
-      bee.visible = false
+    bee.flyTo(converterHex[0])      
+    return true
+  }
+
+  function depositHoney() {
+    const hex = bee.isAt('honey')
+    if (!hex) return false
+    hex.claimSlot(bee)
+    hex.honey += 0.1
+    bee.honeySack -= 0.1
+    if (isHoneySackEmpty() || hex.isHoneyFull()) {
+      bee.position.x = hex.position.x + 5
     }
+    return true
+  }
+
+  function flyToHoney() {
+    const honeyHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.isUnclaimed(bee) && !hex.isHoneyFull())
+    if (honeyHex.length === 0 || !isHoneySackFull()) return false
+    honeyHex[0].claimSlot(bee)
+    bee.flyTo(honeyHex[0])      
+    return true
+  }
+
+  function worker() {
+    if (depositHoney()) return
+    if (flyToHoney()) return
+    if (convertNectar()) return
+    if (flyToConverter()) return
+    bee.flyTo(null)
   }
 
   app.ticker.add(time => {
@@ -585,28 +656,6 @@ function createBee(parent, type) {
     } else {
       bee.scale.set(1, 1)
       beeAddon.texture = Texture.fromImage('bee-drone-legs.png')
-    }
-
-    const honeyHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.honey > 0 && hex.isUnclaimed(bee))
-    const beeIsWellFed = () => bee.hunger >= bee.HUNGER_CAPACITY
-
-    if (honeyHex.length > 0 && isAt(honeyHex[0]) && !beeIsWellFed()) {
-      honeyHex[0].claimSlot(bee)
-      bee.hunger += 30
-      bee.hunger = Math.min(bee.hunger, bee.HUNGER_CAPACITY)
-      honeyHex[0].honey -= 0.01
-      if (beeIsWellFed()) {
-        bee.position.x = honeyHex[0].position.x + 5
-      }
-      return
-    } else {
-      bee.hunger -= 1
-    }
-
-    if (honeyHex.length > 0 && bee.hunger < secondsToTicks(30)) {
-      honeyHex[0].claimSlot(bee)
-      bee.flyTo(honeyHex[0])
-      return
     }
 
     if (bee.type === 'unassigned') {
@@ -638,6 +687,7 @@ function cellEmpty(x, y, parent) {
 
   emptySprite.panelContent = () => {
     const c = new Container()
+    c.addChild(Button(5, 40, 'honey', () => replaceSelectedHex('honey')))
     c.addChild(Button(5, 60, 'brood', () => replaceSelectedHex('brood')))
     c.addChild(Button(5, 80, 'pollen', () => replaceSelectedHex('pollen')))
     c.addChild(Button(5, 100, 'converter', () => replaceSelectedHex('converter')))
@@ -658,8 +708,9 @@ function cellHoney(x, y, parent) {
 
   honeySprite.type = 'honey'
   honeySprite.HONEY_HEX_CAPACITY = 30
-  honeySprite.honey = 30
-  honeySprite.isFull = () => honeySprite.honey >= honeySprite.HONEY_HEX_CAPACITY
+  honeySprite.honey = 15
+  honeySprite.isHoneyFull = () => honeySprite.honey >= honeySprite.HONEY_HEX_CAPACITY
+  honeySprite.isHoneyEmpty = () => honeySprite.honey <= 0
   
   app.ticker.add(time => {
     if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.75) {
@@ -693,15 +744,11 @@ function cellConverter(x, y, parent) {
   makeOccupiable(converterSprite)
   converterSprite.position.x = pixelCoordinate.x
   converterSprite.position.y = pixelCoordinate.y
-  converterSprite.NECTAR_CAPACITY = 20
+  converterSprite.NECTAR_CAPACITY = 15
   converterSprite.nectar = 0
-  converterSprite.honey = 0
-  converterSprite.isFull = () => converterSprite.nectar >= converterSprite.NECTAR_CAPACITY
-  converterSprite.convert = () => {
-    converterSprite.honey += 0.1
-    converterSprite.nectar -= 0.1
-  }
-
+  converterSprite.isNectarFull = () => converterSprite.nectar >= converterSprite.NECTAR_CAPACITY
+  converterSprite.isNectarEmpty = () => converterSprite.nectar <= 0
+ 
   converterSprite.panelContent = () => {
     const text = new PIXI.Text('Loading', { ...fontConfig })
     text.position.x = 7
@@ -821,8 +868,8 @@ function cellPollen(x, y, parent) {
   pollenSprite.type = 'pollen'
   pollenSprite.POLLEN_HEX_CAPACITY = 120
   pollenSprite.pollen = 0
-  pollenSprite.isFull = () => pollenSprite.pollen >= pollenSprite.POLLEN_HEX_CAPACITY
-  pollenSprite.isEmpty = () => pollenSprite.pollen <= 0
+  pollenSprite.isPollenFull = () => pollenSprite.pollen >= pollenSprite.POLLEN_HEX_CAPACITY
+  pollenSprite.isPollenEmpty = () => pollenSprite.pollen <= 0
   app.ticker.add(time => {
     if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.75) {
       pollenSprite.texture = Texture.fromImage('cell-pollen-full.png')
