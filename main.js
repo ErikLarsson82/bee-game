@@ -141,6 +141,8 @@ function setup() {
         pausedText.text = '>>'
       } else if (gameSpeed === 8) {
         pausedText.text = '>>>'
+      } else if (gameSpeed === 64) {
+        pausedText.text = '>>>>>>>'
       }
       pauseFrame.visible = paused
     }
@@ -207,10 +209,10 @@ function setup() {
 
   ui.addChild(panel)
 
-  createBee(beeContainer, 'nurser')
+  //createBee(beeContainer, 'nurser')
   createBee(beeContainer, 'forager')
-  createBee(beeContainer, 'worker')
-  createBee(beeContainer, 'worker')
+  //createBee(beeContainer, 'worker')
+  //createBee(beeContainer, 'worker')
   createQueen(beeContainer)
 
   createMap()
@@ -412,6 +414,52 @@ function createQueen(parent) {
   parent.addChild(queenSprite)
 }
 
+function cap(min, max) {
+  return value => Math.max(Math.min(max, value), min)
+}
+
+function toGameTick(seconds) {
+  return seconds * FPS
+}
+
+function fromSeconds(gameTicks) {
+  return gameTicks / 144
+}
+
+function makeHungry(bee) {
+  const HUNGER_CAPACITY = 100
+  bee.hunger = 100
+  bee.isDead = () => bee.hunger <= 0
+  bee.isWellFed = () => bee.hunger >= HUNGER_CAPACITY
+  bee.isHungry = () => bee.hunger < 30
+
+  bee.feedBee = () => {
+    const honeyHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.honey > 0 && hex.isUnclaimed(bee))
+    
+    if (honeyHex.length > 0 && bee.isAt(honeyHex[0]) && !bee.isWellFed()) {
+      honeyHex[0].claimSlot(bee)
+      bee.hunger += 30
+      bee.hunger = cap(0, HUNGER_CAPACITY)(bee.hunger)
+      honeyHex[0].honey -= 0.01
+      if (bee.isWellFed()) {
+        bee.position.x = honeyHex[0].position.x + 5
+      }
+      return true
+    } else {
+      // A bee will survive approx 15 minuter at speed 1 with a full belly, which is 15 min * 60 sec * 144 FPS = 129600 game ticks
+      // 129600 gameticks / 100 hunger value points = 0.00077160 reduction in hunger each tick
+      bee.hunger -= 0.00077160 * gameSpeed
+    }
+
+    if (honeyHex.length > 0 && bee.isHungry()) {
+      honeyHex[0].claimSlot(bee)
+      bee.flyTo(honeyHex[0])
+      return true
+    }
+    return false
+  }
+}
+
 function createBee(parent, type) {
   const bee = Sprite.fromImage('bee-drone-body.png')
   const beeAddon = Sprite.fromImage('bee-drone-legs.png')
@@ -422,11 +470,13 @@ function createBee(parent, type) {
   beeExclamation.visible = false
   bee.addChild(beeExclamation)
   makeSelectable(bee, 'bee')
+  makeHungry(bee)
   const isAt = samePosition(bee)
   bee.idle = {
     x: 35,
     y: 60 + (bees.length * 15)
   }
+  bee.isAt = isAt
   goIdle(bee)
   makeFlyable(bee)
   makeHexDetectable(bee)
@@ -436,15 +486,12 @@ function createBee(parent, type) {
   bee.NECTAR_SACK_CAPACITY = 20
   bee.POLLEN_SACK_CAPACITY = 20
   bee.HONEY_SACK_CAPACITY = 10
-  bee.HUNGER_CAPACITY = secondsToTicks(120)
   bee.pollenSack = 0
   bee.waxSack = 0
   bee.nectarSack = type === 'forager' ? 20 : 0
   bee.honeySack = 0
-  bee.hunger = Math.min(secondsToTicks(5 + (bees.length * 20)), bee.HUNGER_CAPACITY)
   bee.type = type || 'unassigned'
-  bee.isDead = () => bee.hunger <= 0
-
+  
   const isPollenSackFull = () => bee.pollenSack >= bee.POLLEN_SACK_CAPACITY
   const isPollenSackEmpty = () => !(bee.pollenSack > 0)
 
@@ -465,7 +512,7 @@ function createBee(parent, type) {
       str += 'Nectar  ' + Math.round(bee.nectarSack) + '\n'
       str += 'Wax     ' + Math.round(bee.waxSack) + '\n'
       str += 'Honey   ' + Math.round(bee.honeySack) + '\n\n'
-      str += 'Hunger  ' + ticksToSeconds(bee.hunger)
+      str += 'Hunger  ' + Math.round(bee.hunger)
       text.text = str
     })
     return text
@@ -531,33 +578,8 @@ function createBee(parent, type) {
     return true
   }
 
-  function feedBee() {    
-    const honeyHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.honey > 0 && hex.isUnclaimed(bee))
-    const beeIsWellFed = () => bee.hunger >= bee.HUNGER_CAPACITY
-
-    if (honeyHex.length > 0 && isAt(honeyHex[0]) && !beeIsWellFed()) {
-      honeyHex[0].claimSlot(bee)
-      bee.hunger += 30
-      bee.hunger = Math.min(bee.hunger, bee.HUNGER_CAPACITY)
-      honeyHex[0].honey -= 0.01
-      if (beeIsWellFed()) {
-        bee.position.x = honeyHex[0].position.x + 5
-      }
-      return true
-    } else {
-      bee.hunger -= 1
-    }
-
-    if (honeyHex.length > 0 && bee.hunger < secondsToTicks(30)) {
-      honeyHex[0].claimSlot(bee)
-      bee.flyTo(honeyHex[0])
-      return true
-    }
-    return false
-  }
-
   function forager() {
-    if (feedBee()) return
+    if (bee.feedBee()) return
     if (depositNectar()) return
     if (depositPollen()) return    
     if (pollinateFlower()) return
@@ -566,7 +588,7 @@ function createBee(parent, type) {
   }
 
   function nurser() {
-    if (feedBee()) return
+    if (bee.feedBee()) return
     const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && hex.pollen > 0 && hex.isUnclaimed(bee))
     const isAtAnyLarvae = filterHexagon(hexGrid, hex => hex.type === 'brood' && hex.content === 'larvae' && hex.isUnclaimed(bee) && isAt(hex))
     const larvaeHex = filterHexagon(hexGrid, hex => 
@@ -671,7 +693,7 @@ function createBee(parent, type) {
       return
     }
 
-    beeExclamation.visible = bee.hunger < secondsToTicks(30)
+    beeExclamation.visible = bee.isHungry()
 
     if (bee.vx !== 0 || bee.vy !== 0) {
       (bee.vx >= -0.15 || bee.vx === 0) ? bee.scale.set(1, 1) : bee.scale.set(-1, 1) //
@@ -966,6 +988,12 @@ window.addEventListener('keydown', e => {
   // 2
   if (e.keyCode === 51) {
     gameSpeed = 8
+    paused = false
+  }
+
+  // 3
+  if (e.keyCode === 52) {
+    gameSpeed = 64
     paused = false
   }
     
