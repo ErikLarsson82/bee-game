@@ -259,7 +259,10 @@ function createMap() {
   // replaceSelectedHex('pollen')
   setSelected(hexGrid[0][2])
   replaceSelectedHex('pollen')
-  hexGrid[0][2].pollen = 20
+  hexGrid[0][2].pollen = hexGrid[0][2].POLLEN_HEX_CAPACITY
+  setSelected(hexGrid[0][3])
+  replaceSelectedHex('pollen')
+  hexGrid[0][3].pollen = hexGrid[0][3].POLLEN_HEX_CAPACITY
   // deselect
   setSelected(null)
 }
