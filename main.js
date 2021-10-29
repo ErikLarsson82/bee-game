@@ -307,7 +307,7 @@ function makeOccupiable(parent) {
         parent.slot = null
       }
     }
-    spotClaimed.visible = !!parent.slot // enable for debug
+    // spotClaimed.visible = !!parent.slot // enable for debug
   })
 }
 
@@ -471,7 +471,7 @@ function makeHungry(bee) {
       bee.hunger = cap(0, HUNGER_CAPACITY)(bee.hunger)
       honeyTarget.honey -= transferTo(honeyTarget.HONEY_HEX_CAPACITY).inSeconds(40)
       if (bee.isWellFed()) {
-        bee.position.x = honeyTarget.position.x + 5
+        bee.position.y = honeyTarget.position.y - 5
       }
       return true
     } else {
@@ -574,7 +574,7 @@ function createBee(parent, type) {
       bee.pollenSack += 0.1
       bee.nectarSack += 0.1
       if (isPollenSackFull() && isNectarSackFull()) {
-        bee.position.x = flower.position.x + 5
+        bee.position.y = flower.position.y - 5
       }
       return true
     }
@@ -593,7 +593,7 @@ function createBee(parent, type) {
     bee.pollenSack -= 0.1
     hex.pollen += 0.1
     if (isPollenSackEmpty() || hex.isPollenFull()) {
-      bee.position.x = hex.position.x + 5
+      bee.position.y = hex.position.y - 5
     }
     return true
   }
@@ -632,7 +632,7 @@ function createBee(parent, type) {
       bee.pollenSack += 0.1
       pollenHex[0].pollen -= 0.1
       if (isPollenSackFull()) {
-        bee.position.x = pollenHex[0].position.x + 5
+        bee.position.x = pollenHyx[0].position.y - 5
       }
       return
     }
@@ -666,7 +666,7 @@ function createBee(parent, type) {
     hex.nectar -= 0.1
     bee.honeySack += 0.1
     if (isHoneySackFull() || hex.isNectarEmpty()) {
-      bee.position.x = hex.position.x + 5
+      bee.position.y = hex.position.y - 5
     }
     return true
   }
@@ -686,7 +686,7 @@ function createBee(parent, type) {
     hex.honey += 0.1
     bee.honeySack -= 0.1
     if (isHoneySackEmpty() || hex.isHoneyFull()) {
-      bee.position.x = hex.position.x + 5
+      bee.position.y = hex.position.y - 5
     }
     return true
   }
@@ -724,7 +724,13 @@ function createBee(parent, type) {
 
     beeExclamation.visible = bee.isHungry()
 
-    bee.animationTicker += 0.1 * gameSpeed
+    const speeds = {
+      1: 0.4,
+      4: 0.6,
+      8: 1,
+      64: 2
+    }
+    bee.animationTicker += speeds[gameSpeed]
     
     if (bee.vx !== 0 || bee.vy !== 0) {
       (bee.vx >= -0.15 || bee.vx === 0) ? bee.scale.set(1, 1) : bee.scale.set(-1, 1) //
@@ -735,7 +741,7 @@ function createBee(parent, type) {
       }
     } else {
       bee.scale.set(1, 1)
-      if (bee.position.x === 35 || Math.sin(bee.animationTicker) > 0) {
+      if (bee.position.x === 35 || Math.sin(bee.animationTicker / 2) > 0) {
         beeAddon.texture = Texture.fromImage('bee-drone-legs.png')
       } else {
         beeAddon.texture = Texture.fromImage('bee-drone-legs-jerk.png')
