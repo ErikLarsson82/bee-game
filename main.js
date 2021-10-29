@@ -416,6 +416,11 @@ function createBee(parent, type) {
   const bee = Sprite.fromImage('bee-drone-body.png')
   const beeAddon = Sprite.fromImage('bee-drone-legs.png')
   bee.addChild(beeAddon)
+  const beeExclamation = Sprite.fromImage('exclamation.png')
+  beeExclamation.position.x = 12
+  beeExclamation.position.y = -2
+  beeExclamation.visible = false
+  bee.addChild(beeExclamation)
   makeSelectable(bee, 'bee')
   const isAt = samePosition(bee)
   bee.idle = {
@@ -436,7 +441,7 @@ function createBee(parent, type) {
   bee.waxSack = 0
   bee.nectarSack = type === 'forager' ? 20 : 0
   bee.honeySack = 0
-  bee.hunger = Math.min(secondsToTicks(60 + (bees.length * 5)), bee.HUNGER_CAPACITY)
+  bee.hunger = Math.min(secondsToTicks(5 + (bees.length * 20)), bee.HUNGER_CAPACITY)
   bee.type = type || 'unassigned'
   bee.isDead = () => bee.hunger <= 0
 
@@ -665,6 +670,8 @@ function createBee(parent, type) {
       }
       return
     }
+
+    beeExclamation.visible = bee.hunger < secondsToTicks(30)
 
     if (bee.vx !== 0 || bee.vy !== 0) {
       (bee.vx >= -0.15 || bee.vx === 0) ? bee.scale.set(1, 1) : bee.scale.set(-1, 1) //
