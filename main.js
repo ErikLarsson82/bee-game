@@ -53,7 +53,9 @@ const Container = PIXI.Container,
     PictureSprite = PIXI.extras.PictureSprite
     settings = PIXI.settings
 
-const app = new PIXI.Application(800, 400, { antialias: false })
+const WIDTH = 800
+const HEIGHT = 400
+const app = new PIXI.Application(WIDTH, HEIGHT, { antialias: false })
 document.body.appendChild(app.view)
 
 app.renderer.view.style.imageRendering = 'pixelated'
@@ -63,6 +65,7 @@ settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST // Default pixel-scaling
 app.renderer.view.style.position = 'absolute'
 app.renderer.view.style.display = 'block'
 
+let gameSpeed = 1
 let paused = false
 let day = 0
 let hour = 0
@@ -72,7 +75,6 @@ let queen = null
 let panel = null
 let background = null
 let flower = null
-let pausedText = null
 let selectedSprite = null
 let beeContainer = null
 
@@ -120,10 +122,29 @@ function setup() {
       dayCycle.text = 'Day ' + day + ' Hour ' + Math.round(hour)
     })
 
-    pausedText = new PIXI.Text('Playing', { ...fontConfig, fill: 'white' })
+    const pausedText = new PIXI.Text('Playing', { ...fontConfig, fill: 'white' })
     pausedText.position.x = 330
     pausedText.position.y = 2
     uiTopBar.addChild(pausedText)
+
+    const pauseFrame = new Graphics()
+    pauseFrame.lineStyle(5, 0x000000);
+    pauseFrame.drawRect(0, 0, WIDTH / 2, HEIGHT / 2)
+    ui.addChild(pauseFrame)
+
+    window.setGameSpeedText = () => {
+      if (paused) {
+        pausedText.text = 'Paused'
+      } else if (gameSpeed === 1) {
+        pausedText.text = '>'
+      } else if (gameSpeed === 4) {
+        pausedText.text = '>>'
+      } else if (gameSpeed === 8) {
+        pausedText.text = '>>>'
+      }
+      pauseFrame.visible = paused
+    }
+    window.setGameSpeedText()
     
     ui.addChild(uiTopBar)
   }
@@ -918,15 +939,32 @@ function Button(x, y, text, callback) {
 }
 
 window.addEventListener('keydown', e => {
+  //Space
   if (e.keyCode === 32) {
     paused = !paused
-
-    if (paused) {
-      pausedText.text = 'Paused'
-    } else {
-      pausedText.text = 'Playing'   
-    }
   }
+
+  // 1
+  if (e.keyCode === 49) {
+    gameSpeed = 1
+    paused = false
+  }
+
+  // 2
+  if (e.keyCode === 50) {
+    gameSpeed = 4
+    paused = false
+  }
+
+  // 2
+  if (e.keyCode === 51) {
+    gameSpeed = 8
+    paused = false
+  }
+    
+  setGameSpeedText()
 })
 
+
 setup()
+
