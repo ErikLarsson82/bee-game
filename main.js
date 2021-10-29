@@ -330,7 +330,7 @@ function makeFlyable(sprite) {
 }
 
 function makeHexDetectable(bee) {
-  bee.isAt = type => {
+  bee.isAtType = type => {
     const result = filterHexagon(hexGrid, hex => hex.type === type && samePosition(bee, hex))
     if (result.length > 0) return result[0]
     return null
@@ -426,9 +426,23 @@ function fromSeconds(gameTicks) {
   return gameTicks / 144
 }
 
+function rate(capacity, seconds) {
+  return capacity / (seconds * FPS) * gameSpeed
+}
+
+function transferTo(capacity) {
+  return {
+    inSeconds: seconds => rate(capacity, seconds),
+    inMinutes: minutes => {
+      const seconds = minutes * 60
+      return rate(capacity, seconds)
+    }
+  }
+}
+
 function makeHungry(bee) {
   const HUNGER_CAPACITY = 100
-  bee.hunger = 100
+  bee.hunger = 20
   bee.isDead = () => bee.hunger <= 0
   bee.isWellFed = () => bee.hunger >= HUNGER_CAPACITY
   bee.isHungry = () => bee.hunger < 30
@@ -436,19 +450,21 @@ function makeHungry(bee) {
   bee.feedBee = () => {
     const honeyHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.honey > 0 && hex.isUnclaimed(bee))
     
-    if (honeyHex.length > 0 && bee.isAt(honeyHex[0]) && !bee.isWellFed()) {
-      honeyHex[0].claimSlot(bee)
-      bee.hunger += 30
+    const honeyTarget = bee.isAtType('honey')
+    if (honeyTarget && !bee.isWellFed() && honeyTarget.honey > 0) {
+      honeyTarget.claimSlot(bee)
+      bee.hunger += transferTo(HUNGER_CAPACITY).inSeconds(20)      
       bee.hunger = cap(0, HUNGER_CAPACITY)(bee.hunger)
-      honeyHex[0].honey -= 0.01
+      honeyTarget.honey -= transferTo(honeyTarget.HONEY_HEX_CAPACITY).inSeconds(40)
       if (bee.isWellFed()) {
-        bee.position.x = honeyHex[0].position.x + 5
+        bee.position.x = honeyTarget.position.x + 5
       }
       return true
     } else {
-      // A bee will survive approx 15 minuter at speed 1 with a full belly, which is 15 min * 60 sec * 144 FPS = 129600 game ticks
-      // 129600 gameticks / 100 hunger value points = 0.00077160 reduction in hunger each tick
-      bee.hunger -= 0.00077160 * gameSpeed
+      // A bee will survive approx 15 minuter at speed 1 with a full belly, which is 15 min * 60 sec = 900 sec
+      // 900 sec * 144 FPS = 129600 game ticks
+      // 100 hunger value points / 129600 gameticks = 0.00077160 reduction in hunger each tick
+      bee.hunger -= transferTo(HUNGER_CAPACITY).inSeconds(900)
     }
 
     if (honeyHex.length > 0 && bee.isHungry()) {
@@ -476,7 +492,6 @@ function createBee(parent, type) {
     x: 35,
     y: 60 + (bees.length * 15)
   }
-  bee.isAt = isAt
   goIdle(bee)
   makeFlyable(bee)
   makeHexDetectable(bee)
@@ -558,7 +573,7 @@ function createBee(parent, type) {
   }
 
   function depositPollen() {
-    const hex = bee.isAt('pollen')
+    const hex = bee.isAtType('pollen')
     if (!hex) return false
     hex.claimSlot(bee)
     bee.pollenSack -= 0.1
@@ -631,7 +646,7 @@ function createBee(parent, type) {
   }
 
   function convertNectar() {
-    const hex = bee.isAt('converter')
+    const hex = bee.isAtType('converter')
     if (!hex || isHoneySackFull()) return false
     hex.claimSlot(bee)
     hex.nectar -= 0.1
@@ -651,7 +666,7 @@ function createBee(parent, type) {
   }
 
   function depositHoney() {
-    const hex = bee.isAt('honey')
+    const hex = bee.isAtType('honey')
     if (!hex) return false
     hex.claimSlot(bee)
     hex.honey += 0.1
