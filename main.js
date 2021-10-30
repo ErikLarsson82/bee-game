@@ -508,7 +508,7 @@ function makeParticleCreator(bee) {
 
       const pollenPixel = Sprite.fromImage('pollen-pixel.png')
       pollenPixel.position.x = bee.position.x + 2 + (Math.random() * 4)
-      pollenPixel.position.y = bee.position.y + 4
+      pollenPixel.position.y = bee.position.y + 4 + (Math.random() * 3) - 1.5
       let lifetime = 0
       app.ticker.add(time => {
         if (paused) return
