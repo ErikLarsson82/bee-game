@@ -103,6 +103,9 @@ function setup() {
   foreground = new Container()
   container.addChild(foreground)
   
+  dimmer = new Container()
+  container.addChild(dimmer)
+  
   const ui = new Container()
   container.addChild(ui)
 
@@ -226,15 +229,9 @@ function setup() {
   app.ticker.add(time => {
     nightDimmer.visible = hour > 22
   })
-  foreground.addChild(nightDimmer)
-
-  createBee(beeContainer, 'nurser')
-  createBee(beeContainer, 'forager')
-  //createBee(beeContainer, 'worker')
-  //createBee(beeContainer, 'worker')
-  createQueen(beeContainer)
-
-  createMap()
+  dimmer.addChild(nightDimmer)
+  
+  createMap('default')
 
   app.ticker.add((delta) => gameLoop(delta))
 }
@@ -250,20 +247,40 @@ function gameLoop(delta) {
   }
 }
 
-function createMap() {
-  // select first (for debugging)
-  setSelected(hexGrid[0][0])
-  // create it as honey
-  replaceSelectedHex('honey')
-  // setSelected(hexGrid[0][1])
-  // replaceSelectedHex('pollen')
-  setSelected(hexGrid[0][2])
-  replaceSelectedHex('pollen')
-  hexGrid[0][2].pollen = hexGrid[0][2].POLLEN_HEX_CAPACITY
-  setSelected(hexGrid[0][3])
-  replaceSelectedHex('pollen')
-  hexGrid[0][3].pollen = hexGrid[0][3].POLLEN_HEX_CAPACITY
-  // deselect
+function createMap(m) {
+  createQueen(beeContainer)
+  
+  if (m === 'default') {
+    createBee(beeContainer, 'nurser')
+    createBee(beeContainer, 'forager')
+    createBee(beeContainer, 'worker')
+
+    setSelected(hexGrid[0][0])
+    replaceSelectedHex('honey').setHoney(15)
+  }
+
+  if (m === 'brooder test') {
+    // Things are prepared with pollen so you can breed directly
+    createBee(beeContainer, 'nurser').setPollen(20)
+    createBee(beeContainer, 'forager').setPollen(20)
+    createQueen(beeContainer)
+
+    setSelected(hexGrid[0][0])
+    replaceSelectedHex('honey')
+
+    setSelected(hexGrid[0][2])
+    replaceSelectedHex('pollen')
+    hexGrid[0][2].pollen = hexGrid[0][2].POLLEN_HEX_CAPACITY
+    
+    setSelected(hexGrid[0][3])
+    replaceSelectedHex('pollen')
+    hexGrid[0][3].pollen = hexGrid[0][3].POLLEN_HEX_CAPACITY   
+
+    setSelected(hexGrid[2][1])
+    replaceSelectedHex('brood')
+    hexGrid[2][1].setContents('egg')
+  }  
+
   setSelected(null)
 }
 
@@ -351,6 +368,9 @@ function makeFlyable(sprite) {
     sprite.position.y += sprite.vy
     snapTo(sprite, targetSprite)
   }  
+  sprite.isMoving = () => {
+    return sprite.vx !== 0 || sprite.vy !== 0
+  }
 }
 
 function makeHexDetectable(bee) {
@@ -389,6 +409,7 @@ function snapTo(a, b) {
 }
 
 function replaceSelectedHex(type) {
+  let returnHex = null
   hexGrid.forEach((row, xIdx) => row.forEach((hex, yIdx) => {
     if (hex === selected) {
       background.removeChild(hex)
@@ -403,9 +424,11 @@ function replaceSelectedHex(type) {
       }
       const newHex = f[type](xIdx, yIdx, background)
       hexGrid[xIdx][yIdx] = newHex
+      returnHex = newHex
       setSelected(newHex)
     }
   }))
+  return returnHex;
 }
 
 function cap(min, max) {
@@ -492,10 +515,10 @@ function makeParticleCreator(bee) {
         pollenPixel.position.y += 0.0003 * FPS * gameSpeed
         lifetime += transferTo(1).inSeconds(1)
         if (lifetime > 1) {
-          background.removeChild(pollenPixel)
+          foreground.removeChild(pollenPixel)
         }
       })
-      background.addChild(pollenPixel)
+      foreground.addChild(pollenPixel)
       return
     }
     bee.particleDelay -= transferTo(1).inSeconds(transferRate)
@@ -524,6 +547,22 @@ function createQueen(parent) {
 
   makeFlyable(queenSprite)
   makeHexDetectable(queenSprite)
+
+  queenSprite.panelContent = () => {
+    const text = new PIXI.Text('Loading', { ...fontConfig })
+    text.position.x = 7
+    text.position.y = 50
+    app.ticker.add(time => {
+      let str = ''
+      if (queenSprite.isAtType('brood')) {
+        str = 'Laying egg'
+      } else if (!queenSprite.isMoving()) {
+        str = 'Cannot find empty brood\nhexagon to lay eggs in'
+      }      
+      text.text = str
+    })
+    return text
+  }
 
   app.ticker.add(time => {
     if (paused) return
@@ -586,10 +625,12 @@ function createBee(parent, type, startPosition) {
   bee.POLLEN_SACK_CAPACITY = 20
   bee.HONEY_SACK_CAPACITY = 10
   
-  bee.pollenSack = 20
+  bee.pollenSack = 0
+  bee.setPollen = amount => { bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(amount); return bee }
   bee.waxSack = 0
   bee.nectarSack = 0
   bee.honeySack = 0
+  bee.setHoney = amount => { bee.honeySack = cap(0, bee.HONEY_SACK_CAPACITY)(amount); return bee }
   bee.type = type || 'unassigned'
   
   const isPollenSackFull = () => bee.pollenSack >= bee.POLLEN_SACK_CAPACITY
@@ -607,7 +648,9 @@ function createBee(parent, type, startPosition) {
     text.position.y = 50
     app.ticker.add(time => {
       let str = ''
-      str += bee.isDead() ? 'Dead ;_;\n\n' : ''
+      str += bee.isDead() ? 'Dead ;_;   ' : ''
+      str += bee.type
+      str += '\n\n'
       str += 'Pollen  ' + Math.round(bee.pollenSack) + '\n'
       str += 'Nectar  ' + Math.round(bee.nectarSack) + '\n'
       str += 'Wax     ' + Math.round(bee.waxSack) + '\n'
@@ -835,6 +878,7 @@ function createBee(parent, type, startPosition) {
 
   bees.push(bee)
   parent.addChild(bee)
+  return bee
 }
 
 function cellEmpty(x, y, parent) {
@@ -867,7 +911,8 @@ function cellHoney(x, y, parent) {
 
   honeySprite.type = 'honey'
   honeySprite.HONEY_HEX_CAPACITY = 30
-  honeySprite.honey = 15
+  honeySprite.honey = 0
+  honeySprite.setHoney = amount => { cap(0, honeySprite.HONEY_HEX_CAPACITY)(amount); return honeySprite }
   honeySprite.isHoneyFull = () => honeySprite.honey >= honeySprite.HONEY_HEX_CAPACITY
   honeySprite.isHoneyEmpty = () => honeySprite.honey <= 0
   
