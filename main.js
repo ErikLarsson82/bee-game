@@ -202,7 +202,7 @@ function setup() {
   background.addChild(flower)
 
   panel = Sprite.fromImage('ui-panel.png')
-  panel.position.x = 200
+  panel.position.x = 190
   panel.position.y = 30  
   panel.visible = true
   const panelContent = new Container()
@@ -252,7 +252,7 @@ function createMap(m) {
   
   if (m === 'default') {
     createBee(beeContainer, 'nurser')
-    createBee(beeContainer, 'forager')
+    createBee(beeContainer, 'forager').setPollen(20)
     createBee(beeContainer, 'worker')
 
     setSelected(hexGrid[0][0])
@@ -642,6 +642,23 @@ function createBee(parent, type, startPosition) {
   const isHoneySackFull = () => bee.honeySack >= bee.HONEY_SACK_CAPACITY
   const isHoneySackEmpty = () => !(bee.honeySack > 0)
 
+  const helperText = () => {
+    if (bee.type === 'forager' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y && isPollenSackFull()) {
+      return 'Cannot find pollen hexagon'
+    }
+    if (bee.type === 'nurser' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) {
+      if (isPollenSackFull()) {
+        return 'Cannot find larvae'
+      } else {
+        return 'Cannot find pollen hexagon'
+      }
+    }
+    if (bee.type === 'worker' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) {
+      return 'Cannot find converter hex'
+    }
+    return ''
+  }
+
   bee.panelContent = () => {
     const text = new PIXI.Text('Loading', { ...fontConfig })
     text.position.x = 7
@@ -650,6 +667,8 @@ function createBee(parent, type, startPosition) {
       let str = ''
       str += bee.isDead() ? 'Dead ;_;   ' : ''
       str += bee.type
+      str += '\n\n'
+      str += helperText()
       str += '\n\n'
       str += 'Pollen  ' + Math.round(bee.pollenSack) + '\n'
       str += 'Nectar  ' + Math.round(bee.nectarSack) + '\n'
@@ -685,8 +704,8 @@ function createBee(parent, type, startPosition) {
   function pollinateFlower() {
     if (isAt(flower) && !isPollenSackFull()) {
       flower.claimSlot(bee)
-      bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(30)
-      bee.nectarSack += transferTo(bee.NECTAR_SACK_CAPACITY).inSeconds(30)
+      bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(300)
+      bee.nectarSack += transferTo(bee.NECTAR_SACK_CAPACITY).inSeconds(300)
       bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
       bee.nectarSack = cap(0, bee.NECTAR_SACK_CAPACITY)(bee.nectarSack)
       if (isPollenSackFull() && isNectarSackFull()) {
@@ -1054,7 +1073,8 @@ function cellBrood(x, y, parent) {
     app.ticker.add(time => {
       const line2 = broodSprite.content === 'larvae' ? '\nNutrients: ' + Math.round(broodSprite.nutrition) : ''
       const line3 = ['egg', 'larvae', 'puppa'].includes(broodSprite.content) ? '\nLifecycle: ' + Math.round(broodSprite.lifecycle) : ''
-      text.text = broodSprite.content + line2 + line3
+      const line4 = '\n\n' + (broodSprite.content === 'dead' ? 'Larvae needs pollen to survive' : '')
+      text.text = broodSprite.content + line2 + line3 + line4
     })
     return text
   }
