@@ -231,7 +231,7 @@ function setup() {
   })
   dimmer.addChild(nightDimmer)
   
-  createMap('deposit honey sceanrio')
+  createMap('default')
 
   app.ticker.add((delta) => gameLoop(delta))
 }
