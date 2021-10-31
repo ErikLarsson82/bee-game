@@ -985,6 +985,8 @@ function cellHoney(x, y, parent) {
       honeySprite.texture = Texture.fromImage('cell-honey-filling.png')
     } else if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.25) {
       honeySprite.texture = Texture.fromImage('cell-honey-partial.png')
+    } else if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.05) {
+      honeySprite.texture = Texture.fromImage('cell-honey-minimal.png')
     } else {
       honeySprite.texture = Texture.fromImage('cell-honey-empty.png')
     }
