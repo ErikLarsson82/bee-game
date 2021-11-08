@@ -1,3 +1,11 @@
+// Amelies kommentarer:
+// - Kunna bestämma vilka bin som gör vad
+// - Hus till varje bi!
+// - Workers (eller vilka som helst) måste bygga celler med vax
+// - Skapa vax!
+// - "Hej, jag har ingen bikupa får jag vara med er?" :)
+
+// Speed affects "physics-engine"-buggen
 
 // Speed 0, 1x, 2x and 4x
 
