@@ -94,13 +94,13 @@ let queen = null
 
 let panel = null
 let background = null
-let flower = null
 let selectedSprite = null
 let beeContainer = null
 let nightDimmer = null
 
 let hexGrid = []
 const bees = []
+const flowers = []
 
 function setup() {
   const container = new Container()
@@ -209,12 +209,15 @@ function setup() {
   })
   background.addChild(selectedSprite)
 
-  flower = Sprite.fromImage('flower.png')
-  makeOccupiable(flower)
-  makeSelectable(flower, 'flower')
-  flower.position.x = 30
-  flower.position.y = 30
-  background.addChild(flower)
+  for (var f = 0; f < 3; f++) {
+    const flower = Sprite.fromImage('flower.png')
+    makeOccupiable(flower)
+    makeSelectable(flower, 'flower')
+    flower.position.x = 10 + (f * 10)
+    flower.position.y = 30
+    background.addChild(flower)
+    flowers.push(flower)
+  }
 
   panel = Sprite.fromImage('ui-panel.png')
   panel.position.x = 190
@@ -383,7 +386,7 @@ function makeOccupiable(parent) {
         parent.slot = null
       }
     }
-    // spotClaimed.visible = !!parent.slot // enable for debug
+    spotClaimed.visible = !!parent.slot // enable for debug
   })
 }
 
@@ -418,6 +421,7 @@ function makeFlyable(sprite) {
     sprite.position.x += sprite.vx
     sprite.position.y += sprite.vy
     snapTo(sprite, targetSprite)
+    if (sprite.type !== 'queen') console.log('flightlog stardate 1337', sprite, targetSprite)
   }  
   sprite.isMoving = () => {
     return sprite.vx !== 0 || sprite.vy !== 0
@@ -426,8 +430,12 @@ function makeFlyable(sprite) {
 
 function makeHexDetectable(bee) {
   bee.isAtType = type => {
-    const result = filterHexagon(hexGrid, hex => hex.type === type && samePosition(bee, hex))
-    if (result.length > 0) return result[0]
+    const hexesInGrid = filterHexagon(hexGrid, hex => hex.type === type && samePosition(bee, hex))
+    if (hexesInGrid.length > 0) return hexesInGrid[0]
+
+    const flowerResult = flowers.filter(flower => samePosition(bee, flower))
+    console.log('flowerResult', flowerResult)
+    if (flowerResult.length > 0) return flowerResult[0]
     return null
   }
 }
@@ -603,6 +611,7 @@ function decreaseForagers() {
 function createQueen(parent) {
   const queenSprite = PIXI.Sprite.fromImage('bee-queen.png')
   makeSelectable(queenSprite, 'queen')
+  queenSprite.type = 'queen'
   
   const queenWingAddon = Sprite.fromImage('bee-queen-wings-flapped.png')
   queenWingAddon.visible = false
@@ -783,8 +792,10 @@ function createBee(parent, type, startPosition) {
     return true
   }
 
-  function pollinateFlower() {
-    if (isAt(flower) && !isPollenSackFull()) {
+  function flyToAndPollinateFlower() {
+    const flower = bee.isAtType('flower')
+    console.log('flower', flower);
+    if (flower && !isPollenSackFull()) {
       flower.claimSlot(bee)
       bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(300)
       bee.nectarSack += transferTo(bee.NECTAR_SACK_CAPACITY).inSeconds(300)
@@ -795,9 +806,11 @@ function createBee(parent, type, startPosition) {
       }
       return true
     }
-    if (!isPollenSackFull() && flower.isUnclaimed(bee)) {
-      flower.claimSlot(bee)
-      bee.flyTo(flower)
+    const unclaimedFlowers = flowers.filter(flower => flower.isUnclaimed(bee))
+
+    if (!isPollenSackFull() && unclaimedFlowers[0]) {
+      unclaimedFlowers[0].claimSlot(bee)
+      bee.flyTo(unclaimedFlowers[0])
       return true
     }
     return false
@@ -829,7 +842,7 @@ function createBee(parent, type, startPosition) {
     if (bee.feedBee()) return
     if (flyToAndDepositNectar()) return
     if (depositPollen()) return    
-    if (pollinateFlower()) return
+    if (flyToAndPollinateFlower()) return
     if (flyToPollen()) return    
     bee.flyTo(null)
   }
