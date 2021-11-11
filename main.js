@@ -1,5 +1,12 @@
 // Amelies kommentarer:
 // - Kunna bestämma vilka bin som gör vad
+// Jobb:
+// --- nursers
+// --- foragers
+// --- architect (behöver vax?)
+// --- honey maker (behöver byggnad?)
+// --- undertaker (behöver byggnad?)
+
 // - Hus till varje bi!
 // - Workers (eller vilka som helst) måste bygga celler med vax
 // - Skapa vax!
