@@ -246,7 +246,7 @@ function setup() {
   })
   dimmer.addChild(nightDimmer)
   
-  createMap('default')
+  createMap('jobs')
 
   app.ticker.add((delta) => gameLoop(delta))
 }
@@ -273,6 +273,16 @@ function createMap(m) {
     setSelected(hexGrid[0][0])
     replaceSelectedHex('honey').setHoney(15)
   }
+
+  if (m === 'jobs') {
+    createBee(beeContainer, 'idle')
+    createBee(beeContainer, 'idle')
+    createBee(beeContainer, 'idle')
+
+    setSelected(hexGrid[0][0])
+    replaceSelectedHex('honey').setHoney(15)
+  }
+
 
   if (m === 'deposit nectar sceanrio') {
     createBee(beeContainer, 'forager').setNectar(18)
@@ -571,6 +581,25 @@ function makeParticleCreator(bee) {
   })
 }
 
+const isForager = b => b.type === 'forager'
+const isIdle = b => b.type === 'idle'
+
+function increaseForagers() {
+  const idleBees = bees.filter(isIdle)
+
+  if (idleBees.length > 0) {
+    idleBees[0].type = 'forager'
+  }
+}
+
+function decreaseForagers() {
+  const foragerBees = bees.filter(isForager)
+
+  if (foragerBees.length > 0) {
+    foragerBees[0].type = 'idle'
+  }
+}
+
 function createQueen(parent) {
   const queenSprite = PIXI.Sprite.fromImage('bee-queen.png')
   makeSelectable(queenSprite, 'queen')
@@ -702,6 +731,9 @@ function createBee(parent, type, startPosition) {
     }
     if (bee.type === 'worker' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) {
       return 'Cannot find converter hex'
+    }
+    if (bee.type === 'idle') {
+      return 'Bee is idle'
     }
     return ''
   }
