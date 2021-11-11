@@ -240,6 +240,8 @@ function setup() {
 
   ui.addChild(panel)
 
+  addJobsButtons()
+
   nightDimmer = new Graphics()
   nightDimmer.beginFill(0x000000)
   nightDimmer.drawRect(0, 0, WIDTH / 2, HEIGHT / 2)
@@ -268,6 +270,28 @@ function gameLoop(delta, manualTick) {
   }
 }
 
+function addJobsButtons() {
+  for (var i = 0; i < 3; i++) {
+    for (var j = 0; j < 2; j++) {
+      {
+        const button = Sprite.fromImage(j === 0 ? 'minus.png' : 'plus.png')
+        button.position.x = 20 + (j * 12)
+        button.position.y = 50 + (i * 50)
+        button.interactive = true
+        button.buttonMode = true
+        button.alpha = 1
+        button.mouseover = () => button.alpha = 0.7
+        button.mouseout = () => button.alpha = 1
+        const idx = ['forager', 'nurser', 'worker']
+        const type = idx[i]
+        const action = j === 0 ? 'remove' : 'add'
+        button.mousedown = () => jobs(action, type)
+        background.addChild(button)
+      }
+    }
+  }
+}
+
 function createMap(m) {
   createQueen(beeContainer)
   
@@ -287,12 +311,19 @@ function createMap(m) {
     bees[0].nectarSack = 20
     createBee(beeContainer, 'idle')
     createBee(beeContainer, 'idle')
-    jobs('add', 'forager')
-    jobs('add', 'nurser')
-    jobs('add', 'worker')
+    // jobs('add', 'forager')
+    // jobs('add', 'nurser')
+    // jobs('add', 'worker')
 
     setSelected(hexGrid[0][0])
     replaceSelectedHex('honey').setHoney(15)
+
+    setSelected(hexGrid[1][0])
+    replaceSelectedHex('pollen')
+    setSelected(hexGrid[2][0])
+    replaceSelectedHex('pollen')
+    setSelected(hexGrid[3][0])
+    replaceSelectedHex('pollen')
   }
 
 
@@ -806,8 +837,8 @@ function createBee(parent, type, startPosition) {
     const flower = bee.isAtType('flower')
     if (flower && !isPollenSackFull()) {
       flower.claimSlot(bee)
-      bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(300)
-      bee.nectarSack += transferTo(bee.NECTAR_SACK_CAPACITY).inSeconds(300)
+      bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(100)
+      bee.nectarSack += transferTo(bee.NECTAR_SACK_CAPACITY).inSeconds(100)
       bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
       bee.nectarSack = cap(0, bee.NECTAR_SACK_CAPACITY)(bee.nectarSack)
       if (isPollenSackFull() && isNectarSackFull()) {
