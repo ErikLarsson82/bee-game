@@ -101,6 +101,7 @@ let nightDimmer = null
 let hexGrid = []
 const bees = []
 const flowers = []
+const tickers = []
 
 function setup() {
   const container = new Container()
@@ -133,7 +134,7 @@ function setup() {
     populationText.position.x = 5
     populationText.position.y = 2
     uiTopBar.addChild(populationText)
-    app.ticker.add(time => {
+    tickers.push(time => {
       const aliveBees = bees.filter(b => !b.isDead())
       const foragers = aliveBees.filter(b => b.type === 'forager').length
       const nurses = aliveBees.filter(b => b.type === 'nurser').length
@@ -145,7 +146,7 @@ function setup() {
     dayCycle.position.x = 230
     dayCycle.position.y = 2
     uiTopBar.addChild(dayCycle)
-    app.ticker.add(time => {
+    tickers.push(time => {
       dayCycle.text = 'Day ' + day + ' Hour ' + Math.round(hour)
     })
 
@@ -198,7 +199,7 @@ function setup() {
   selectedSpriteSub.position.x = -2
   selectedSpriteSub.position.y = -2
   selectedSprite.addChild(selectedSpriteSub)  
-  app.ticker.add(time => {
+  tickers.push(time => {
     if (selected) {
       selectedSprite.visible = true
       selectedSprite.position.x = selected.position.x
@@ -244,7 +245,7 @@ function setup() {
   nightDimmer.drawRect(0, 0, WIDTH / 2, HEIGHT / 2)
   nightDimmer.alpha = 0.4
   nightDimmer.visible = false
-  app.ticker.add(time => {
+  tickers.push(time => {
     nightDimmer.visible = hour > 22
   })
   dimmer.addChild(nightDimmer)
@@ -254,8 +255,10 @@ function setup() {
   app.ticker.add((delta) => gameLoop(delta))
 }
 
-function gameLoop(delta) {
-  if (paused) return
+function gameLoop(delta, manualTick) {
+  if (paused && !manualTick) return
+  
+  tickers.forEach(f => f());
 
   hour += transferTo(24).inMinutes(5)
 
@@ -278,7 +281,11 @@ function createMap(m) {
   }
 
   if (m === 'jobs') {
+    paused = true
     createBee(beeContainer, 'idle')
+    //bees[0].position.x = 10
+    //bees[0].position.y = 30
+    // increaseForagers()
     createBee(beeContainer, 'idle')
     createBee(beeContainer, 'idle')
 
@@ -379,7 +386,7 @@ function makeOccupiable(parent) {
     parent.slot = item
     parent.slotCounter = secondsToTicks(1)
   }
-  app.ticker.add(time => {
+  tickers.push(time => {
     if (parent.slot) {
       parent.slotCounter--
       if (parent.slotCounter <= 0) {
@@ -421,7 +428,6 @@ function makeFlyable(sprite) {
     sprite.position.x += sprite.vx
     sprite.position.y += sprite.vy
     snapTo(sprite, targetSprite)
-    if (sprite.type !== 'queen') console.log('flightlog stardate 1337', sprite, targetSprite)
   }  
   sprite.isMoving = () => {
     return sprite.vx !== 0 || sprite.vy !== 0
@@ -434,8 +440,7 @@ function makeHexDetectable(bee) {
     if (hexesInGrid.length > 0) return hexesInGrid[0]
 
     const flowerResult = flowers.filter(flower => samePosition(bee, flower))
-    console.log('flowerResult', flowerResult)
-    if (flowerResult.length > 0) return flowerResult[0]
+    if (flowerResult.length > 0 && type === 'flower') return flowerResult[0]
     return null
   }
 }
@@ -561,9 +566,7 @@ function makeParticleCreator(bee) {
   bee.particleDelay = 0
   let transferRate = 0
 
-  app.ticker.add(time => {
-    if (paused) return
-
+  tickers.push(time => {
     if (bee.pollenSack < bee.POLLEN_SACK_CAPACITY) return
 
     if (bee.particleDelay <= 0) {
@@ -574,8 +577,7 @@ function makeParticleCreator(bee) {
       pollenPixel.position.x = bee.position.x + 2 + (Math.random() * 4)
       pollenPixel.position.y = bee.position.y + 4 + (Math.random() * 3) - 1.5
       let lifetime = 0
-      app.ticker.add(time => {
-        if (paused) return
+      tickers.push(time => {
         pollenPixel.position.y += 0.0003 * FPS * gameSpeed
         lifetime += transferTo(1).inSeconds(1)
         if (lifetime > 1) {
@@ -636,7 +638,7 @@ function createQueen(parent) {
     const text = new PIXI.Text('Loading', { ...fontConfig })
     text.position.x = 7
     text.position.y = 50
-    app.ticker.add(time => {
+    tickers.push(time => {
       let str = ''
       if (queenSprite.isAtType('brood')) {
         str = 'Laying egg'
@@ -648,9 +650,7 @@ function createQueen(parent) {
     return text
   }
 
-  app.ticker.add(time => {
-    if (paused) return
-    
+  tickers.push(time => {
     queenSprite.animationTicker += speeds[gameSpeed]
     
     const targetBrood = queenSprite.isAtType('brood')
@@ -751,7 +751,7 @@ function createBee(parent, type, startPosition) {
     const text = new PIXI.Text('Loading', { ...fontConfig })
     text.position.x = 7
     text.position.y = 50
-    app.ticker.add(time => {
+    tickers.push(time => {
       let str = ''
       str += bee.isDead() ? 'Dead ;_;   ' : ''
       str += bee.type
@@ -794,7 +794,6 @@ function createBee(parent, type, startPosition) {
 
   function flyToAndPollinateFlower() {
     const flower = bee.isAtType('flower')
-    console.log('flower', flower);
     if (flower && !isPollenSackFull()) {
       flower.claimSlot(bee)
       bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(300)
@@ -947,9 +946,7 @@ function createBee(parent, type, startPosition) {
     bee.flyTo(null)
   }
 
-  app.ticker.add(time => {
-    if (paused) return
-
+  tickers.push(time => {
     bee.visible = true
 
     if (bee.isDead()) {
@@ -996,6 +993,11 @@ function createBee(parent, type, startPosition) {
     if (bee.type === 'forager') forager()
     if (bee.type === 'nurser') nurser()
     if (bee.type === 'worker') worker()
+    if (bee.type === 'idle') {
+      bee.flyTo(null)
+    }
+
+    
   })
 
   bees.push(bee)
@@ -1038,7 +1040,7 @@ function cellHoney(x, y, parent) {
   honeySprite.isHoneyFull = () => honeySprite.honey >= honeySprite.HONEY_HEX_CAPACITY
   honeySprite.isHoneyEmpty = () => honeySprite.honey <= 0
   
-  app.ticker.add(time => {
+  tickers.push(time => {
     if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.75) {
       honeySprite.texture = Texture.fromImage('cell-honey-full.png')
     } else if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.50) {
@@ -1056,7 +1058,7 @@ function cellHoney(x, y, parent) {
     const text = new PIXI.Text('Loading', { ...fontConfig })
     text.position.x = 7
     text.position.y = 50
-    app.ticker.add(time => text.text = 'Honey stored  ' + Math.round(honeySprite.honey))
+    tickers.push(time => text.text = 'Honey stored  ' + Math.round(honeySprite.honey))
     return text
   }
 
@@ -1083,13 +1085,13 @@ function cellConverter(x, y, parent) {
     const text = new PIXI.Text('Loading', { ...fontConfig })
     text.position.x = 7
     text.position.y = 50
-    app.ticker.add(time => {
+    tickers.push(time => {
       text.text = `Nectar   ${ Math.round(converterSprite.nectar) }`
     })
     return text
   }
 
-  app.ticker.add(time => {
+  tickers.push(time => {
     if (bees.filter(samePosition(converterSprite)).length > 0) {
       converterSprite.texture = Texture.fromImage('cell-converter-occupied.png')   
     } else {
@@ -1146,8 +1148,7 @@ function cellBrood(x, y, parent) {
     }
   }
 
-  app.ticker.add(time => {
-    if (paused) return
+  tickers.push(time => {
     setTexture()
     if (!broodSprite.content) return
     if (['dead', 'empty'].includes(broodSprite.content)) return
@@ -1177,7 +1178,7 @@ function cellBrood(x, y, parent) {
     const text = new PIXI.Text('Loading', { ...fontConfig })
     text.position.x = 7
     text.position.y = 50
-    app.ticker.add(time => {
+    tickers.push(time => {
       const line2 = broodSprite.content === 'larvae' ? '\nNutrients: ' + Math.round(broodSprite.nutrition) : ''
       const line3 = ['egg', 'larvae', 'puppa'].includes(broodSprite.content) ? '\nLifecycle: ' + Math.round(broodSprite.lifecycle) : ''
       const line4 = '\n\n' + (broodSprite.content === 'dead' ? 'Larvae needs pollen to survive' : '')
@@ -1204,7 +1205,7 @@ function cellPollen(x, y, parent) {
   pollenSprite.pollen = 0
   pollenSprite.isPollenFull = () => pollenSprite.pollen >= pollenSprite.POLLEN_HEX_CAPACITY
   pollenSprite.isPollenEmpty = () => pollenSprite.pollen <= 0
-  app.ticker.add(time => {
+  tickers.push(time => {
     if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.75) {
       pollenSprite.texture = Texture.fromImage('cell-pollen-full.png')
     } else if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.50) {
@@ -1220,7 +1221,7 @@ function cellPollen(x, y, parent) {
     const text = new PIXI.Text('Loading', { ...fontConfig })
     text.position.x = 7
     text.position.y = 50
-    app.ticker.add(time => text.text = 'Pollen   ' + Math.round(pollenSprite.pollen))
+    tickers.push(time => text.text = 'Pollen   ' + Math.round(pollenSprite.pollen))
     return text
   }
   
@@ -1255,6 +1256,11 @@ window.addEventListener('keydown', e => {
   //Space
   if (e.keyCode === 32) {
     paused = !paused
+  }
+
+  //T, for gameTick
+  if (e.keyCode === 84) {
+    gameLoop(16.66, true)
   }
 
   // 1
