@@ -283,11 +283,13 @@ function createMap(m) {
   if (m === 'jobs') {
     paused = true
     createBee(beeContainer, 'idle')
-    //bees[0].position.x = 10
-    //bees[0].position.y = 30
-    // increaseForagers()
+    bees[0].pollenSack = 20
+    bees[0].nectarSack = 20
     createBee(beeContainer, 'idle')
     createBee(beeContainer, 'idle')
+    jobs('add', 'forager')
+    jobs('add', 'nurser')
+    jobs('add', 'worker')
 
     setSelected(hexGrid[0][0])
     replaceSelectedHex('honey').setHoney(15)
@@ -593,6 +595,14 @@ function makeParticleCreator(bee) {
 
 const isForager = b => b.type === 'forager'
 const isIdle = b => b.type === 'idle'
+
+function jobs(addOrRemove, type) {
+  const availableBees = bees.filter(addOrRemove === 'add' ? isIdle : x=>x.type===type)
+
+  if (availableBees.length > 0) {
+    availableBees[0].type = addOrRemove === 'add' ? type : 'idle'
+  }
+}
 
 function increaseForagers() {
   const idleBees = bees.filter(isIdle)
