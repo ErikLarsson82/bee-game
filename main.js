@@ -356,8 +356,8 @@ function createMap(m) {
   if (m === 'jobs') {
     paused = true
     createBee(beeContainer, 'idle')
-    //bees[0].pollenSack = 20
-    //bees[0].nectarSack = 20
+    bees[0].pollenSack = 20
+    bees[0].nectarSack = 20
     //createBee(beeContainer, 'idle')
     //createBee(beeContainer, 'idle')
     //for (var i = 0; i < 12; i++) {
@@ -499,8 +499,18 @@ function makeFlyable(sprite) {
     if (x === 0 && y === 0) return
     const direction = new PIXI.Point(x, y).normalize()
     
-    sprite.vx += direction.x * 0.0001 * gameSpeed
-    sprite.vy += direction.y * 0.0001 * gameSpeed
+    sprite.vx += direction.x * 0.006 * gameSpeed
+    sprite.vy += direction.y * 0.006 * gameSpeed
+
+    const distanceToTarget = distance(sprite, targetSprite)
+
+    let velocity = new PIXI.Point(sprite.vx, sprite.vy)
+
+    if (velocity.magnitude() > velocity.normalize().magnitude() * 0.1 * gameSpeed) {
+      velocity = new PIXI.Point(velocity.normalize().x * 0.1 * gameSpeed, velocity.normalize().y * 0.1 * gameSpeed)
+    }
+    sprite.vx = velocity.x
+    sprite.vy = velocity.y
 
     sprite.position.x += sprite.vx
     sprite.position.y += sprite.vy
@@ -510,6 +520,8 @@ function makeFlyable(sprite) {
     return sprite.vx !== 0 || sprite.vy !== 0
   }
 }
+
+ 
 
 function makeHexDetectable(bee) {
   bee.isAtType = type => {
