@@ -355,6 +355,8 @@ function createMap(m) {
 
   if (m === 'jobs') {
     paused = false
+    createBee(beeContainer, 'worker').setHunger(31)
+    /*
     for (var i = 0; i < 6; i++) {
       createBee(beeContainer, 'idle').setPollen(20).setNectar(20)
     }
@@ -364,6 +366,7 @@ function createMap(m) {
     jobs('add', 'nurser')
     jobs('add', 'worker')
     jobs('add', 'worker')
+    */
 
     setSelected(hexGrid[0][0])
     replaceSelectedHex('honey').setHoney(15)
@@ -382,7 +385,7 @@ function createMap(m) {
     replaceSelectedHex('pollen')
 
     setSelected(hexGrid[0][3])
-    replaceSelectedHex('converter')
+    replaceSelectedHex('converter').setNectar(15)
     setSelected(hexGrid[0][4])
     replaceSelectedHex('converter')
   }
@@ -650,6 +653,14 @@ function makeHungry(bee) {
   bee.isHungry = () => bee.hunger < 30
   bee.setHunger = amount => { bee.hunger = cap(0, HUNGER_CAPACITY)(amount); return bee }
 
+  bee.consumeEnergy = () => {
+    // A bee will survive approx 15 minuter at speed 1 with a full belly, which is 15 min * 60 sec = 900 sec
+    // 900 sec * 144 FPS = 129600 game ticks
+    // 100 hunger value points / 129600 gameticks = 0.00077160 reduction in hunger each tick
+    bee.hunger -= transferTo(HUNGER_CAPACITY).inSeconds(900)
+    bee.hunger = cap(0, HUNGER_CAPACITY)(bee.hunger)
+  }
+
   bee.eat = () => {
     bee.hunger += transferTo(HUNGER_CAPACITY).inSeconds(20)      
     bee.hunger = cap(0, HUNGER_CAPACITY)(bee.hunger)
@@ -668,10 +679,7 @@ function makeHungry(bee) {
       }
       return true
     } else {
-      // A bee will survive approx 15 minuter at speed 1 with a full belly, which is 15 min * 60 sec = 900 sec
-      // 900 sec * 144 FPS = 129600 game ticks
-      // 100 hunger value points / 129600 gameticks = 0.00077160 reduction in hunger each tick
-      bee.hunger -= transferTo(HUNGER_CAPACITY).inSeconds(900)
+      bee.consumeEnergy()
     }
 
     if (honeyHex.length > 0 && bee.isHungry()) {
@@ -1066,6 +1074,7 @@ function createBee(parent, type, startPosition) {
   }
 
   function worker() {
+    bee.consumeEnergy()   
     if (depositHoney()) return
     if (flyToHoney()) return
     if (convertNectar()) return
@@ -1120,11 +1129,7 @@ function createBee(parent, type, startPosition) {
     if (bee.type === 'forager') forager()
     if (bee.type === 'nurser') nurser()
     if (bee.type === 'worker') worker()
-    if (bee.type === 'idle') {
-      bee.flyTo(null)
-    }
-
-    
+    if (bee.type === 'idle') bee.flyTo(null)
   })
 
   bees.push(bee)
