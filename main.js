@@ -134,7 +134,7 @@ function setup() {
     clickFinder.buttonMode = true
     clickFinder.interactive = true
     clickFinder.mousedown = e => {
-      console.log('hey', e.data.global.x / 2, e.data.global.y / 2);
+      console.log('Mouse Click Position', e.data.global.x / 2, e.data.global.y / 2);
     }
     ui.addChild(clickFinder)
   }
@@ -202,22 +202,26 @@ function setup() {
   background.addChild(jobsPanel)
 
   const unassignedText = new PIXI.Text('-', { ...fontConfig, fill: 'black' })
-  unassignedText.position.x = 65
+  unassignedText.anchor.set(1, 0)
+  unassignedText.position.x = 73
   unassignedText.position.y = 3
   jobsPanel.addChild(unassignedText)
 
   const foragerText = new PIXI.Text('-', { ...fontConfig, fill: 'black' })
-  foragerText.position.x = 47
+  foragerText.anchor.set(1, 0)
+  foragerText.position.x = 52
   foragerText.position.y = 41.5
   jobsPanel.addChild(foragerText)
 
   const nurserText = new PIXI.Text('-', { ...fontConfig, fill: 'black' })
-  nurserText.position.x = 47
+  nurserText.anchor.set(1, 0)
+  nurserText.position.x = 50
   nurserText.position.y = 79.5
   jobsPanel.addChild(nurserText)
 
   const workerText = new PIXI.Text('-', { ...fontConfig, fill: 'black' })
-  workerText.position.x = 47
+  workerText.anchor.set(1, 0)
+  workerText.position.x = 53
   workerText.position.y = 117.5
   jobsPanel.addChild(workerText)
   
@@ -354,12 +358,12 @@ function createMap(m) {
     createBee(beeContainer, 'idle')
     //bees[0].pollenSack = 20
     //bees[0].nectarSack = 20
-    createBee(beeContainer, 'idle')
-    createBee(beeContainer, 'idle')
-    for (var i = 0; i < 12; i++) {
-      createBee(beeContainer, 'idle')
-    }
-    // jobs('add', 'forager')
+    //createBee(beeContainer, 'idle')
+    //createBee(beeContainer, 'idle')
+    //for (var i = 0; i < 12; i++) {
+    //  createBee(beeContainer, 'idle')
+    //}
+    jobs('add', 'forager')
     // jobs('add', 'nurser')
     // jobs('add', 'worker')
 
@@ -481,8 +485,7 @@ function makeOccupiable(parent) {
 function makeFlyable(sprite) {
   sprite.vx = 0
   sprite.vy = 0
-  sprite.timeOfFlight = 0
-  sprite.flyTo = (targetSprite) => {
+  sprite.flyTo = targetSprite => {
     if (!targetSprite) {
       targetSprite = {
         position: {
@@ -491,25 +494,18 @@ function makeFlyable(sprite) {
         }
       }
     }
-    const SPEED = 0.001 * gameSpeed
-    sprite.timeOfFlight += 20
-
-    if (sprite.vx === 0 && sprite.vy === 0) {
-      sprite.timeOfFlight = 0
-      // sprite.vx = (Math.random() - 0.5) * 3
-      // sprite.vy = (Math.random() - 0.5) * 3
-    }
-    sprite.vx += targetSprite.position.x < sprite.position.x ? -SPEED : SPEED  
-    sprite.vy += targetSprite.position.y < sprite.position.y ? -SPEED : SPEED
+    const x = targetSprite.position.x - sprite.position.x
+    const y = targetSprite.position.y - sprite.position.y
+    if (x === 0 && y === 0) return
+    const direction = new PIXI.Point(x, y).normalize()
     
-    if (sprite.timeOfFlight > FPS) {
-      sprite.vx = sprite.vx * 0.97
-      sprite.vy = sprite.vy * 0.97
-    }    
+    sprite.vx += direction.x * 0.0001 * gameSpeed
+    sprite.vy += direction.y * 0.0001 * gameSpeed
+
     sprite.position.x += sprite.vx
     sprite.position.y += sprite.vy
     snapTo(sprite, targetSprite)
-  }  
+  }
   sprite.isMoving = () => {
     return sprite.vx !== 0 || sprite.vy !== 0
   }
@@ -541,11 +537,14 @@ function samePosition(a, b) {
   } 
 }
 
-function snapTo(a, b) {
+function distance(a, b) {
   const x2 = Math.abs(a.position.x - b.position.x) * 2
   const y2 = Math.abs(a.position.y - b.position.y) * 2
-  const distance = Math.sqrt(x2 + y2)
-  if (distance < 2) {
+  return Math.sqrt(x2 + y2)
+}
+
+function snapTo(a, b) {  
+  if (distance(a, b) < 2) {
     a.position.x = b.position.x
     a.position.y = b.position.y
     a.vx = 0
