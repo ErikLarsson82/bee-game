@@ -1,5 +1,6 @@
 
-const OFFSET = 70
+const OFFSET_X = 145
+const OFFSET_Y = 70
 const SIZE = 12
 
 const WIDTH_FLAT = 2 * SIZE
@@ -14,8 +15,8 @@ function toLocalCoordinateFlat(index) {
   const odd = x % 2
 
   return {
-    x: (x * WIDTH_FLAT * (3/4)) + OFFSET,
-    y: (y * HEIGHT_FLAT) + OFFSET + (odd ? HEIGHT_FLAT/2 : 0)
+    x: (x * WIDTH_FLAT * (3/4)) + OFFSET_X,
+    y: (y * HEIGHT_FLAT) + OFFSET_Y + (odd ? HEIGHT_FLAT/2 : 0)
   } 
 }
 
@@ -25,8 +26,8 @@ function toLocalCoordinatePointy(index) {
   const odd = y % 2
 
   return {
-    x: (x * WIDTH_POINTY) + OFFSET + (odd ? WIDTH_POINTY/2 : 0),
-    y: (y * HEIGHT_POINTY * (3/4)) + OFFSET
+    x: (x * WIDTH_POINTY) + OFFSET_X + (odd ? WIDTH_POINTY/2 : 0),
+    y: (y * HEIGHT_POINTY * (3/4)) + OFFSET_Y
   }
 }
 

@@ -94,6 +94,7 @@ let queen = null
 
 let panel = null
 let background = null
+let ui = null
 let selectedSprite = null
 let beeContainer = null
 let nightDimmer = null
@@ -122,8 +123,20 @@ function setup() {
   dimmer = new Container()
   container.addChild(dimmer)
   
-  const ui = new Container()
+  ui = new Container()
   container.addChild(ui)
+
+  if (false) {
+    const clickFinder = new Graphics()
+    clickFinder.beginFill(0xff0000)
+    clickFinder.drawRect(0, 0, WIDTH, HEIGHT)
+    clickFinder.buttonMode = true
+    clickFinder.interactive = true
+    clickFinder.mousedown = e => {
+      console.log('hey', e.data.global.x / 2, e.data.global.y / 2);
+    }
+    ui.addChild(clickFinder)
+  }
 
   {
     const uiTopBar = new Graphics()
@@ -181,13 +194,18 @@ function setup() {
 
   const grass = new Graphics()
   grass.beginFill(0x6abe30)
-  grass.drawRect(0, 0, 60, 400)
+  grass.drawRect(0, 0, 150, 400)
   background.addChild(grass)
 
   const beehive = new Graphics()
   beehive.beginFill(0xffc83f)
-  beehive.drawRect(120 / 2, 120 / 2, 120, 120)
+  beehive.drawRect(270 / 2, 120 / 2, 120, 120)
   background.addChild(beehive)
+
+  const jobsPanel = Sprite.fromImage('ui-jobs-panel.png')
+  jobsPanel.position.x = 0
+  jobsPanel.position.y = 48
+  background.addChild(jobsPanel)
 
   hexGrid = new Array(5).fill().map((_, x) => 
     new Array(5).fill().map((_, y) => cellEmpty(x, y, background))
@@ -214,8 +232,8 @@ function setup() {
     const flower = Sprite.fromImage('flower.png')
     makeOccupiable(flower)
     makeSelectable(flower, 'flower')
-    flower.position.x = 10 + (f * 10)
-    flower.position.y = 30
+    flower.position.x = 110
+    flower.position.y = 30 + (f * 25)
     background.addChild(flower)
     flowers.push(flower)
   }
@@ -275,8 +293,8 @@ function addJobsButtons() {
     for (var j = 0; j < 2; j++) {
       {
         const button = Sprite.fromImage(j === 0 ? 'minus.png' : 'plus.png')
-        button.position.x = 20 + (j * 12)
-        button.position.y = 50 + (i * 50)
+        button.position.x = 54 + (j * 12)
+        button.position.y = 89 + (i * 38)
         button.interactive = true
         button.buttonMode = true
         button.alpha = 1
@@ -286,7 +304,7 @@ function addJobsButtons() {
         const type = idx[i]
         const action = j === 0 ? 'remove' : 'add'
         button.mousedown = () => jobs(action, type)
-        background.addChild(button)
+        ui.addChild(button)
       }
     }
   }
@@ -665,7 +683,7 @@ function createQueen(parent) {
   queenSprite.addChild(queenLegAddon)
   
   queenSprite.idle = {
-    x: 100,
+    x: 170,
     y: 45
   }
   goIdle(queenSprite)
