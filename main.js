@@ -354,21 +354,23 @@ function createMap(m) {
   }
 
   if (m === 'jobs') {
-    paused = true
-    createBee(beeContainer, 'idle')
-    bees[0].pollenSack = 20
-    bees[0].nectarSack = 20
-    //createBee(beeContainer, 'idle')
-    //createBee(beeContainer, 'idle')
-    //for (var i = 0; i < 12; i++) {
-    //  createBee(beeContainer, 'idle')
-    //}
+    paused = false
+    for (var i = 0; i < 6; i++) {
+      createBee(beeContainer, 'idle').setPollen(20).setNectar(20)
+    }
     jobs('add', 'forager')
-    // jobs('add', 'nurser')
-    // jobs('add', 'worker')
+    jobs('add', 'forager')
+    jobs('add', 'nurser')
+    jobs('add', 'nurser')
+    jobs('add', 'worker')
+    jobs('add', 'worker')
 
     setSelected(hexGrid[0][0])
     replaceSelectedHex('honey').setHoney(15)
+    setSelected(hexGrid[0][1])
+    replaceSelectedHex('honey')
+    setSelected(hexGrid[0][2])
+    replaceSelectedHex('honey')
 
     setSelected(hexGrid[1][0])
     replaceSelectedHex('pollen')
@@ -376,6 +378,13 @@ function createMap(m) {
     replaceSelectedHex('pollen')
     setSelected(hexGrid[3][0])
     replaceSelectedHex('pollen')
+    setSelected(hexGrid[4][0])
+    replaceSelectedHex('pollen')
+
+    setSelected(hexGrid[0][3])
+    replaceSelectedHex('converter')
+    setSelected(hexGrid[0][4])
+    replaceSelectedHex('converter')
   }
 
 
@@ -499,15 +508,15 @@ function makeFlyable(sprite) {
     if (x === 0 && y === 0) return
     const direction = new PIXI.Point(x, y).normalize()
     
-    sprite.vx += direction.x * 0.006 * gameSpeed
-    sprite.vy += direction.y * 0.006 * gameSpeed
+    sprite.vx += direction.x * 0.008 * (gameSpeed * 5)
+    sprite.vy += direction.y * 0.008 * (gameSpeed * 5)
 
     const distanceToTarget = distance(sprite, targetSprite)
 
     let velocity = new PIXI.Point(sprite.vx, sprite.vy)
 
-    if (velocity.magnitude() > velocity.normalize().magnitude() * 0.1 * gameSpeed) {
-      velocity = new PIXI.Point(velocity.normalize().x * 0.1 * gameSpeed, velocity.normalize().y * 0.1 * gameSpeed)
+    if (velocity.magnitude() > velocity.normalize().magnitude() * 0.07 * gameSpeed) {
+      velocity = new PIXI.Point(velocity.normalize().x * 0.07 * gameSpeed, velocity.normalize().y * 0.07 * gameSpeed)
     }
     sprite.vx = velocity.x
     sprite.vy = velocity.y
@@ -555,8 +564,9 @@ function distance(a, b) {
   return Math.sqrt(x2 + y2)
 }
 
-function snapTo(a, b) {  
-  if (distance(a, b) < 2) {
+function snapTo(a, b) {
+  const threshold = gameSpeed > 4 ? 4 : 2.5 
+  if (distance(a, b) < threshold) {
     a.position.x = b.position.x
     a.position.y = b.position.y
     a.vx = 0
@@ -913,8 +923,8 @@ function createBee(parent, type, startPosition) {
     const flower = bee.isAtType('flower')
     if (flower && !isPollenSackFull()) {
       flower.claimSlot(bee)
-      bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(100)
-      bee.nectarSack += transferTo(bee.NECTAR_SACK_CAPACITY).inSeconds(100)
+      bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(60)
+      bee.nectarSack += transferTo(bee.NECTAR_SACK_CAPACITY).inSeconds(60)
       bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
       bee.nectarSack = cap(0, bee.NECTAR_SACK_CAPACITY)(bee.nectarSack)
       if (isPollenSackFull() && isNectarSackFull()) {
@@ -1279,7 +1289,7 @@ function cellBrood(x, y, parent) {
       broodSprite.setContents('puppa')
     } else if (broodSprite.lifecycle > 20 + 105 + 50 && broodSprite.content === 'puppa') {
       broodSprite.setContents('empty')
-      createBee(beeContainer, null, { x: broodSprite.position.x, y: broodSprite.position.y - 5 })
+      createBee(beeContainer, 'idle', { x: broodSprite.position.x, y: broodSprite.position.y - 5 })
     }
 
     // States
