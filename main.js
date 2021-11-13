@@ -95,6 +95,7 @@ let queen = null
 let panel = null
 let background = null
 let ui = null
+let populationText = null
 let selectedSprite = null
 let beeContainer = null
 let nightDimmer = null
@@ -143,18 +144,11 @@ function setup() {
     uiTopBar.beginFill(0x000000)
     uiTopBar.drawRect(0, 0, 400, 20)
     
-    const populationText = new PIXI.Text('Loading', { ...fontConfig, fill: 'white' })
+    populationText = new PIXI.Text('Loading', { ...fontConfig, fill: 'white' })
     populationText.position.x = 5
     populationText.position.y = 2
     uiTopBar.addChild(populationText)
-    tickers.push(time => {
-      const aliveBees = bees.filter(b => !b.isDead())
-      const foragers = aliveBees.filter(b => b.type === 'forager').length
-      const nurses = aliveBees.filter(b => b.type === 'nurser').length
-      const workers = aliveBees.filter(b => b.type === 'worker').length
-      populationText.text = `Colony population ${ aliveBees.length + 1 }    ${ foragers } / ${ nurses } / ${ workers }` 
-    })
-    
+
     const dayCycle = new PIXI.Text('Loading', { ...fontConfig, fill: 'white' })
     dayCycle.position.x = 230
     dayCycle.position.y = 2
@@ -207,6 +201,39 @@ function setup() {
   jobsPanel.position.y = 48
   background.addChild(jobsPanel)
 
+  const unassignedText = new PIXI.Text('-', { ...fontConfig, fill: 'black' })
+  unassignedText.position.x = 65
+  unassignedText.position.y = 3
+  jobsPanel.addChild(unassignedText)
+
+  const foragerText = new PIXI.Text('-', { ...fontConfig, fill: 'black' })
+  foragerText.position.x = 47
+  foragerText.position.y = 41.5
+  jobsPanel.addChild(foragerText)
+
+  const nurserText = new PIXI.Text('-', { ...fontConfig, fill: 'black' })
+  nurserText.position.x = 47
+  nurserText.position.y = 79.5
+  jobsPanel.addChild(nurserText)
+
+  const workerText = new PIXI.Text('-', { ...fontConfig, fill: 'black' })
+  workerText.position.x = 47
+  workerText.position.y = 117.5
+  jobsPanel.addChild(workerText)
+  
+  tickers.push(time => {
+    const aliveBees = bees.filter(b => !b.isDead())
+    const idles = aliveBees.filter(b => b.type === 'idle').length
+    const foragers = aliveBees.filter(b => b.type === 'forager').length
+    const nurses = aliveBees.filter(b => b.type === 'nurser').length
+    const workers = aliveBees.filter(b => b.type === 'worker').length
+    unassignedText.text = idles
+    foragerText.text = foragers
+    nurserText.text = nurses
+    workerText.text = workers
+    populationText.text = `Colony population ${ aliveBees.length + 1 }    ${ foragers } / ${ nurses } / ${ workers }` 
+  })
+  
   hexGrid = new Array(5).fill().map((_, x) => 
     new Array(5).fill().map((_, y) => cellEmpty(x, y, background))
   )
@@ -228,7 +255,7 @@ function setup() {
   })
   background.addChild(selectedSprite)
 
-  for (var f = 0; f < 3; f++) {
+  for (var f = 0; f < 7; f++) {
     const flower = Sprite.fromImage('flower.png')
     makeOccupiable(flower)
     makeSelectable(flower, 'flower')
@@ -239,7 +266,7 @@ function setup() {
   }
 
   panel = Sprite.fromImage('ui-panel.png')
-  panel.position.x = 190
+  panel.position.x = 270
   panel.position.y = 30  
   panel.visible = true
   const panelContent = new Container()
@@ -312,7 +339,7 @@ function addJobsButtons() {
 
 function createMap(m) {
   createQueen(beeContainer)
-  
+   
   if (m === 'default') {
     createBee(beeContainer, 'nurser')
     createBee(beeContainer, 'forager').setPollen(20)
@@ -325,10 +352,13 @@ function createMap(m) {
   if (m === 'jobs') {
     paused = true
     createBee(beeContainer, 'idle')
-    bees[0].pollenSack = 20
-    bees[0].nectarSack = 20
+    //bees[0].pollenSack = 20
+    //bees[0].nectarSack = 20
     createBee(beeContainer, 'idle')
     createBee(beeContainer, 'idle')
+    for (var i = 0; i < 12; i++) {
+      createBee(beeContainer, 'idle')
+    }
     // jobs('add', 'forager')
     // jobs('add', 'nurser')
     // jobs('add', 'worker')
@@ -444,7 +474,7 @@ function makeOccupiable(parent) {
         parent.slot = null
       }
     }
-    spotClaimed.visible = !!parent.slot // enable for debug
+    // spotClaimed.visible = !!parent.slot // enable for debug
   })
 }
 
@@ -572,6 +602,25 @@ function transferTo(capacity) {
   }
 }
 
+function getIdlePosition(type) {
+  const y = {
+    unassigned: 57,
+    idle: 57,
+    [null]: 57,
+    forager: 96,
+    nurser: 134,
+    worker: 134 + (134 - 96),
+  }[type]
+
+  const beesPerRow = 7
+  const filteredBees = bees.filter(x => x.type === type)
+  
+  return {
+    x: 68 - (filteredBees.length % beesPerRow * 11),
+    y: y + (Math.floor(filteredBees.length / beesPerRow) * 10)
+  }
+}
+
 function makeHungry(bee) {
   const HUNGER_CAPACITY = 100
   bee.hunger = HUNGER_CAPACITY
@@ -649,7 +698,7 @@ function jobs(addOrRemove, type) {
   const availableBees = bees.filter(addOrRemove === 'add' ? isIdle : x=>x.type===type)
 
   if (availableBees.length > 0) {
-    availableBees[0].type = addOrRemove === 'add' ? type : 'idle'
+    availableBees[0].setType(addOrRemove === 'add' ? type : 'idle')
   }
 }
 
@@ -752,10 +801,7 @@ function createBee(parent, type, startPosition) {
   makeHungry(bee)
   makeParticleCreator(bee)
   const isAt = samePosition(bee)
-  bee.idle = {
-    x: 35,
-    y: 60 + (bees.length * 15)
-  }
+  bee.idle = getIdlePosition(type)
   goIdle(bee)
   if (startPosition) {
     bee.position.x = startPosition.x
@@ -776,6 +822,7 @@ function createBee(parent, type, startPosition) {
   bee.honeySack = 0
   bee.setHoney = amount => { bee.honeySack = cap(0, bee.HONEY_SACK_CAPACITY)(amount); return bee }
   bee.type = type || 'unassigned'
+  bee.setType = type => { bee.type = type; bee.idle = getIdlePosition(type) }
   
   const isPollenSackFull = () => bee.pollenSack >= bee.POLLEN_SACK_CAPACITY
   const isPollenSackEmpty = () => !(bee.pollenSack > 0)
@@ -1031,7 +1078,7 @@ function createBee(parent, type, startPosition) {
       }
     } else {
       bee.scale.set(1, 1)
-      if (bee.position.x === 35 || Math.sin(bee.animationTicker / 2) > 0) {
+      if ((bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) || Math.sin(bee.animationTicker / 2) > 0) {
         beeAddon.texture = Texture.fromImage('bee-drone-legs.png')
       } else {
         beeAddon.texture = Texture.fromImage('bee-drone-legs-jerk.png')
