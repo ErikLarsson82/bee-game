@@ -355,8 +355,6 @@ function createMap(m) {
 
   if (m === 'jobs') {
     paused = false
-    createBee(beeContainer, 'worker').setHunger(31)
-    /*
     for (var i = 0; i < 6; i++) {
       createBee(beeContainer, 'idle').setPollen(20).setNectar(20)
     }
@@ -366,8 +364,7 @@ function createMap(m) {
     jobs('add', 'nurser')
     jobs('add', 'worker')
     jobs('add', 'worker')
-    */
-
+    
     setSelected(hexGrid[0][0])
     replaceSelectedHex('honey').setHoney(15)
     setSelected(hexGrid[0][1])
@@ -1002,9 +999,9 @@ function createBee(parent, type, startPosition) {
       return
     }
 
-    if (larvaeHex.length > 0 && isAtAnyLarvae.length > 0 && !isPollenSackEmpty()) {
+    if (isAtAnyLarvae.length > 0 && !isPollenSackEmpty()) {
       isAtAnyLarvae[0].claimSlot(bee)
-      bee.pollenSack -= transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(20)
+      bee.pollenSack -= transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(40)
       isAtAnyLarvae[0].nutrition += transferTo(isAtAnyLarvae[0].NUTRITION_CAPACITY).inSeconds(10)
       isAtAnyLarvae[0].nutrition = cap(0, isAtAnyLarvae[0].NUTRITION_CAPACITY)(isAtAnyLarvae[0].nutrition)
       return
@@ -1263,7 +1260,7 @@ function cellBrood(x, y, parent) {
       broodSprite.nutrition = 50
     }
   }
-  broodSprite.isWellFed = () => broodSprite.nutrition >= broodSprite.NUTRITION_CAPACITY
+  broodSprite.isWellFed = () => broodSprite.nutrition >= broodSprite.NUTRITION_CAPACITY - 10
 
   const setTexture = () => {
     const item = broodSprite.content
@@ -1299,7 +1296,7 @@ function cellBrood(x, y, parent) {
 
     // States
     if (broodSprite.content === 'larvae') {
-      broodSprite.nutrition -= transferTo(broodSprite.NUTRITION_CAPACITY).inSeconds(60)
+      broodSprite.nutrition -= transferTo(broodSprite.NUTRITION_CAPACITY).inSeconds(90)
       if (broodSprite.nutrition <= 0) {
         broodSprite.setContents('dead')
       }
