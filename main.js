@@ -926,7 +926,7 @@ function createBee(parent, type, startPosition) {
 
   function flyToAndPollinateFlower() {
     const flower = bee.isAtType('flower')
-    if (flower && !isPollenSackFull()) {
+    if (flower && !(isPollenSackFull() && isNectarSackFull())) {
       flower.claimSlot(bee)
       bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(60)
       bee.nectarSack += transferTo(bee.NECTAR_SACK_CAPACITY).inSeconds(60)
