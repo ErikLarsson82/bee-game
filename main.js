@@ -924,9 +924,10 @@ function createBee(parent, type, startPosition) {
     return true
   }
 
-  function flyToAndPollinateFlower() {
+  function pollinateFlower() {
     const flower = bee.isAtType('flower')
-    if (flower && !(isPollenSackFull() && isNectarSackFull())) {
+    const needsResource = !(isPollenSackFull() && isNectarSackFull())
+    if (flower && needsResource) {
       flower.claimSlot(bee)
       bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(60)
       bee.nectarSack += transferTo(bee.NECTAR_SACK_CAPACITY).inSeconds(60)
@@ -936,10 +937,15 @@ function createBee(parent, type, startPosition) {
         bee.position.y = flower.position.y - 5
       }
       return true
-    }
-    const unclaimedFlowers = flowers.filter(flower => flower.isUnclaimed(bee))
+    }    
+    return false
+  }
 
-    if (!isPollenSackFull() && unclaimedFlowers[0]) {
+  function flyToFlower() {
+    const unclaimedFlowers = flowers.filter(flower => flower.isUnclaimed(bee))
+    const needsResource = !(isPollenSackFull() && isNectarSackFull())
+
+    if (needsResource && unclaimedFlowers[0]) {
       unclaimedFlowers[0].claimSlot(bee)
       bee.flyTo(unclaimedFlowers[0])
       return true
@@ -952,6 +958,7 @@ function createBee(parent, type, startPosition) {
     if (!hex) return false
     hex.claimSlot(bee)  
     bee.pollenSack -= transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(30)
+    bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
     hex.pollen += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(30)
     hex.pollen = cap(0, hex.POLLEN_HEX_CAPACITY)(hex.pollen)
     if (isPollenSackEmpty() || hex.isPollenFull()) {
@@ -963,7 +970,7 @@ function createBee(parent, type, startPosition) {
 
   function flyToPollen() {
     const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && hex.isUnclaimed(bee) && !hex.isPollenFull())
-    if (pollenHex.length === 0 || !isPollenSackFull()) return false
+    if (pollenHex.length === 0 || isPollenSackEmpty()) return false
     pollenHex[0].claimSlot(bee)
     bee.flyTo(pollenHex[0])      
     return true
@@ -971,10 +978,11 @@ function createBee(parent, type, startPosition) {
 
   function forager() {
     if (bee.feedBee()) return
-    if (flyToAndDepositNectar()) return
+    if (pollinateFlower()) return
     if (depositPollen()) return    
-    if (flyToAndPollinateFlower()) return
+    if (flyToAndDepositNectar()) return
     if (flyToPollen()) return    
+    if (flyToFlower()) return    
     bee.flyTo(null)
   }
 
