@@ -818,6 +818,14 @@ function createBee(parent, type, startPosition) {
   const bee = Sprite.fromImage('bee-drone-body.png')
   const beeAddon = Sprite.fromImage('bee-drone-legs.png')
   bee.addChild(beeAddon)
+  const honeyDrop = Sprite.fromImage('drop-honey.png')
+  honeyDrop.position.x = 2
+  honeyDrop.position.y = 6
+  bee.addChild(honeyDrop)
+  const nectarDrop = Sprite.fromImage('drop-nectar.png')
+  nectarDrop.position.x = 1
+  nectarDrop.position.y = 5
+  bee.addChild(nectarDrop)
   const beeExclamation = Sprite.fromImage('exclamation.png')
   beeExclamation.position.x = 12
   beeExclamation.position.y = -2
@@ -1103,6 +1111,9 @@ function createBee(parent, type, startPosition) {
     beeExclamation.visible = bee.isHungry()
     
     bee.animationTicker += speeds[gameSpeed]
+
+    honeyDrop.visible = isHoneySackFull()
+    nectarDrop.visible = isNectarSackFull()
 
     if (bee.vx !== 0 || bee.vy !== 0) {
       (bee.vx >= -0.15 || bee.vx === 0) ? bee.scale.set(1, 1) : bee.scale.set(-1, 1) //
