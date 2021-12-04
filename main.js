@@ -42,6 +42,8 @@
 
 // Eventlog
 
+const MAP_SELECTION = 'sparse'
+
 const fontConfig = {
     fontFamily: '"Lucida Console", Monaco, monospace',
     fontSize: 8,
@@ -301,7 +303,7 @@ function setup() {
   })
   dimmer.addChild(nightDimmer)
   
-  createMap('jobs')
+  createMap(MAP_SELECTION)
 
   app.ticker.add((delta) => gameLoop(delta))
 }
@@ -353,17 +355,23 @@ function createMap(m) {
     replaceSelectedHex('honey').setHoney(15)
   }
 
+  if (m === 'sparse') {
+    createBee(beeContainer, 'worker')
+  }
+
   if (m === 'jobs') {
     paused = false
     for (var i = 0; i < 6; i++) {
-      createBee(beeContainer, 'idle').setPollen(20).setNectar(20)
+      createBee(beeContainer, 'idle') //.setPollen(20).setNectar(20)
     }
+    /*
     jobs('add', 'forager')
     jobs('add', 'forager')
     jobs('add', 'nurser')
     jobs('add', 'nurser')
     jobs('add', 'worker')
     jobs('add', 'worker')
+    */
     
     setSelected(hexGrid[0][0])
     replaceSelectedHex('honey').setHoney(15)
@@ -583,7 +591,8 @@ function replaceSelectedHex(type) {
         converter: cellConverter,
         brood: cellBrood,
         pollen: cellPollen,
-        honey: cellHoney
+        honey: cellHoney,
+        prepared: cellPrepared
       }
       if (!f[type]) {
         console.error('No type!')
@@ -1162,15 +1171,58 @@ function cellEmpty(x, y, parent) {
 
   emptySprite.panelContent = () => {
     const c = new Container()
-    c.addChild(Button(5, 40, 'honey', () => replaceSelectedHex('honey')))
-    c.addChild(Button(5, 60, 'brood', () => replaceSelectedHex('brood')))
-    c.addChild(Button(5, 80, 'pollen', () => replaceSelectedHex('pollen')))
-    c.addChild(Button(5, 100, 'converter', () => replaceSelectedHex('converter')))
+    c.addChild(Button(5, 40, 'prepared', () => replaceSelectedHex('prepared')))
     return c
   }
   
   parent.addChild(emptySprite)
   return emptySprite
+}
+
+function cellPrepared(x, y, parent) {
+  const pixelCoordinate = toLocalCoordinateFlat({ x, y })
+  const preparedCellSprite = Sprite.fromImage('cell-prepared-partial1.png')
+  makeSelectable(preparedCellSprite, 'prepared')
+  preparedCellSprite.position.x = pixelCoordinate.x
+  preparedCellSprite.position.y = pixelCoordinate.y
+  preparedCellSprite.completeness = 0
+  const BUILD_TIME = FPS * 10
+
+  preparedCellSprite.panelContent = () => {
+    if (preparedCellSprite.completeness >= BUILD_TIME) {
+      const c = new Container()
+      c.addChild(Button(5, 40, 'honey', () => replaceSelectedHex('honey')))
+      c.addChild(Button(5, 60, 'brood', () => replaceSelectedHex('brood')))
+      c.addChild(Button(5, 80, 'pollen', () => replaceSelectedHex('pollen')))
+      c.addChild(Button(5, 100, 'converter', () => replaceSelectedHex('converter')))
+      return c
+    } else {
+      const text = new PIXI.Text('Loading', { ...fontConfig })
+      text.position.x = 7
+      text.position.y = 50
+      tickers.push(time => {
+        if (preparedCellSprite.completeness === BUILD_TIME && selected === preparedCellSprite) {
+          setSelected(preparedCellSprite)
+        }
+        text.text = `Building progress ${Math.round(preparedCellSprite.completeness / BUILD_TIME * 100)}%`
+      })
+      return text
+    }
+  }
+
+  tickers.push(time => {
+    preparedCellSprite.completeness = preparedCellSprite.completeness + 1
+
+    if (preparedCellSprite.completeness >= BUILD_TIME) {
+      preparedCellSprite.texture = Texture.fromImage('cell-prepared-complete.png')      
+    } else {
+      const partialNumber = Math.ceil(preparedCellSprite.completeness / BUILD_TIME * 8)
+      preparedCellSprite.texture = Texture.fromImage(`cell-prepared-partial${partialNumber}.png`)      
+    }    
+  })
+  
+  parent.addChild(preparedCellSprite)
+  return preparedCellSprite
 }
 
 function cellHoney(x, y, parent) {
