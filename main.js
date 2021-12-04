@@ -241,9 +241,10 @@ function setup() {
   })
   
   hexGrid = new Array(5).fill().map((_, x) => 
-    new Array(5).fill().map((_, y) => cellEmpty(x, y, background))
+    new Array(5).fill().map((_, y) => cellDisabled(x, y, background))
   )
-
+  hexGrid[2][2] = cellEmpty(2, 2, background)
+  
   selectedSprite = new Container()
   selectedSprite.visible = false
   const selectedSpriteSub = Sprite.fromImage('cell-selected.png')
@@ -445,6 +446,17 @@ function createMap(m) {
   }  
 
   setSelected(null)
+}
+
+function activateAdjacent(_x, _y) {
+  const instructions = _x % 2 === 0 ? DIRECTIONS_FLAT_EVEN : DIRECTIONS_FLAT_ODD
+  for (direction in instructions) {
+    const modifier = instructions[direction]
+    const target = hexGrid[_x + modifier.x] && hexGrid[_x + modifier.x][_y + modifier.y]
+    if (target && target.isDisabled && target.isDisabled()) {
+      hexGrid[_x + modifier.x][_y + modifier.y] = cellEmpty(_x + modifier.x, _y + modifier.y, background)
+    }
+  }
 }
 
 function setSelected(item) {
@@ -1095,8 +1107,33 @@ function createBee(parent, type, startPosition) {
     return true
   }
 
+  function prepareCell() {
+    const hex = bee.isAtType('prepared')
+    if (!hex) return false
+    hex.claimSlot(bee)
+
+    hex.completeness += transferTo(100).inSeconds(20)
+    hex.completeness = cap(0, 100)(hex.completeness)
+    
+    if (hex.completeness >= 100) {
+      activateAdjacent(hex.index.x, hex.index.y)
+      bee.position.y = hex.position.y - 5
+    }
+    return true
+  }
+
+  function flyToPrepareCell() {
+    const preparedHex = filterHexagon(hexGrid, hex => hex.type === 'prepared' && hex.isUnclaimed(bee) && hex.completeness < 100)
+    if (preparedHex.length === 0) return false
+    preparedHex[0].claimSlot(bee)
+    bee.flyTo(preparedHex[0])      
+    return true
+  }
+
   function worker() {
     bee.consumeEnergy()   
+    if (prepareCell()) return
+    if (flyToPrepareCell()) return
     if (depositHoney()) return
     if (flyToHoney()) return
     if (convertNectar()) return
@@ -1162,6 +1199,18 @@ function createBee(parent, type, startPosition) {
   return bee
 }
 
+function cellDisabled(x, y, parent) {
+  const pixelCoordinate = toLocalCoordinateFlat({ x, y })
+  const disabledSprite = Sprite.fromImage('cell-disabled.png')
+  disabledSprite.position.x = pixelCoordinate.x
+  disabledSprite.position.y = pixelCoordinate.y
+  disabledSprite.isDisabled = () => true
+  disabledSprite.index = { x, y }
+
+  parent.addChild(disabledSprite)
+  return disabledSprite
+}
+
 function cellEmpty(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const emptySprite = Sprite.fromImage('cell-empty.png')
@@ -1183,13 +1232,15 @@ function cellPrepared(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const preparedCellSprite = Sprite.fromImage('cell-prepared-partial1.png')
   makeSelectable(preparedCellSprite, 'prepared')
+  makeOccupiable(preparedCellSprite)
   preparedCellSprite.position.x = pixelCoordinate.x
   preparedCellSprite.position.y = pixelCoordinate.y
   preparedCellSprite.completeness = 0
-  const BUILD_TIME = FPS * 10
-
+  preparedCellSprite.type = 'prepared'
+  preparedCellSprite.index = { x, y }
+  
   preparedCellSprite.panelContent = () => {
-    if (preparedCellSprite.completeness >= BUILD_TIME) {
+    if (preparedCellSprite.completeness >= 100) {
       const c = new Container()
       c.addChild(Button(5, 40, 'honey', () => replaceSelectedHex('honey')))
       c.addChild(Button(5, 60, 'brood', () => replaceSelectedHex('brood')))
@@ -1201,22 +1252,20 @@ function cellPrepared(x, y, parent) {
       text.position.x = 7
       text.position.y = 50
       tickers.push(time => {
-        if (preparedCellSprite.completeness === BUILD_TIME && selected === preparedCellSprite) {
+        if (preparedCellSprite.completeness === 100 && selected === preparedCellSprite) {
           setSelected(preparedCellSprite)
         }
-        text.text = `Building progress ${Math.round(preparedCellSprite.completeness / BUILD_TIME * 100)}%`
+        text.text = `Building progress ${Math.round(preparedCellSprite.completeness / 100 * 100)}%`
       })
       return text
     }
   }
 
   tickers.push(time => {
-    preparedCellSprite.completeness = preparedCellSprite.completeness + 1
-
-    if (preparedCellSprite.completeness >= BUILD_TIME) {
+    if (preparedCellSprite.completeness >= 100) {
       preparedCellSprite.texture = Texture.fromImage('cell-prepared-complete.png')      
     } else {
-      const partialNumber = Math.ceil(preparedCellSprite.completeness / BUILD_TIME * 8)
+      const partialNumber = Math.ceil(preparedCellSprite.completeness / 100 * 7) + 1
       preparedCellSprite.texture = Texture.fromImage(`cell-prepared-partial${partialNumber}.png`)      
     }    
   })
