@@ -42,7 +42,7 @@
 
 // Eventlog
 
-const MAP_SELECTION = 'sparse'
+const MAP_SELECTION = 'jobs'
 
 const fontConfig = {
     fontFamily: '"Lucida Console", Monaco, monospace',
@@ -307,6 +307,17 @@ function setup() {
   createMap(MAP_SELECTION)
 
   app.ticker.add((delta) => gameLoop(delta))
+
+  function handleVisibilityChange() {
+    if (document.visibilityState === 'hidden') {
+      paused = true
+      app.ticker.stop()
+    } else {
+      app.ticker.start()
+    }
+    window.setGameSpeedText()
+  }
+  document.addEventListener('visibilitychange', handleVisibilityChange, false)
 }
 
 function gameLoop(delta, manualTick) {
