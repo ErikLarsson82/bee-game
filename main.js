@@ -42,7 +42,7 @@
 
 // Eventlog
 
-const MAP_SELECTION = 'jobs'
+const MAP_SELECTION = 'default'
 
 const fontConfig = {
     fontFamily: '"Lucida Console", Monaco, monospace',
