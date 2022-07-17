@@ -284,7 +284,7 @@ function setup() {
       selectedSprite.visible = false
     }
   })
-  background.addChild(selectedSprite)
+  hexForeground.addChild(selectedSprite)
 
   createFlowers()
 
@@ -691,7 +691,7 @@ function replaceSelectedHex(type) {
       if (!f[type]) {
         console.error('No type!')
       }
-      const newHex = f[type](xIdx, yIdx, background)
+      const newHex = f[type](xIdx, yIdx, hexForeground)
       hexGrid[xIdx][yIdx] = newHex
       returnHex = newHex
       setSelected(newHex)
@@ -1294,8 +1294,6 @@ function cellDisabled(x, y, parent) {
   disabledSprite.position.y = pixelCoordinate.y
   disabledSprite.isDisabled = () => true
   disabledSprite.index = { x, y }
-
-  console.log(pixelCoordinate)
 
   parent.addChild(disabledSprite)
   return disabledSprite
