@@ -43,6 +43,7 @@
 // Eventlog
 
 const MAP_SELECTION = 'default'
+let DEBUG = false
 
 const fontConfig = {
     fontFamily: '"Lucida Console", Monaco, monospace',
@@ -1086,13 +1087,84 @@ function createBee(parent, type, startPosition) {
     return true
   }
 
+  function refillPollen() {
+    const hex = bee.isAtType('pollen')
+    if (!hex) return false
+    hex.claimSlot(bee)  
+    bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(30)
+    bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
+    hex.pollen -= transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(30)
+    hex.pollen = cap(0, hex.POLLEN_HEX_CAPACITY)(hex.pollen)
+    if (isPollenSackFull() || hex.isPollenEmpty()) {
+      bee.position.y = hex.position.y - 5
+    }
+    return true
+  }
 
-  function flyToPollen() {
+
+  function flyToPollenToDeposit() {
     const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && hex.isUnclaimed(bee) && !hex.isPollenFull())
     if (pollenHex.length === 0 || isPollenSackEmpty()) return false
     pollenHex[0].claimSlot(bee)
     bee.flyTo(pollenHex[0])      
     return true
+  }
+
+  function flyToPollenToRefill() {
+    const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && hex.isUnclaimed(bee) && !hex.isPollenEmpty())
+    if (pollenHex.length === 0 || isPollenSackFull()) return false
+    pollenHex[0].claimSlot(bee)
+    bee.flyTo(pollenHex[0])      
+    return true
+  }
+
+  function flyToBroodling() {
+    const larvaeHex = filterHexagon(hexGrid, hex => 
+      hex.type === 'brood' &&
+      hex.content === 'larvae' &&
+      hex.isUnclaimed(bee) && 
+      !hex.isWellFed()
+    ).sort((a, b) => a.nutrition > b.nutrition ? 1 : -1)
+
+    if (larvaeHex.length === 0 || isPollenSackEmpty()) return false
+    larvaeHex[0].claimSlot(bee)
+    bee.flyTo(larvaeHex[0])
+    return true
+  }
+
+  function flyToCleanBrood() {
+    const deadLarvaeHex = filterHexagon(hexGrid, hex => 
+      hex.type === 'brood' &&
+      hex.isUnclaimed(bee) && 
+      hex.isDead()
+    )
+
+    if (deadLarvaeHex.length === 0) return false
+    deadLarvaeHex[0].claimSlot(bee)
+    bee.flyTo(deadLarvaeHex[0])
+    return true
+  }
+
+  function nurseBroodling() {
+    const isAtAnyLarvae = filterHexagon(hexGrid, hex => hex.type === 'brood' && hex.content === 'larvae' && hex.isUnclaimed(bee) && isAt(hex))
+    if (isAtAnyLarvae.length === 0 || isPollenSackEmpty()) return false
+    
+    isAtAnyLarvae[0].claimSlot(bee)
+    bee.pollenSack -= transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(40)
+    isAtAnyLarvae[0].nutrition += transferTo(isAtAnyLarvae[0].NUTRITION_CAPACITY).inSeconds(10)
+    isAtAnyLarvae[0].nutrition = cap(0, isAtAnyLarvae[0].NUTRITION_CAPACITY)(isAtAnyLarvae[0].nutrition) 
+    return true   
+  }
+
+  function cleanBrood() {
+    const hex = bee.isAtType('brood')
+    if (!hex) return false
+    hex.claimSlot(bee)  
+    hex.corpseCleaned -= transferTo(hex.CORPSE_DELAY).inSeconds(10)
+    if (hex.corpseCleaned <= 0) {
+      bee.position.y = hex.position.y - 5
+    }
+    return true    
   }
 
   function idle() {
@@ -1105,13 +1177,21 @@ function createBee(parent, type, startPosition) {
     if (pollinateFlower()) return
     if (depositPollen()) return    
     if (flyToAndDepositNectar()) return
-    if (flyToPollen()) return    
+    if (flyToPollenToDeposit()) return    
     if (flyToFlower()) return    
     bee.flyTo(null)
   }
 
   function nurser() {
     if (bee.feedBee()) return
+    if (DEBUG) debugger;
+    if (refillPollen()) return
+    if (nurseBroodling()) return
+    if (cleanBrood()) return
+    if (flyToPollenToRefill()) return
+    if (flyToBroodling()) return
+    if (flyToCleanBrood()) return
+    /*
     const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && hex.pollen > 0 && hex.isUnclaimed(bee))
     const isAtAnyLarvae = filterHexagon(hexGrid, hex => hex.type === 'brood' && hex.content === 'larvae' && hex.isUnclaimed(bee) && isAt(hex))
     const larvaeHex = filterHexagon(hexGrid, hex => 
@@ -1121,6 +1201,7 @@ function createBee(parent, type, startPosition) {
       !hex.isWellFed()
     ).sort((a, b) => a.nutrition > b.nutrition ? 1 : -1)
 
+    // Became refillPollen
     if (pollenHex.length > 0 && isAt(pollenHex[0])) {
       pollenHex[0].claimSlot(bee)
       bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(30)
@@ -1131,6 +1212,7 @@ function createBee(parent, type, startPosition) {
       return
     }
 
+    // Became nurseBroodling
     if (isAtAnyLarvae.length > 0 && !isPollenSackEmpty()) {
       isAtAnyLarvae[0].claimSlot(bee)
       bee.pollenSack -= transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(40)
@@ -1139,17 +1221,20 @@ function createBee(parent, type, startPosition) {
       return
     }
 
+    // Became flyToPollenToRefill
     if (!isPollenSackFull() && pollenHex.length > 0) {
       pollenHex[0].claimSlot(bee)
       bee.flyTo(pollenHex[0])
       return
     }
       
+    // Became flyToBroodling
     if (larvaeHex.length > 0 && !isPollenSackEmpty()) {
       larvaeHex[0].claimSlot(bee)
       bee.flyTo(larvaeHex[0])
       return
     }
+    */
 
     bee.flyTo(null)
   }
@@ -1486,6 +1571,8 @@ function cellBrood(x, y, parent) {
   broodSprite.content = 'empty'
   broodSprite.NUTRITION_CAPACITY = 100
   broodSprite.nutrition = null
+  broodSprite.CORPSE_DELAY = 60
+  broodSprite.corpseCleaned = broodSprite.CORPSE_DELAY
   broodSprite.isOccupiedWithOffspring = () => broodSprite.content !== 'empty'
   broodSprite.setContents = item => {
     // empty -> egg -> (larvae -> puppa) || dead
@@ -1496,6 +1583,7 @@ function cellBrood(x, y, parent) {
     }
   }
   broodSprite.isWellFed = () => broodSprite.nutrition >= broodSprite.NUTRITION_CAPACITY - 10
+  broodSprite.isDead = () => broodSprite.content === 'dead'
 
   const setTexture = () => {
     const item = broodSprite.content
@@ -1515,7 +1603,14 @@ function cellBrood(x, y, parent) {
   tickers.push(time => {
     setTexture()
     if (!broodSprite.content) return
-    if (['dead', 'empty'].includes(broodSprite.content)) return
+    if (broodSprite.content === 'empty') return
+    if (broodSprite.content === 'dead') {
+      if (broodSprite.corpseCleaned <= 0) {
+        broodSprite.corpseCleaned = broodSprite.CORPSE_DELAY
+        broodSprite.setContents('empty')
+      }
+      return
+    }
     
     broodSprite.lifecycle += transferTo(225).inSeconds(225)
 
