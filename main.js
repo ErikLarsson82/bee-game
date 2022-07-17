@@ -1078,6 +1078,11 @@ function createBee(parent, type, startPosition) {
     return true
   }
 
+  function idle() {
+    if (bee.feedBee()) return
+    bee.flyTo(null)
+  }
+
   function forager() {
     if (bee.feedBee()) return
     if (pollinateFlower()) return
@@ -1264,7 +1269,7 @@ function createBee(parent, type, startPosition) {
     if (bee.type === 'forager') forager()
     if (bee.type === 'nurser') nurser()
     if (bee.type === 'worker') worker()
-    if (bee.type === 'idle') bee.flyTo(null)
+    if (bee.type === 'idle') idle()
   })
 
   bees.push(bee)
