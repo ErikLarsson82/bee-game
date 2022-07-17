@@ -591,7 +591,7 @@ function makeOccupiable(parent) {
   }
   tickers.push(time => {
     if (parent.slot) {
-      parent.slotCounter--
+      parent.slotCounter = parent.slotCounter - gameSpeed
       if (parent.slotCounter <= 0) {
         parent.slot = null
       }
@@ -616,7 +616,7 @@ function makeFlyable(sprite) {
     const y = targetSprite.position.y - sprite.position.y
     if (x === 0 && y === 0) return
     const direction = new PIXI.Point(x, y).normalize()
-    
+
     sprite.vx += direction.x * 0.008 * (gameSpeed * 5)
     sprite.vy += direction.y * 0.008 * (gameSpeed * 5)
 
