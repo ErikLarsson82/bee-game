@@ -385,7 +385,7 @@ function gameLoop(delta, manualTick) {
 
 function createFlowers() {
   const positions = [10, -50, 60, -110, 120, -160, 170]
-  for (var f = 0; f < 10; f++) {
+  for (var f = 0; f < seeds; f++) {
     const flipped = Math.random() < 0.5
     const flower = Sprite.fromImage('images/scene/flower.png')
     makeOccupiable(flower)
