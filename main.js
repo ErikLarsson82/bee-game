@@ -937,7 +937,7 @@ function createBee(parent, type, startPosition) {
   nectarDrop.position.x = 1
   nectarDrop.position.y = 5
   bee.addChild(nectarDrop)
-  const beeExclamation = Sprite.fromImage('exclamation.png')
+  const beeExclamation = Sprite.fromImage('exclamation-warning-severe.png')
   beeExclamation.position.x = 12
   beeExclamation.position.y = -2
   beeExclamation.visible = false
