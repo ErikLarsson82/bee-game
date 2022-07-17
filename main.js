@@ -87,10 +87,16 @@ settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST // Default pixel-scaling
 app.renderer.view.style.position = 'absolute'
 app.renderer.view.style.display = 'block'
 
+let cycles = [2, 2, 4, 4, 6, 6, 6, 20]
+
 let gameSpeed = 1
 let paused = false
-let day = 0
 let hour = 0
+let day = 1
+let year = 1
+let seeds = 2
+let season = 'summer'
+
 let selected = null
 let queen = null
 
@@ -101,10 +107,12 @@ let populationText = null
 let selectedSprite = null
 let beeContainer = null
 let nightDimmer = null
+let backgroundScene = null
+let warning = null
 
 let hexGrid = []
+let flowers = []
 const bees = []
-const flowers = []
 const tickers = []
 
 function setup() {
@@ -144,7 +152,7 @@ function setup() {
   {
     const uiTopBar = new Graphics()
     uiTopBar.beginFill(0x000000)
-    uiTopBar.drawRect(0, 0, 400, 20)
+    uiTopBar.drawRect(0, 0, 1024, 20)
     
     populationText = new PIXI.Text('Loading', { ...fontConfig, fill: 'white' })
     populationText.position.x = 5
@@ -156,11 +164,19 @@ function setup() {
     dayCycle.position.y = 2
     uiTopBar.addChild(dayCycle)
     tickers.push(time => {
-      dayCycle.text = 'Day ' + day + ' Hour ' + Math.round(hour)
+      dayCycle.text = 'Year ' + year + ' Day ' + day + ' Hour ' + Math.round(hour)
+    })
+
+    const seasonCycle = new PIXI.Text('Loading', { ...fontConfig, fill: 'white' })
+    seasonCycle.position.x = 400
+    seasonCycle.position.y = 2
+    uiTopBar.addChild(seasonCycle)
+    tickers.push(time => {
+      seasonCycle.text = season === 'summer' ? 'Summer' : 'Winter'
     })
 
     const pausedText = new PIXI.Text('Playing', { ...fontConfig, fill: 'white' })
-    pausedText.position.x = 330
+    pausedText.position.x = 480
     pausedText.position.y = 2
     uiTopBar.addChild(pausedText)
 
@@ -188,7 +204,7 @@ function setup() {
     ui.addChild(uiTopBar)
   }
 
-  const backgroundScene = Sprite.fromImage('images/scene/background.png')
+  backgroundScene = Sprite.fromImage('images/scene/background-summer.png')
   background.addChild(backgroundScene)
 
   const beehive = new Graphics()
@@ -260,16 +276,13 @@ function setup() {
   })
   background.addChild(selectedSprite)
 
-  for (var f = 0; f < 7; f++) {
-    const flower = Sprite.fromImage('images/scene/flower.png')
-    if (Math.random() < 0.5) flower.scale.x = -1
-    makeOccupiable(flower)
-    makeSelectable(flower, 'flower')
-    flower.position.x = 35 + (f * 70 + Math.round(Math.random() * 40))
-    flower.position.y = 320
-    background.addChild(flower)
-    flowers.push(flower)
-  }
+  createFlowers()
+
+  warning = Sprite.fromImage('images/ui/warning.png')
+  warning.position.x = 180
+  warning.position.y = 50  
+  warning.visible = false
+  ui.addChild(warning)
 
   panel = Sprite.fromImage('ui-panel.png')
   panel.position.x = 330
@@ -339,7 +352,46 @@ function gameLoop(delta, manualTick) {
   if (hour > 24) {
     hour = 0
     day++
+    cycles[0]--
+    if (cycles[0] === 1 && season === 'summer') {
+      warning.visible = true
+    }
+    if (cycles[0] === 0) {
+      warning.visible = false
+      cycles = cycles.slice(1)
+      season = season === 'summer' ? 'winter' : 'summer'
+      if (season === 'summer') {
+        backgroundScene.texture = Texture.fromImage('images/scene/background-summer.png')        
+        year++
+        day = 1
+        createFlowers()
+      } else {
+        backgroundScene.texture = Texture.fromImage('images/scene/background-winter.png')
+        killFlowers()
+      }
+    }
   }
+}
+
+function createFlowers() {
+for (var f = 0; f < seeds; f++) {
+    const flower = Sprite.fromImage('images/scene/flower.png')
+    if (Math.random() < 0.5) flower.scale.x = -1
+    makeOccupiable(flower)
+    makeSelectable(flower, 'flower')
+    flower.position.x = 35 + (f * 70 + Math.round(Math.random() * 40))
+    flower.position.y = 320
+    background.addChild(flower)
+    flowers.push(flower)
+  }
+}
+
+function killFlowers() {
+  flowers.forEach(flower => {
+    background.removeChild(flower)
+    delete flower    
+  })
+  flowers = []
 }
 
 function addJobsButtons(jobsPanel) {
