@@ -384,20 +384,26 @@ function gameLoop(delta, manualTick) {
 }
 
 function createFlowers() {
-for (var f = 0; f < seeds; f++) {
+  const positions = [10, -50, 60, -110, 120, -160, 170]
+  for (var f = 0; f < 10; f++) {
+    const flipped = Math.random() < 0.5
     const flower = Sprite.fromImage('images/scene/flower.png')
-    if (Math.random() < 0.5) flower.scale.x = -1
     makeOccupiable(flower)
     makeSelectable(flower, 'flower')
-    flower.position.x = 35 + (f * 70 + Math.round(Math.random() * 40))
-    flower.position.y = 320
+    flower.scale.x = flipped ? -1 : 1
+    flower.anchor.set(flipped ? 0.55 : 0.27, 0.2)
+    flower.position.x = (WIDTH / 4) + positions[f] //35 + (f * 70 + Math.round(Math.random() * 40))
+    flower.position.y = 330 // HEIGHT - 100 // 320
     background.addChild(flower)
+
     flowers.push(flower)
   }
 }
 
 function killFlowers() {
   flowers.forEach(flower => {
+    flower.removeChild(flower.flowerSprite)
+    delete flower.flowerSprite
     background.removeChild(flower)
     delete flower    
   })
