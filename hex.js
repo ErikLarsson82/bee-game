@@ -1,6 +1,6 @@
 
-const OFFSET_X = 145
-const OFFSET_Y = 70
+const OFFSET_X = 246
+const OFFSET_Y = 106
 const SIZE = 12
 
 const WIDTH_FLAT = 2 * SIZE

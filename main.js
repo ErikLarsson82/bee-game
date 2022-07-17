@@ -75,8 +75,8 @@ const Container = PIXI.Container,
     PictureSprite = PIXI.extras.PictureSprite
     settings = PIXI.settings
 
-const WIDTH = 800
-const HEIGHT = 400
+const WIDTH = 1063
+const HEIGHT = 735
 const app = new PIXI.Application(WIDTH, HEIGHT, { antialias: false })
 document.body.appendChild(app.view)
 
@@ -188,19 +188,17 @@ function setup() {
     ui.addChild(uiTopBar)
   }
 
-  const grass = new Graphics()
-  grass.beginFill(0x6abe30)
-  grass.drawRect(0, 0, 150, 400)
-  background.addChild(grass)
+  const backgroundScene = Sprite.fromImage('images/scene/background.png')
+  background.addChild(backgroundScene)
 
   const beehive = new Graphics()
   beehive.beginFill(0xffc83f)
-  beehive.drawRect(270 / 2, 120 / 2, 120, 120)
+  beehive.drawRect(470 / 2, 190 / 2, 120, 120)
   background.addChild(beehive)
 
   const jobsPanel = Sprite.fromImage('ui-jobs-panel.png')
   jobsPanel.position.x = 0
-  jobsPanel.position.y = 48
+  jobsPanel.position.y = 100
   background.addChild(jobsPanel)
 
   const unassignedText = new PIXI.Text('-', { ...fontConfig, fill: 'black' })
@@ -263,22 +261,33 @@ function setup() {
   background.addChild(selectedSprite)
 
   for (var f = 0; f < 7; f++) {
-    const flower = Sprite.fromImage('flower.png')
+    const flower = Sprite.fromImage('images/scene/flower.png')
+    if (Math.random() < 0.5) flower.scale.x = -1
     makeOccupiable(flower)
     makeSelectable(flower, 'flower')
-    flower.position.x = 110
-    flower.position.y = 30 + (f * 25)
+    flower.position.x = 35 + (f * 70 + Math.round(Math.random() * 40))
+    flower.position.y = 320
     background.addChild(flower)
     flowers.push(flower)
   }
 
   panel = Sprite.fromImage('ui-panel.png')
-  panel.position.x = 270
-  panel.position.y = 30  
+  panel.position.x = 330
+  panel.position.y = 70  
   panel.visible = true
   const panelContent = new Container()
   panel.content = panelContent
   panel.addChild(panelContent)
+
+  const closeButton = Sprite.fromImage('images/ui/close.png')
+  closeButton.position.x = 186
+  closeButton.position.y = 3
+  closeButton.buttonMode = true
+  closeButton.interactive = true
+  closeButton.mousedown = e => {
+    setSelected(null)
+  }
+  panel.addChild(closeButton)
 
   const panelText = new PIXI.Text('-', { ...fontConfig })
   panelText.position.x = 6
@@ -292,7 +301,7 @@ function setup() {
 
   ui.addChild(panel)
 
-  addJobsButtons()
+  addJobsButtons(jobsPanel)
 
   nightDimmer = new Graphics()
   nightDimmer.beginFill(0x000000)
@@ -333,13 +342,13 @@ function gameLoop(delta, manualTick) {
   }
 }
 
-function addJobsButtons() {
+function addJobsButtons(jobsPanel) {
   for (var i = 0; i < 3; i++) {
     for (var j = 0; j < 2; j++) {
       {
         const button = Sprite.fromImage(j === 0 ? 'minus.png' : 'plus.png')
         button.position.x = 54 + (j * 12)
-        button.position.y = 89 + (i * 38)
+        button.position.y = 41 + (i * 38)
         button.interactive = true
         button.buttonMode = true
         button.alpha = 1
@@ -349,7 +358,7 @@ function addJobsButtons() {
         const type = idx[i]
         const action = j === 0 ? 'remove' : 'add'
         button.mousedown = () => jobs(action, type)
-        ui.addChild(button)
+        jobsPanel.addChild(button)
       }
     }
   }
@@ -656,13 +665,14 @@ function transferTo(capacity) {
 }
 
 function getIdlePosition(type) {
+  const rowHeight = 38
   const y = {
-    unassigned: 57,
-    idle: 57,
-    [null]: 57,
-    forager: 96,
-    nurser: 134,
-    worker: 134 + (134 - 96),
+    unassigned: 112,
+    idle: 112,
+    [null]: 112,
+    forager: 112 + (1 * rowHeight),
+    nurser: 112 + (2 * rowHeight),
+    worker: 112 + (3 * rowHeight),
   }[type]
 
   const beesPerRow = 7
@@ -790,8 +800,8 @@ function createQueen(parent) {
   queenSprite.addChild(queenLegAddon)
   
   queenSprite.idle = {
-    x: 170,
-    y: 45
+    x: 260,
+    y: 80
   }
   goIdle(queenSprite)
   queenSprite.animationTicker = Math.random() * 100
