@@ -215,16 +215,9 @@ function setup() {
   backgroundScene = Sprite.fromImage('images/scene/background-summer.png')
   background.addChild(backgroundScene)
 
-  /*
-  const beehive = new Graphics()
-  beehive.beginFill(0xffc83f)
-  beehive.drawRect(470 / 2, 190 / 2, 120, 120)
-  background.addChild(beehive)
-  */
-  
   const jobsPanel = Sprite.fromImage('ui-jobs-panel.png')
-  jobsPanel.position.x = 0
-  jobsPanel.position.y = 100
+  jobsPanel.position.x = 140
+  jobsPanel.position.y = 95
   background.addChild(jobsPanel)
 
   const unassignedText = new PIXI.Text('-', { ...fontConfig, fill: 'black' })
@@ -392,8 +385,8 @@ function createFlowers() {
     makeSelectable(flower, 'flower')
     flower.scale.x = flipped ? -1 : 1
     flower.anchor.set(flipped ? 0.55 : 0.27, 0.2)
-    flower.position.x = (WIDTH / 4) + positions[f] //35 + (f * 70 + Math.round(Math.random() * 40))
-    flower.position.y = 330 // HEIGHT - 100 // 320
+    flower.position.x = (WIDTH / 4) + positions[f]
+    flower.position.y = 330
     background.addChild(flower)
 
     flowers.push(flower)
@@ -436,6 +429,12 @@ function createMap(m) {
   createQueen(beeContainer)
    
   if (m === 'default') {
+    createBee(beeContainer, 'nurser')
+    createBee(beeContainer, 'forager').setPollen(20)
+    createBee(beeContainer, 'worker')
+  }
+
+  if (m === 'honey-deposits') {
     createBee(beeContainer, 'nurser')
     createBee(beeContainer, 'forager').setPollen(20)
     createBee(beeContainer, 'worker')
@@ -749,7 +748,7 @@ function getIdlePosition(type) {
   const filteredBees = bees.filter(x => x.type === type)
   
   return {
-    x: 68 - (filteredBees.length % beesPerRow * 11),
+    x: 200 - (filteredBees.length % beesPerRow * 11),
     y: y + (Math.floor(filteredBees.length / beesPerRow) * 10)
   }
 }
