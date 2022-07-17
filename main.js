@@ -435,7 +435,9 @@ function createMap(m) {
     createBee(beeContainer, 'worker')
 
     setSelected(hexGrid[0][0])
-    replaceSelectedHex('honey').setHoney(15)
+    replaceSelectedHex('honey').setHoney(60)
+    setSelected(hexGrid[0][1])
+    replaceSelectedHex('honey').setHoney(60)
   }
 
   if (m === 'sparse') {
@@ -1155,7 +1157,7 @@ function createBee(parent, type, startPosition) {
     hex.nectar = cap(0, hex.NECTAR_CAPACITY)(hex.nectar)
     bee.honeySack += transferTo(bee.HONEY_SACK_CAPACITY).inSeconds(30)
     bee.honeySack = cap(0, bee.HONEY_SACK_CAPACITY)(bee.honeySack)
-    bee.eat()
+    if (season === 'summer') bee.eat()
     if (isHoneySackFull() || hex.isNectarEmpty()) {
       bee.position.y = hex.position.y - 5
     }
@@ -1219,13 +1221,21 @@ function createBee(parent, type, startPosition) {
   }
 
   function worker() {
-    bee.consumeEnergy()   
-    if (prepareCell()) return
-    if (flyToPrepareCell()) return
-    if (depositHoney()) return
-    if (flyToHoney()) return
-    if (convertNectar()) return
-    if (flyToConverter()) return
+    // This creates the bug where the worker bee goes from converter to honey hex back and forth and get hunger 100 without spending any resource
+    if (season === 'summer') {
+      bee.consumeEnergy()   
+      if (prepareCell()) return
+      if (flyToPrepareCell()) return
+      if (depositHoney()) return
+      if (flyToHoney()) return
+      if (convertNectar()) return
+      if (flyToConverter()) return
+    } else {
+      if (bee.feedBee()) return
+      if (prepareCell()) return
+      if (flyToPrepareCell()) return
+    }
+    
     bee.flyTo(null)
   }
 
