@@ -1451,10 +1451,16 @@ function cellConverter(x, y, parent) {
 
   tickers.push(time => {
     if (bees.filter(samePosition(converterSprite)).length > 0) {
-      converterSprite.texture = Texture.fromImage('cell-converter-occupied.png')   
-    } else {
-      converterSprite.texture = Texture.fromImage('cell-converter.png')   
+      converterSprite.texture = Texture.fromImage('cell-converter-occupied.png')
+      return
     }
+
+    if (converterSprite.nectar >= converterSprite.NECTAR_CAPACITY) {
+      converterSprite.texture = Texture.fromImage('cell-converter-full.png')   
+      return
+    }
+
+    converterSprite.texture = Texture.fromImage('cell-converter.png')   
   })
 
   converterSprite.type = 'converter'
