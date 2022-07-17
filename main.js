@@ -109,6 +109,8 @@ let beeContainer = null
 let nightDimmer = null
 let backgroundScene = null
 let warning = null
+let hexBackground = null
+let hexForeground = null
 
 let hexGrid = []
 let flowers = []
@@ -124,6 +126,12 @@ function setup() {
 
   background = new Container()
   container.addChild(background)
+
+  hexBackground = new Container()
+  container.addChild(hexBackground)
+
+  hexForeground = new Container()
+  container.addChild(hexForeground)
 
   beeContainer = new Container()
   container.addChild(beeContainer)
@@ -207,11 +215,13 @@ function setup() {
   backgroundScene = Sprite.fromImage('images/scene/background-summer.png')
   background.addChild(backgroundScene)
 
+  /*
   const beehive = new Graphics()
   beehive.beginFill(0xffc83f)
   beehive.drawRect(470 / 2, 190 / 2, 120, 120)
   background.addChild(beehive)
-
+  */
+  
   const jobsPanel = Sprite.fromImage('ui-jobs-panel.png')
   jobsPanel.position.x = 0
   jobsPanel.position.y = 100
@@ -255,9 +265,9 @@ function setup() {
   })
   
   hexGrid = new Array(5).fill().map((_, x) => 
-    new Array(5).fill().map((_, y) => cellDisabled(x, y, background))
+    new Array(5).fill().map((_, y) => cellDisabled(x, y, hexForeground))
   )
-  hexGrid[2][2] = cellEmpty(2, 2, background)
+  hexGrid[2][2] = cellEmpty(2, 2, hexForeground, hexBackground)
   
   selectedSprite = new Container()
   selectedSprite.visible = false
@@ -526,7 +536,7 @@ function activateAdjacent(_x, _y) {
     const modifier = instructions[direction]
     const target = hexGrid[_x + modifier.x] && hexGrid[_x + modifier.x][_y + modifier.y]
     if (target && target.isDisabled && target.isDisabled()) {
-      hexGrid[_x + modifier.x][_y + modifier.y] = cellEmpty(_x + modifier.x, _y + modifier.y, background)
+      hexGrid[_x + modifier.x][_y + modifier.y] = cellEmpty(_x + modifier.x, _y + modifier.y, hexForeground, hexBackground)
     }
   }
 }
@@ -1285,11 +1295,13 @@ function cellDisabled(x, y, parent) {
   disabledSprite.isDisabled = () => true
   disabledSprite.index = { x, y }
 
+  console.log(pixelCoordinate)
+
   parent.addChild(disabledSprite)
   return disabledSprite
 }
 
-function cellEmpty(x, y, parent) {
+function cellEmpty(x, y, parent, parent2) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const emptySprite = Sprite.fromImage('cell-empty.png')
   makeSelectable(emptySprite, 'cell')
@@ -1303,6 +1315,12 @@ function cellEmpty(x, y, parent) {
   }
   
   parent.addChild(emptySprite)
+
+  const backgroundSprite = Sprite.fromImage('cell-background.png')
+  backgroundSprite.position.x = pixelCoordinate.x - 10
+  backgroundSprite.position.y = pixelCoordinate.y - 10
+  parent2.addChild(backgroundSprite)
+
   return emptySprite
 }
 
