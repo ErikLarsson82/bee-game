@@ -912,7 +912,7 @@ function createQueen(parent) {
       return true
     }
 
-    const emptyBroodCells = filterHexagon(hexGrid, hex => hex.type === 'brood' && !hex.isOccupiedWithOffspring())
+    const emptyBroodCells = filterHexagon(hexGrid, hex => hex.type === 'brood' && !hex.isOccupiedWithOffspring() && hex.paused === false)
     if (emptyBroodCells.length > 0) {
       queenSprite.flyTo(emptyBroodCells[0])
       return true
@@ -1478,6 +1478,7 @@ function cellBrood(x, y, parent) {
   broodSprite.position.y = pixelCoordinate.y
 
   broodSprite.type = 'brood'
+  broodSprite.paused = false
   
   // Stored in seconds for easy transitions
   broodSprite.lifecycle = 0
@@ -1538,6 +1539,8 @@ function cellBrood(x, y, parent) {
   })
 
   broodSprite.panelContent = () => {
+    const c = new Container()
+
     const text = new PIXI.Text('Loading', { ...fontConfig })
     text.position.x = 7
     text.position.y = 50
@@ -1545,9 +1548,15 @@ function cellBrood(x, y, parent) {
       const line2 = broodSprite.content === 'larvae' ? '\nNutrients: ' + Math.round(broodSprite.nutrition) : ''
       const line3 = ['egg', 'larvae', 'puppa'].includes(broodSprite.content) ? '\nLifecycle: ' + Math.round(broodSprite.lifecycle) : ''
       const line4 = '\n\n' + (broodSprite.content === 'dead' ? 'Larvae needs pollen to survive' : '')
-      text.text = broodSprite.content + line2 + line3 + line4
+      const line5 = '\n\n' + (broodSprite.paused ? 'paused' : 'active')
+      text.text = broodSprite.content + line2 + line3 + line4 + line5      
     })
-    return text
+    c.addChild(text)
+
+    c.addChild(Button(5, 110, 'toggle active', () => {
+      broodSprite.paused = !broodSprite.paused
+    }))
+    return c
   }
   
   parent.addChild(broodSprite)
