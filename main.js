@@ -668,7 +668,6 @@ function snapTo(a, b) {
 }
 
 function replaceSelectedHex(type) {
-  console.log(type, selected);
   let returnHex = null
   hexGrid.forEach((row, xIdx) => row.forEach((hex, yIdx) => {
     if (hex === selected) {
@@ -1404,7 +1403,7 @@ function cellEmpty(x, y, parent, parent2) {
     description.position.y = -29
     container.addChild(description)
 
-    const button = Button(44, -29, Sprite.fromImage('images/text/prepare.png'), () => { console.log('wat'); replaceSelectedHex('prepared') }, () => description.visible = true, () => description.visible = false)
+    const button = Button(44, -29, Sprite.fromImage('images/text/prepare.png'), () => replaceSelectedHex('prepared'), () => description.visible = true, () => description.visible = false)
     container.addChild(button)
 
     return container
