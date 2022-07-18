@@ -288,34 +288,7 @@ function setup() {
   warning.visible = false
   ui.addChild(warning)
 
-  panel = Sprite.fromImage('ui-panel.png')
-  panel.position.x = 330
-  panel.position.y = 70  
-  panel.visible = true
-  const panelContent = new Container()
-  panel.content = panelContent
-  panel.addChild(panelContent)
-
-  const closeButton = Sprite.fromImage('images/ui/close.png')
-  closeButton.position.x = 186
-  closeButton.position.y = 3
-  closeButton.buttonMode = true
-  closeButton.interactive = true
-  closeButton.mousedown = e => {
-    setSelected(null)
-  }
-  panel.addChild(closeButton)
-
-  const panelText = new PIXI.Text('-', { ...fontConfig })
-  panelText.position.x = 6
-  panelText.position.y = 2
-  panel.addChild(panelText)
-
-  panel.render = target => {
-    panel.visible = !!target
-    panelText.text = target && target.label
-  }
-
+  panel = new Container()
   ui.addChild(panel)
 
   addJobsButtons(jobsPanel)
@@ -551,14 +524,24 @@ function activateAdjacent(_x, _y) {
 
 function setSelected(item) {
   // start with cleanup of panel
-  panel.content.children.forEach(child => panel.content.removeChild(child))
-    
+  panel.removeChildren()
+  
   selected = item || null
 
-  panel.render(selected)
+  if (!item) return;  
+  
+  if (item.panelContent) {
+    const { x, y } = item.panelPosition && item.panelPosition() || { x: 350, y: 100 }
+    panel.position.x = x
+    panel.position.y = y
+    panel.addChild(item.panelContent())
+  }
 
-  if (item && item.panelContent) {
-    panel.content.addChild(item.panelContent())
+  if (item.label && !(item.panelLabel && item.panelLabel() !== true)) {
+    const panelText = new PIXI.Text(item.label, { ...fontConfig })
+    panelText.position.x = 6
+    panelText.position.y = 2
+    panel.addChild(panelText)
   }
 }
 
@@ -685,6 +668,7 @@ function snapTo(a, b) {
 }
 
 function replaceSelectedHex(type) {
+  console.log(type, selected);
   let returnHex = null
   hexGrid.forEach((row, xIdx) => row.forEach((hex, yIdx) => {
     if (hex === selected) {
@@ -1405,10 +1389,25 @@ function cellEmpty(x, y, parent, parent2) {
   emptySprite.position.x = pixelCoordinate.x
   emptySprite.position.y = pixelCoordinate.y
 
+  emptySprite.panelLabel = () => false
+  emptySprite.panelPosition = () => ({ x: pixelCoordinate.x + 8, y: pixelCoordinate.y + 5 })
+
   emptySprite.panelContent = () => {
-    const c = new Container()
-    c.addChild(Button(5, 40, 'prepared', () => replaceSelectedHex('prepared')))
-    return c
+    const container = new Container()
+    const whiteLine = Sprite.fromImage('images/ui/prepare-cell.png')
+    whiteLine.anchor.set(0, 0.65)
+    container.addChild(whiteLine)
+
+    const description = Sprite.fromImage('images/ui/prepare-cell-hover.png')
+    description.visible = false
+    description.position.x = 95
+    description.position.y = -29
+    container.addChild(description)
+
+    const button = Button(44, -29, Sprite.fromImage('images/text/prepare.png'), () => { console.log('wat'); replaceSelectedHex('prepared') }, () => description.visible = true, () => description.visible = false)
+    container.addChild(button)
+
+    return container
   }
   
   parent.addChild(emptySprite)
@@ -1697,24 +1696,40 @@ function cellPollen(x, y, parent) {
 }
 
 
-function Button(x, y, text, callback) {
-  const buttonSprite = Sprite.fromImage('button.png')
+function Button(x, y, text, callback, hoverover, hoverout) {
+  const buttonSprite = Sprite.fromImage('images/ui/button-standard.png')
+  let swallow = false
   buttonSprite.position.x = x
   buttonSprite.position.y = y
   buttonSprite.interactive = true
   buttonSprite.buttonMode = true
-  buttonSprite.alpha = 1
-  buttonSprite.mouseover = () => buttonSprite.alpha = 0.5
-  buttonSprite.mouseout = () => buttonSprite.alpha = 1
+  buttonSprite.mouseover = () => {
+    hoverover && hoverover()
+    buttonSprite.texture = Texture.fromImage('images/ui/button-hover.png')
+  }
+  buttonSprite.mouseout = () => {
+    hoverout && hoverout()
+    buttonSprite.texture = Texture.fromImage('images/ui/button-standard.png')
+  }
   buttonSprite.mousedown = () => {
-    buttonSprite.alpha = 0.8
-    callback()    
+    if (swallow) return
+    swallow = true
+    buttonSprite.texture = Texture.fromImage('images/ui/button-click.png')
+    setTimeout(callback, 50)
   }
 
-  const buttonText = new PIXI.Text(text, { ...fontConfig })
-  buttonText.position.x = 7
-  buttonText.position.y = 3
-  buttonSprite.addChild(buttonText)
+  if (typeof text === 'string') {
+    const buttonText = new PIXI.Text(text, { ...fontConfig })
+    buttonText.position.x = 7
+    buttonText.position.y = 3
+    buttonSprite.addChild(buttonText)    
+  } else {
+    const buttonText = Sprite.fromImage('images/text/prepare.png')
+    buttonText.position.x = 24
+    buttonText.position.y = 2
+    buttonText.anchor.set(0.5, 0)
+    buttonSprite.addChild(buttonText)    
+  }
 
   return buttonSprite
 }
