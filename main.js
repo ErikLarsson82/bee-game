@@ -1393,6 +1393,11 @@ function cellEmpty(x, y, parent, parent2) {
 
   emptySprite.panelContent = () => {
     const container = new Container()
+    const text = Sprite.fromImage('images/text/hexagon.png')
+    text.position.x = 6
+    text.position.y = -30
+    container.addChild(text)
+
     const whiteLine = Sprite.fromImage('images/ui/prepare-cell.png')
     whiteLine.anchor.set(0, 0.65)
     container.addChild(whiteLine)
