@@ -1435,31 +1435,41 @@ function cellPrepared(x, y, parent) {
   preparedCellSprite.type = 'prepared'
   preparedCellSprite.index = { x, y }
   
+  preparedCellSprite.panelLabel = () => false
+  preparedCellSprite.panelPosition = () => ({ x: pixelCoordinate.x + 8, y: pixelCoordinate.y + 5 })
+
   preparedCellSprite.panelContent = () => {
+    const container = new Container()
+    const text = Sprite.fromImage('images/text/prepared-hexagon.png')
+    text.position.x = 6
+    text.position.y = -30
+    container.addChild(text)
+
+    const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
+    whiteLine.position.x = 0
+    whiteLine.position.y = -30
+    container.addChild(whiteLine)
+
     if (preparedCellSprite.completeness >= 100) {
-      const c = new Container()
-      c.addChild(Button(5, 40, 'honey', () => replaceSelectedHex('honey')))
-      c.addChild(Button(5, 60, 'brood', () => replaceSelectedHex('brood')))
-      c.addChild(Button(5, 80, 'pollen', () => replaceSelectedHex('pollen')))
-      c.addChild(Button(5, 100, 'converter', () => replaceSelectedHex('converter')))
-      return c
+      container.addChild(Button(5, 40, 'honey', () => replaceSelectedHex('honey')))
+      container.addChild(Button(5, 60, 'brood', () => replaceSelectedHex('brood')))
+      container.addChild(Button(5, 80, 'pollen', () => replaceSelectedHex('pollen')))
+      container.addChild(Button(5, 100, 'converter', () => replaceSelectedHex('converter')))
     } else {
-      const text = new PIXI.Text('Loading', { ...fontConfig })
-      text.position.x = 7
-      text.position.y = 50
-      tickers.push(time => {
-        if (preparedCellSprite.completeness === 100 && selected === preparedCellSprite) {
-          setSelected(preparedCellSprite)
-        }
-        text.text = `Building progress ${Math.round(preparedCellSprite.completeness / 100 * 100)}%`
-      })
-      return text
+      const content = Sprite.fromImage('images/ui/content-hexagon.png')
+      content.position.x = 72
+      content.position.y = -29
+      container.addChild(content)
+
+      container.addChild(ProgressBar(113, -15, 'build', () => preparedCellSprite.completeness))
     }
+    return container
   }
 
   tickers.push(time => {
     if (preparedCellSprite.completeness >= 100) {
-      preparedCellSprite.texture = Texture.fromImage('cell-prepared-complete.png')      
+      preparedCellSprite.texture = Texture.fromImage('cell-prepared-complete.png')
+      if (selected === preparedCellSprite) setSelected(preparedCellSprite) 
     } else {
       const partialNumber = Math.ceil(preparedCellSprite.completeness / 100 * 7) + 1
       preparedCellSprite.texture = Texture.fromImage(`cell-prepared-partial${partialNumber}.png`)      
@@ -1699,6 +1709,15 @@ function cellPollen(x, y, parent) {
   return pollenSprite
 }
 
+function ProgressBar(x, y, type, tickerData) {
+  const progressSprite = Sprite.fromImage('images/ui/progress-' + type + '.png')
+  progressSprite.position.x = x
+  progressSprite.position.y = y
+  tickers.push(time => {
+    progressSprite.width = (tickerData() / 100) * 21  
+  })
+  return progressSprite
+}
 
 function Button(x, y, text, callback, hoverover, hoverout) {
   const buttonSprite = Sprite.fromImage('images/ui/button-standard.png')
