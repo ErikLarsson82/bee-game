@@ -42,7 +42,7 @@
 
 // Eventlog
 
-const MAP_SELECTION = 'default'
+const MAP_SELECTION = 'honey-deposits'
 let DEBUG = false
 
 const fontConfig = {
@@ -50,6 +50,11 @@ const fontConfig = {
     fontSize: 8,
     fontWeight: 'bolder',
     fill: 'black'
+}
+
+const picoFontConfig = {
+    fontFamily: 'PICO-8 mono Regular',
+    fill: 'white'
 }
 
 const l = console.log
@@ -68,13 +73,15 @@ const speeds = {
 
 const Container = PIXI.Container,
     autoDetectRenderer = PIXI.autoDetectRenderer,
-    loader = PIXI.loader,
+    Loader = PIXI.loader,
     resources = PIXI.loader.resources,
     Sprite = PIXI.Sprite,
     Graphics = PIXI.Graphics,
     Texture = PIXI.Texture,
     PictureSprite = PIXI.extras.PictureSprite
     settings = PIXI.settings
+
+Loader.add("pico8-mono.ttf")
 
 const WIDTH = 1063
 const HEIGHT = 735
@@ -1461,7 +1468,7 @@ function cellPrepared(x, y, parent) {
       content.position.y = -29
       container.addChild(content)
 
-      container.addChild(ProgressBar(113, -15, 'build', () => preparedCellSprite.completeness))
+      container.addChild(ProgressBar(113, -15, 'build', () => preparedCellSprite.completeness, 100))
     }
     return container
   }
@@ -1509,12 +1516,45 @@ function cellHoney(x, y, parent) {
     }
   })
 
+  honeySprite.panelLabel = () => false
+  honeySprite.panelPosition = () => ({ x: pixelCoordinate.x + 8, y: pixelCoordinate.y + 5 })
+
   honeySprite.panelContent = () => {
+    const container = new Container()
+    
+    const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
+    whiteLine.position.x = 0
+    whiteLine.position.y = -30
+    container.addChild(whiteLine)
+
+    const content = Sprite.fromImage('images/ui/content-honey-hex.png')
+    content.position.x = 72
+    content.position.y = -29
+    container.addChild(content)
+
+    container.addChild(ProgressBar(113, -15, 'honey', () => honeySprite.honey, honeySprite.HONEY_HEX_CAPACITY))
+
+    const textHeading = new PIXI.Text('HONEY HEX', { ...picoFontConfig })
+    textHeading.scale.set(0.15, 0.15)
+    textHeading.position.x = 90
+    textHeading.position.y = -26
+    container.addChild(textHeading)
+
+    const textDescription = new PIXI.Text('HONEY', { ...picoFontConfig, fill: '#96a5bc' })
+    textDescription.scale.set(0.15, 0.15)
+    textDescription.position.x = 90
+    textDescription.position.y = -16
+    container.addChild(textDescription)
+
+    return container
+
+    /*
     const text = new PIXI.Text('Loading', { ...fontConfig })
     text.position.x = 7
     text.position.y = 50
     tickers.push(time => text.text = 'Honey stored  ' + Math.round(honeySprite.honey))
     return text
+    */
   }
 
   parent.addChild(honeySprite)
@@ -1709,12 +1749,13 @@ function cellPollen(x, y, parent) {
   return pollenSprite
 }
 
-function ProgressBar(x, y, type, tickerData) {
+function ProgressBar(x, y, type, tickerData, max) {
   const progressSprite = Sprite.fromImage('images/ui/progress-' + type + '.png')
   progressSprite.position.x = x
   progressSprite.position.y = y
   tickers.push(time => {
-    progressSprite.width = (tickerData() / 100) * 21  
+    const _max = max === undefined ? 100 : max
+    progressSprite.width = (tickerData() / max) * 21  
   })
   return progressSprite
 }
