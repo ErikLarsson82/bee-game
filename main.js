@@ -87,7 +87,7 @@ settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST // Default pixel-scaling
 app.renderer.view.style.position = 'absolute'
 app.renderer.view.style.display = 'block'
 
-let cycles = [3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30]
+let cycles = [3, 1, 3, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30]
 
 let gameSpeed = 1
 let paused = false
@@ -453,6 +453,21 @@ function createMap(m) {
     createBee(beeContainer, 'nurser')
     createBee(beeContainer, 'forager')
     createBee(beeContainer, 'worker')
+  }
+
+  if (m === 'playtest') {
+    createBee(beeContainer, 'nurser')
+    createBee(beeContainer, 'forager')
+    createBee(beeContainer, 'worker')
+
+    setSelected(hexGrid[0][0])
+    replaceSelectedHex('honey')
+    setSelected(hexGrid[0][1])
+    replaceSelectedHex('pollen')
+    setSelected(hexGrid[0][2])
+    replaceSelectedHex('converter')
+    setSelected(hexGrid[0][3])
+    replaceSelectedHex('brood')
   }
 
   if (m === 'pollination scenario') {
@@ -937,8 +952,8 @@ function createQueen(parent) {
     queenWingAddon.visible = (queenSprite.vx !== 0 || queenSprite.vy !== 0) && Math.sin(queenSprite.animationTicker) > 0
     queenLegAddon.visible = (queenSprite.vx === 0 && queenSprite.vy === 0 && targetBrood) && Math.sin(queenSprite.animationTicker) > 0
 
-    if (targetBrood) {
-      queenSprite.delay += transferTo(1).inSeconds(10)
+    if (targetBrood && season === 'summer') {
+      queenSprite.delay += transferTo(1).inSeconds(300)
       if (queenSprite.delay < 1) return true
       queenSprite.delay = 0
       targetBrood.setContents('egg')
@@ -947,7 +962,7 @@ function createQueen(parent) {
     }
 
     const emptyBroodCells = filterHexagon(hexGrid, hex => hex.type === 'brood' && !hex.isOccupiedWithOffspring() && hex.paused === false)
-    if (emptyBroodCells.length > 0) {
+    if (emptyBroodCells.length > 0 && season === 'summer') {
       queenSprite.flyTo(emptyBroodCells[0])
       return true
     }
