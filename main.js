@@ -22,14 +22,6 @@
 
 // Focus on gathering resources -> no or reduced amount of flowers (but short term resource gains)
 
-// Bees should harvest both nectar and pollen
-
-// Progress bars
-
-// Implement seasons
-
-// Flower lifecycle
-
 // Either use decimals or not, but dont mix
 
 // Have worker bees convert hexes
@@ -42,7 +34,7 @@
 
 // Eventlog
 
-const MAP_SELECTION = 'honey-deposits'
+const MAP_SELECTION = 'default'
 let DEBUG = false
 
 const fontConfig = {
@@ -95,14 +87,14 @@ settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST // Default pixel-scaling
 app.renderer.view.style.position = 'absolute'
 app.renderer.view.style.display = 'block'
 
-let cycles = [2, 2, 4, 4, 6, 6, 6, 20]
+let cycles = [3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30]
 
 let gameSpeed = 1
 let paused = false
 let hour = 0
 let day = 1
 let year = 1
-let seeds = 2
+let seeds = 1
 let season = 'summer'
 
 let selected = null
@@ -360,21 +352,69 @@ function gameLoop(delta, manualTick) {
 function createFlowers() {
   const positions = [10, -50, 60, -110, 120, -160, 170]
   for (var f = 0; f < seeds; f++) {
-    const flipped = Math.random() < 0.5
     const flower = Sprite.fromImage('images/scene/flower.png')
+    const flipped = Math.random() < 0.5
     makeOccupiable(flower)
     makeSelectable(flower, 'flower')
+
+    flower.POLLINATION_REQUIREMENT = 100
+    flower.pollinationLevel = 0
+    flower.isPollinated = () => flower.pollinationLevel >= flower.POLLINATION_REQUIREMENT
+    
     flower.scale.x = flipped ? -1 : 1
     flower.anchor.set(flipped ? 0.55 : 0.27, 0.2)
     flower.position.x = (WIDTH / 4) + positions[f]
     flower.position.y = 330
     background.addChild(flower)
 
+    flower.panelLabel = () => false
+    flower.panelPosition = () => flower.position
+
+    flower.panelContent = () => {
+      const container = new Container()
+      
+      const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
+      whiteLine.position.x = 0
+      whiteLine.position.y = -30
+      container.addChild(whiteLine)
+
+      const content = Sprite.fromImage('images/ui/content-flower.png')
+      content.position.x = 72
+      content.position.y = -29
+      container.addChild(content)
+
+      container.addChild(ProgressBar(124, -15, 'flower', () => flower.pollinationLevel, flower.POLLINATION_REQUIREMENT))
+
+      const textHeading = new PIXI.Text('FLOWER', { ...picoFontConfig })
+      textHeading.scale.set(0.15, 0.15)
+      textHeading.position.x = 105
+      textHeading.position.y = -26
+      container.addChild(textHeading)
+
+      const textDescription = new PIXI.Text('POLLINATED', { ...picoFontConfig, fill: '#96a5bc' })
+      textDescription.scale.set(0.15, 0.15)
+      textDescription.position.x = 82
+      textDescription.position.y = -16
+      container.addChild(textDescription)
+
+     return container
+    }
+
+    tickers.push(() => {
+      if (flower.isPollinated()) {
+        flower.texture = Texture.fromImage('images/scene/flower-pollinated.png')        
+      }
+    })
+
     flowers.push(flower)
   }
 }
 
 function killFlowers() {
+  if (flowers.filter(flower => flower.isPollinated()).length === flowers.length) {
+    seeds++
+  }
+  if (selected && selected.label === 'flower') setSelected(null)
   flowers.forEach(flower => {
     flower.removeChild(flower.flowerSprite)
     delete flower.flowerSprite
@@ -411,8 +451,19 @@ function createMap(m) {
    
   if (m === 'default') {
     createBee(beeContainer, 'nurser')
-    createBee(beeContainer, 'forager').setPollen(20)
+    createBee(beeContainer, 'forager')
     createBee(beeContainer, 'worker')
+  }
+
+  if (m === 'pollination scenario') {
+    createBee(beeContainer, 'nurser')
+    createBee(beeContainer, 'forager')
+    createBee(beeContainer, 'worker')
+
+    setSelected(hexGrid[0][0])
+    replaceSelectedHex('pollen')
+    setSelected(hexGrid[0][1])
+    replaceSelectedHex('converter')
   }
 
   if (m === 'honey-deposits') {
@@ -433,17 +484,9 @@ function createMap(m) {
   if (m === 'jobs') {
     paused = false
     for (var i = 0; i < 6; i++) {
-      createBee(beeContainer, 'idle') //.setPollen(20).setNectar(20)
+      createBee(beeContainer, 'idle')
     }
-    /*
-    jobs('add', 'forager')
-    jobs('add', 'forager')
-    jobs('add', 'nurser')
-    jobs('add', 'nurser')
-    jobs('add', 'worker')
-    jobs('add', 'worker')
-    */
-    
+
     setSelected(hexGrid[0][0])
     replaceSelectedHex('honey').setHoney(15)
     setSelected(hexGrid[0][1])
@@ -1037,8 +1080,10 @@ function createBee(parent, type, startPosition) {
   function pollinateFlower() {
     const flower = bee.isAtType('flower')
     const needsResource = !(isPollenSackFull() && isNectarSackFull())
-    if (flower && needsResource) {
+    if (flower && needsResource) { 
       flower.claimSlot(bee)
+      flower.pollinationLevel += transferTo(flower.POLLINATION_REQUIREMENT).inSeconds(200)
+      flower.pollinationLevel = cap(0, flower.POLLINATION_REQUIREMENT)(flower.pollinationLevel)
       bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(60)
       bee.nectarSack += transferTo(bee.NECTAR_SACK_CAPACITY).inSeconds(60)
       bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
@@ -1547,14 +1592,6 @@ function cellHoney(x, y, parent) {
     container.addChild(textDescription)
 
     return container
-
-    /*
-    const text = new PIXI.Text('Loading', { ...fontConfig })
-    text.position.x = 7
-    text.position.y = 50
-    tickers.push(time => text.text = 'Honey stored  ' + Math.round(honeySprite.honey))
-    return text
-    */
   }
 
   parent.addChild(honeySprite)
