@@ -476,6 +476,14 @@ function createMap(m) {
     createBee(beeContainer, 'worker')
   }
 
+  if (m === 'prepared') {
+    createBee(beeContainer, 'nurser')
+    createBee(beeContainer, 'forager')
+    createBee(beeContainer, 'worker')
+    setSelected(hexGrid[0][0])
+    replaceSelectedHex('prepared').instantlyPrepare()
+  }
+
   if (m === 'kill brood') {
     createBee(beeContainer, 'nurser')
     createBee(beeContainer, 'nurser')
@@ -1522,7 +1530,12 @@ function cellEmpty(x, y, parent, parent2) {
     description.position.y = -29
     container.addChild(description)
 
-    const button = Button(44, -29, Sprite.fromImage('images/text/prepare.png'), () => replaceSelectedHex('prepared'), () => description.visible = true, () => description.visible = false)
+    const buttonText = Sprite.fromImage('images/text/prepare.png')
+    buttonText.position.x = 24
+    buttonText.position.y = 2
+    buttonText.anchor.set(0.5, 0)
+    
+    const button = Button(44, -29, buttonText, () => replaceSelectedHex('prepared'), () => description.visible = true, () => description.visible = false)
     container.addChild(button)
 
     return container
@@ -1546,6 +1559,7 @@ function cellPrepared(x, y, parent) {
   preparedCellSprite.position.x = pixelCoordinate.x
   preparedCellSprite.position.y = pixelCoordinate.y
   preparedCellSprite.completeness = 0
+  preparedCellSprite.done = false
   preparedCellSprite.type = 'prepared'
   preparedCellSprite.index = { x, y }
 
@@ -1558,21 +1572,22 @@ function cellPrepared(x, y, parent) {
 
   preparedCellSprite.panelContent = () => {
     const container = new Container()
-    const text = Sprite.fromImage('images/text/prepared-hexagon.png')
-    text.position.x = 6
-    text.position.y = -30
-    container.addChild(text)
-
+    
     const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
     whiteLine.position.x = 0
     whiteLine.position.y = -30
     container.addChild(whiteLine)
 
-    if (preparedCellSprite.completeness >= 100) {
-      container.addChild(Button(5, 40, 'honey', () => replaceSelectedHex('honey')))
-      container.addChild(Button(5, 60, 'brood', () => replaceSelectedHex('brood')))
-      container.addChild(Button(5, 80, 'pollen', () => replaceSelectedHex('pollen')))
-      container.addChild(Button(5, 100, 'converter', () => replaceSelectedHex('converter')))
+    const contentHoney = Sprite.fromImage('images/ui/button-large/button-large-content-honey.png')
+    const contentBrood = Sprite.fromImage('images/ui/button-large/button-large-content-brood.png')
+    const contentPollen = Sprite.fromImage('images/ui/button-large/button-large-content-pollen.png')
+    const contentNectar = Sprite.fromImage('images/ui/button-large/button-large-content-nectar.png')
+    
+    if (preparedCellSprite.done) {
+      container.addChild(Button(70, -34, contentHoney, () => replaceSelectedHex('honey'), null, null, 'large'))
+      container.addChild(Button(100, -23, contentBrood, () => replaceSelectedHex('brood'), null, null, 'large'))
+      container.addChild(Button(70, -12, contentPollen, () => replaceSelectedHex('pollen'), null, null, 'large'))
+      container.addChild(Button(100, -1, contentNectar, () => replaceSelectedHex('converter'), null, null, 'large'))
     } else {
       const content = Sprite.fromImage('images/ui/content-hexagon.png')
       content.position.x = 72
@@ -1585,13 +1600,18 @@ function cellPrepared(x, y, parent) {
   }
 
   tickers.push(time => {
+    if (preparedCellSprite.done) {
+      return;
+    }
     if (preparedCellSprite.completeness >= 100) {
       preparedCellSprite.texture = Texture.fromImage('cell-prepared-complete.png')
-      if (selected === preparedCellSprite) setSelected(preparedCellSprite) 
-    } else {
-      const partialNumber = Math.ceil(preparedCellSprite.completeness / 100 * 7) + 1
-      preparedCellSprite.texture = Texture.fromImage(`cell-prepared-partial${partialNumber}.png`)      
-    }    
+      if (selected === preparedCellSprite) setSelected(null)
+      preparedCellSprite.done = true
+      return
+    }
+
+    const partialNumber = Math.ceil(preparedCellSprite.completeness / 100 * 7) + 1
+    preparedCellSprite.texture = Texture.fromImage(`cell-prepared-partial${partialNumber}.png`)       
   })
   
   parent.addChild(preparedCellSprite)
@@ -1867,8 +1887,9 @@ function ProgressBar(x, y, type, tickerData, max) {
   return progressSprite
 }
 
-function Button(x, y, text, callback, hoverover, hoverout) {
-  const buttonSprite = Sprite.fromImage('images/ui/button-standard.png')
+function Button(x, y, content, callback, hoverover, hoverout, _size) {
+  const size = _size === undefined ? 'standard' : _size
+  const buttonSprite = Sprite.fromImage(`images/ui/button-${size}/button-${size}-standard.png`)
   let swallow = false
   buttonSprite.position.x = x
   buttonSprite.position.y = y
@@ -1876,30 +1897,26 @@ function Button(x, y, text, callback, hoverover, hoverout) {
   buttonSprite.buttonMode = true
   buttonSprite.mouseover = () => {
     hoverover && hoverover()
-    buttonSprite.texture = Texture.fromImage('images/ui/button-hover.png')
+    buttonSprite.texture = Texture.fromImage(`images/ui/button-${size}/button-${size}-hover.png`)
   }
   buttonSprite.mouseout = () => {
     hoverout && hoverout()
-    buttonSprite.texture = Texture.fromImage('images/ui/button-standard.png')
+    buttonSprite.texture = Texture.fromImage(`images/ui/button-${size}/button-${size}-standard.png`)
   }
   buttonSprite.mousedown = () => {
     if (swallow) return
     swallow = true
-    buttonSprite.texture = Texture.fromImage('images/ui/button-click.png')
+    buttonSprite.texture = Texture.fromImage(`images/ui/button-${size}/button-${size}-click.png`)
     setTimeout(callback, 50)
   }
 
-  if (typeof text === 'string') {
-    const buttonText = new PIXI.Text(text, { ...fontConfig })
+  if (typeof content === 'string') {
+    const buttonText = new PIXI.Text(content, { ...fontConfig })
     buttonText.position.x = 7
     buttonText.position.y = 3
     buttonSprite.addChild(buttonText)    
-  } else {
-    const buttonText = Sprite.fromImage('images/text/prepare.png')
-    buttonText.position.x = 24
-    buttonText.position.y = 2
-    buttonText.anchor.set(0.5, 0)
-    buttonSprite.addChild(buttonText)    
+  } else if (content !== undefined && content !== null) {
+    buttonSprite.addChild(content)    
   }
 
   return buttonSprite
