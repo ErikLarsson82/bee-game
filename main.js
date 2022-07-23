@@ -87,7 +87,7 @@ settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST // Default pixel-scaling
 app.renderer.view.style.position = 'absolute'
 app.renderer.view.style.display = 'block'
 
-let cycles = [3, 1, 3, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30]
+let cycles = [4, 1, 4, 2, 4, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30]
 
 let gameSpeed = 1
 let paused = false
