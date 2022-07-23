@@ -111,6 +111,7 @@ let backgroundScene = null
 let warning = null
 let hexBackground = null
 let hexForeground = null
+let flowerBed = null
 
 let hexGrid = []
 let flowers = []
@@ -132,6 +133,9 @@ function setup() {
 
   dimmer = new Container()
   container.addChild(dimmer)
+
+  flowerBed = new Container()
+  container.addChild(flowerBed)
   
   hexForeground = new Container()
   container.addChild(hexForeground)
@@ -218,10 +222,18 @@ function setup() {
   nightDimmer = new Graphics()
   nightDimmer.beginFill(0x000000)
   nightDimmer.drawRect(0, 0, WIDTH / 2, HEIGHT / 2)
-  nightDimmer.alpha = 0.4
-  nightDimmer.visible = false
+  nightDimmer.alpha = 0
+  nightDimmer.visible = true
   tickers.push(time => {
-    nightDimmer.visible = hour > 22
+    const isNight = hour > 21
+    const isDay = !isNight
+    if (nightDimmer.alpha < 0.4 && isNight) {
+      nightDimmer.alpha += transferTo(0.4).inSeconds(2)
+    }
+    if (nightDimmer.alpha > 0 && isDay) {
+      nightDimmer.alpha -= transferTo(0.4).inSeconds(2)
+    } 
+    nightDimmer.alpha = cap(0, 0.4)(nightDimmer.alpha)
   })
   dimmer.addChild(nightDimmer)
 
@@ -366,7 +378,7 @@ function createFlowers() {
     flower.anchor.set(flipped ? 0.55 : 0.27, 0.2)
     flower.position.x = (WIDTH / 4) + positions[f]
     flower.position.y = 330
-    background.addChild(flower)
+    flowerBed.addChild(flower)
 
     flower.panelLabel = () => false
     flower.panelPosition = () => flower.position
@@ -419,7 +431,7 @@ function killFlowers() {
   flowers.forEach(flower => {
     flower.removeChild(flower.flowerSprite)
     delete flower.flowerSprite
-    background.removeChild(flower)
+    flowerBed.removeChild(flower)
     delete flower    
   })
   flowers = []
