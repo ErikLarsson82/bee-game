@@ -474,6 +474,13 @@ function createMap(m) {
     createBee(beeContainer, 'nurser')
     createBee(beeContainer, 'forager')
     createBee(beeContainer, 'worker')
+
+    setSelected(hexGrid[2][2])
+    replaceSelectedHex('wax')
+    activateAdjacent(2, 2)
+    setSelected(hexGrid[2][3])
+    replaceSelectedHex('honey').setHoney(30)
+    activateAdjacent(2, 3)
   }
 
   if (m === 'prepared') {
@@ -787,18 +794,34 @@ function snapTo(a, b) {
   }
 }
 
+const f = {
+  converter: cellConverter,
+  brood: cellBrood,
+  pollen: cellPollen,
+  honey: cellHoney,
+  wax: cellWax,
+  prepared: cellPrepared
+}
+
+function replaceHex(coordinate, type) {
+  hexForeground.removeChild(hexGrid[coordinate[0]][coordinate[1]])
+  delete hexGrid[coordinate[0]][coordinate[1]]
+  
+  if (!f[type]) {
+    console.error('No type!')
+  }
+  const newHex = f[type](coordinate[0], coordinate[1], hexForeground)
+  hexGrid[coordinate[0]][coordinate[1]] = newHex
+  return newHex
+}
+
 function replaceSelectedHex(type) {
   let returnHex = null
   hexGrid.forEach((row, xIdx) => row.forEach((hex, yIdx) => {
     if (hex === selected) {
-      background.removeChild(hex)
-      const f = {
-        converter: cellConverter,
-        brood: cellBrood,
-        pollen: cellPollen,
-        honey: cellHoney,
-        prepared: cellPrepared
-      }
+      hexForeground.removeChild(hex)
+      delete hex
+      
       if (!f[type]) {
         console.error('No type!')
       }
@@ -1062,6 +1085,7 @@ function createBee(parent, type, startPosition) {
   bee.NECTAR_SACK_CAPACITY = 20
   bee.POLLEN_SACK_CAPACITY = 20
   bee.HONEY_SACK_CAPACITY = 10
+  bee.WAX_SACK_CAPACITY = 10
   
   bee.pollenSack = 0
   bee.setPollen = amount => { bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(amount); return bee }
@@ -1081,6 +1105,9 @@ function createBee(parent, type, startPosition) {
 
   const isHoneySackFull = () => bee.honeySack >= bee.HONEY_SACK_CAPACITY
   const isHoneySackEmpty = () => !(bee.honeySack > 0)
+
+  const isWaxSackFull = () => bee.waxSack >= bee.WAX_SACK_CAPACITY
+  const isWaxSackEmpty = () => !(bee.waxSack > 0)
 
   const helperText = () => {
     if (bee.type === 'forager' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y && isPollenSackFull()) {
@@ -1201,6 +1228,20 @@ function createBee(parent, type, startPosition) {
     hex.pollen -= transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(30)
     hex.pollen = cap(0, hex.POLLEN_HEX_CAPACITY)(hex.pollen)
     if (isPollenSackFull() || hex.isPollenEmpty()) {
+      bee.position.y = hex.position.y - 5
+    }
+    return true
+  }
+
+  function refillWax() {
+    const hex = bee.isAtType('wax')
+    if (!hex) return false
+    hex.claimSlot(bee)  
+    bee.waxSack += transferTo(bee.WAX_SACK_CAPACITY).inSeconds(30)
+    bee.wax = cap(0, bee.WAX_SACK_CAPACITY)(bee.waxSack)
+    hex.wax -= transferTo(bee.WAX_SACK_CAPACITY).inSeconds(30)
+    hex.wax = cap(0, hex.WAX_HEX_CAPACITY)(hex.wax)
+    if (isWaxSackFull() || hex.isWaxEmpty()) {
       bee.position.y = hex.position.y - 5
     }
     return true
@@ -1392,13 +1433,25 @@ function createBee(parent, type, startPosition) {
     return true
   }
 
+  function flyToWax() {
+    const waxHex = filterHexagon(hexGrid, hex => hex.type === 'wax' && hex.isUnclaimed(bee) && !hex.isWaxEmpty())
+    if (waxHex.length === 0 || isWaxSackFull()) return false
+    waxHex[0].claimSlot(bee)
+    bee.flyTo(waxHex[0])      
+    return true
+  }
+
   function prepareCell() {
+    if (isWaxSackEmpty()) return
     const hex = bee.isAtType('prepared')
     if (!hex) return false
     hex.claimSlot(bee)
 
     hex.completeness += transferTo(100).inSeconds(20)
     hex.completeness = cap(0, 100)(hex.completeness)
+
+    bee.waxSack -= transferTo(bee.WAX_SACK_CAPACITY).inSeconds(5)
+    bee.waxSack = cap(0, bee.WAX_SACK_CAPACITY)(bee.waxSack)
     
     if (hex.completeness >= 100) {
       activateAdjacent(hex.index.x, hex.index.y)
@@ -1408,6 +1461,7 @@ function createBee(parent, type, startPosition) {
   }
 
   function flyToPrepareCell() {
+    if (isWaxSackEmpty()) return
     const preparedHex = filterHexagon(hexGrid, hex => hex.type === 'prepared' && hex.isUnclaimed(bee) && hex.completeness < 100)
     if (preparedHex.length === 0) return false
     preparedHex[0].claimSlot(bee)
@@ -1419,6 +1473,8 @@ function createBee(parent, type, startPosition) {
     if (season === 'summer') {
       bee.consumeEnergy()   
       if (prepareCell()) return
+      if (refillWax()) return
+      if (flyToWax()) return
       if (flyToPrepareCell()) return
       if (depositHoney()) return
       if (flyToHoney()) return
@@ -1677,11 +1733,79 @@ function cellHoney(x, y, parent) {
     textDescription.position.y = -16
     container.addChild(textDescription)
 
+    const button = Button(70, 30, 'Convert to Wax', () => {
+      replaceHex([x, y], 'wax')
+      setSelected(null) 
+    })
+    container.addChild(button)
+
     return container
   }
 
   parent.addChild(honeySprite)
   return honeySprite
+}
+
+function cellWax(x, y, parent) {
+  const pixelCoordinate = toLocalCoordinateFlat({ x, y })
+  const waxSprite = Sprite.fromImage('images/hex/hex-wax-0.png')
+  makeSelectable(waxSprite, 'wax')
+  makeOccupiable(waxSprite)
+  waxSprite.position.x = pixelCoordinate.x
+  waxSprite.position.y = pixelCoordinate.y
+
+  waxSprite.type = 'wax'
+  waxSprite.WAX_HEX_CAPACITY = 130
+  waxSprite.wax = 130
+  waxSprite.setWax = amount => { waxSprite.wax = cap(0, waxSprite.WAX_HEX_CAPACITY)(amount); return waxSprite }
+  waxSprite.isWaxFull = () => waxSprite.wax >= waxSprite.WAX_HEX_CAPACITY
+  waxSprite.isWaxEmpty = () => waxSprite.wax <= 0
+  
+  tickers.push(time => {
+    if (waxSprite.wax >= waxSprite.WAX_HEX_CAPACITY) {
+      waxSprite.texture = Texture.fromImage('images/hex/hex-wax-1.png')
+    }
+    if (waxSprite.wax <= 0) {
+      waxSprite.wax = 1 // this is dirty
+      replaceHex([x, y], 'prepared').instantlyPrepare()
+    }
+  })
+
+  waxSprite.panelLabel = () => false
+  waxSprite.panelPosition = () => ({ x: pixelCoordinate.x + 8, y: pixelCoordinate.y + 5 })
+
+  waxSprite.panelContent = () => {
+    const container = new Container()
+    
+    const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
+    whiteLine.position.x = 0
+    whiteLine.position.y = -30
+    container.addChild(whiteLine)
+
+    const content = Sprite.fromImage('images/ui/content-honey-hex.png')
+    content.position.x = 72
+    content.position.y = -29
+    container.addChild(content)
+
+    container.addChild(ProgressBar(113, -15, 'wax', () => waxSprite.wax, waxSprite.WAX_HEX_CAPACITY))
+
+    const textHeading = new PIXI.Text('WAX HEX', { ...picoFontConfig })
+    textHeading.scale.set(0.15, 0.15)
+    textHeading.position.x = 90
+    textHeading.position.y = -26
+    container.addChild(textHeading)
+
+    const textDescription = new PIXI.Text('WAX', { ...picoFontConfig, fill: '#96a5bc' })
+    textDescription.scale.set(0.15, 0.15)
+    textDescription.position.x = 90
+    textDescription.position.y = -16
+    container.addChild(textDescription)
+
+    return container
+  }
+
+  parent.addChild(waxSprite)
+  return waxSprite
 }
 
 
@@ -1877,7 +2001,7 @@ function cellPollen(x, y, parent) {
 }
 
 function ProgressBar(x, y, type, tickerData, max) {
-  const progressSprite = Sprite.fromImage('images/ui/progress-' + type + '.png')
+  const progressSprite = Sprite.fromImage('images/ui/progress-bar/progress-' + type + '.png')
   progressSprite.position.x = x
   progressSprite.position.y = y
   tickers.push(time => {
