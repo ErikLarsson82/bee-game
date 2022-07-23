@@ -344,6 +344,7 @@ function gameLoop(delta, manualTick) {
       } else {
         backgroundScene.texture = Texture.fromImage('images/scene/background-winter.png')
         killFlowers()
+        killBroodlings()
       }
     }
   }
@@ -424,6 +425,14 @@ function killFlowers() {
   flowers = []
 }
 
+function killBroodlings() {
+  forEachHexagon(hexGrid, hex => {
+    if (hex.type === 'brood' && ['egg', 'larvae'].includes(hex.content)) {
+      hex.kill()
+    }
+  })
+}
+
 function addJobsButtons(jobsPanel) {
   for (var i = 0; i < 3; i++) {
     for (var j = 0; j < 2; j++) {
@@ -453,6 +462,32 @@ function createMap(m) {
     createBee(beeContainer, 'nurser')
     createBee(beeContainer, 'forager')
     createBee(beeContainer, 'worker')
+  }
+
+  if (m === 'kill brood') {
+    createBee(beeContainer, 'nurser')
+    createBee(beeContainer, 'nurser')
+    createBee(beeContainer, 'nurser')
+    
+    setSelected(hexGrid[0][0])
+    replaceSelectedHex('converter').setNectar(15)
+    setSelected(hexGrid[0][1])
+    replaceSelectedHex('pollen').setPollen(120)
+    setSelected(hexGrid[0][2])
+
+    setSelected(hexGrid[2][2])
+    replaceSelectedHex('brood')
+    setSelected(hexGrid[2][3])
+    replaceSelectedHex('brood')
+    setSelected(hexGrid[2][4])
+    replaceSelectedHex('brood')
+
+    setSelected(hexGrid[4][2])
+    replaceSelectedHex('brood')
+    setSelected(hexGrid[4][3])
+    replaceSelectedHex('brood')
+    setSelected(hexGrid[4][4])
+    replaceSelectedHex('brood')
   }
 
   if (m === 'playtest') {
@@ -1501,6 +1536,10 @@ function cellPrepared(x, y, parent) {
   preparedCellSprite.completeness = 0
   preparedCellSprite.type = 'prepared'
   preparedCellSprite.index = { x, y }
+
+  preparedCellSprite.instantlyPrepare = () => {
+    preparedCellSprite.completeness = 100
+  }
   
   preparedCellSprite.panelLabel = () => false
   preparedCellSprite.panelPosition = () => ({ x: pixelCoordinate.x + 8, y: pixelCoordinate.y + 5 })
@@ -1687,6 +1726,9 @@ function cellBrood(x, y, parent) {
       broodSprite.nutrition = 50
     }
   }
+  broodSprite.kill = () => {
+    broodSprite.setContents('dead')
+  }
   broodSprite.isWellFed = () => broodSprite.nutrition >= broodSprite.NUTRITION_CAPACITY - 10
   broodSprite.isDead = () => broodSprite.content === 'dead'
 
@@ -1775,6 +1817,7 @@ function cellPollen(x, y, parent) {
   pollenSprite.type = 'pollen'
   pollenSprite.POLLEN_HEX_CAPACITY = 120
   pollenSprite.pollen = 0
+  pollenSprite.setPollen = (pollen) => pollenSprite.pollen = pollen
   pollenSprite.isPollenFull = () => pollenSprite.pollen >= pollenSprite.POLLEN_HEX_CAPACITY
   pollenSprite.isPollenEmpty = () => pollenSprite.pollen <= 0
   tickers.push(time => {
