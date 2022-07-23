@@ -130,6 +130,9 @@ function setup() {
   hexBackground = new Container()
   container.addChild(hexBackground)
 
+  dimmer = new Container()
+  container.addChild(dimmer)
+  
   hexForeground = new Container()
   container.addChild(hexForeground)
 
@@ -138,9 +141,6 @@ function setup() {
 
   foreground = new Container()
   container.addChild(foreground)
-  
-  dimmer = new Container()
-  container.addChild(dimmer)
   
   ui = new Container()
   container.addChild(ui)
@@ -214,6 +214,16 @@ function setup() {
 
   backgroundScene = Sprite.fromImage('images/scene/background-summer.png')
   background.addChild(backgroundScene)
+
+  nightDimmer = new Graphics()
+  nightDimmer.beginFill(0x000000)
+  nightDimmer.drawRect(0, 0, WIDTH / 2, HEIGHT / 2)
+  nightDimmer.alpha = 0.4
+  nightDimmer.visible = false
+  tickers.push(time => {
+    nightDimmer.visible = hour > 22
+  })
+  dimmer.addChild(nightDimmer)
 
   const jobsPanel = Sprite.fromImage('ui-jobs-panel.png')
   jobsPanel.position.x = 140
@@ -292,16 +302,6 @@ function setup() {
 
   addJobsButtons(jobsPanel)
 
-  nightDimmer = new Graphics()
-  nightDimmer.beginFill(0x000000)
-  nightDimmer.drawRect(0, 0, WIDTH / 2, HEIGHT / 2)
-  nightDimmer.alpha = 0.4
-  nightDimmer.visible = false
-  tickers.push(time => {
-    nightDimmer.visible = hour > 22
-  })
-  dimmer.addChild(nightDimmer)
-  
   createMap(MAP_SELECTION)
 
   app.ticker.add((delta) => gameLoop(delta))
