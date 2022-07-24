@@ -471,16 +471,17 @@ function createMap(m) {
   createQueen(beeContainer)
    
   if (m === 'default') {
-    createBee(beeContainer, 'nurser')
-    createBee(beeContainer, 'forager')
-    createBee(beeContainer, 'worker')
+    createBee(beeContainer, 'nurser').setHunger(20).setAge(10)
+    createBee(beeContainer, 'forager').setHunger(40).setAge(20)
+    createBee(beeContainer, 'worker').setHunger(60).setAge(30)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(40)
 
     setSelected(hexGrid[2][2])
     replaceSelectedHex('wax')
     activateAdjacent(2, 2)
-    //setSelected(hexGrid[2][3])
-    //replaceSelectedHex('honey').setHoney(30)
-    //activateAdjacent(2, 3)
+    setSelected(hexGrid[2][3])
+    replaceSelectedHex('honey').setHoney(30)
+    activateAdjacent(2, 3)
   }
 
   if (m === 'prepared') {
@@ -883,7 +884,7 @@ function getIdlePosition(type) {
 function makeHungry(bee) {
   const HUNGER_CAPACITY = 100
   bee.hunger = HUNGER_CAPACITY
-  bee.isDead = () => bee.hunger <= 0
+  bee.isDead = () => bee.hunger <= 0 || bee.age >= 100
   bee.isWellFed = () => bee.hunger >= HUNGER_CAPACITY
   bee.isHungry = () => bee.hunger < 30
   bee.setHunger = amount => { bee.hunger = cap(0, HUNGER_CAPACITY)(amount); return bee }
@@ -1097,6 +1098,8 @@ function createBee(parent, type, startPosition) {
   bee.HONEY_SACK_CAPACITY = 10
   bee.WAX_SACK_CAPACITY = 10
   
+  bee.age = 0
+  bee.setAge = amount => { bee.age = amount; return bee }
   bee.pollenSack = 0
   bee.setPollen = amount => { bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(amount); return bee }
   bee.waxSack = 0
@@ -1154,7 +1157,8 @@ function createBee(parent, type, startPosition) {
       str += 'Nectar  ' + Math.round(bee.nectarSack) + '\n'
       str += 'Wax     ' + Math.round(bee.waxSack) + '\n'
       str += 'Honey   ' + Math.round(bee.honeySack) + '\n\n'
-      str += 'Hunger  ' + Math.round(bee.hunger)
+      str += 'Hunger  ' + Math.round(bee.hunger) + '\n'
+      str += 'Age     ' + Math.round(bee.age)
       text.text = str
     })
     return text
@@ -1323,12 +1327,19 @@ function createBee(parent, type, startPosition) {
     return true    
   }
 
+  function ageBee() {
+    bee.age += transferTo(100).inMinutes(60)
+    if (bee.age >= 100) return true
+  }
+
   function idle() {
+    if (ageBee()) return
     if (bee.feedBee()) return
     bee.flyTo(null)
   }
 
   function forager() {
+    if (ageBee()) return
     if (bee.feedBee()) return
     if (pollinateFlower()) return
     if (depositPollen()) return    
@@ -1339,6 +1350,7 @@ function createBee(parent, type, startPosition) {
   }
 
   function nurser() {
+    if (ageBee()) return
     if (bee.feedBee()) return
     if (refillPollen()) return
     if (nurseBroodling()) return
@@ -1346,6 +1358,27 @@ function createBee(parent, type, startPosition) {
     if (flyToPollenToRefill()) return
     if (flyToBroodling()) return
     if (flyToCleanBrood()) return
+    bee.flyTo(null)
+  }
+
+  function worker() {
+    if (ageBee()) return
+    if (season === 'summer') {
+      bee.consumeEnergy()   
+      if (prepareCell()) return
+      if (refillWax()) return
+      if (flyToWax()) return
+      if (flyToPrepareCell()) return
+      if (depositHoney()) return
+      if (flyToHoney()) return
+      if (convertNectar()) return
+      if (flyToConverter()) return
+    } else {
+      if (bee.feedBee()) return
+      if (prepareCell()) return
+      if (flyToPrepareCell()) return
+    }
+    
     bee.flyTo(null)
   }
 
@@ -1431,26 +1464,6 @@ function createBee(parent, type, startPosition) {
     preparedHex[0].claimSlot(bee)
     bee.flyTo(preparedHex[0])      
     return true
-  }
-
-  function worker() {
-    if (season === 'summer') {
-      bee.consumeEnergy()   
-      if (prepareCell()) return
-      if (refillWax()) return
-      if (flyToWax()) return
-      if (flyToPrepareCell()) return
-      if (depositHoney()) return
-      if (flyToHoney()) return
-      if (convertNectar()) return
-      if (flyToConverter()) return
-    } else {
-      if (bee.feedBee()) return
-      if (prepareCell()) return
-      if (flyToPrepareCell()) return
-    }
-    
-    bee.flyTo(null)
   }
 
   tickers.push(time => {
