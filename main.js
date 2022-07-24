@@ -1337,51 +1337,6 @@ function createBee(parent, type, startPosition) {
     if (flyToPollenToRefill()) return
     if (flyToBroodling()) return
     if (flyToCleanBrood()) return
-    /*
-    const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && hex.pollen > 0 && hex.isUnclaimed(bee))
-    const isAtAnyLarvae = filterHexagon(hexGrid, hex => hex.type === 'brood' && hex.content === 'larvae' && hex.isUnclaimed(bee) && isAt(hex))
-    const larvaeHex = filterHexagon(hexGrid, hex => 
-      hex.type === 'brood' &&
-      hex.content === 'larvae' &&
-      hex.isUnclaimed(bee) && 
-      !hex.isWellFed()
-    ).sort((a, b) => a.nutrition > b.nutrition ? 1 : -1)
-
-    // Became refillPollen
-    if (pollenHex.length > 0 && isAt(pollenHex[0])) {
-      pollenHex[0].claimSlot(bee)
-      bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(30)
-      pollenHex[0].pollen -= transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(30)
-      if (isPollenSackFull()) {
-        bee.position.y = pollenHex[0].position.y - 5
-      }
-      return
-    }
-
-    // Became nurseBroodling
-    if (isAtAnyLarvae.length > 0 && !isPollenSackEmpty()) {
-      isAtAnyLarvae[0].claimSlot(bee)
-      bee.pollenSack -= transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(40)
-      isAtAnyLarvae[0].nutrition += transferTo(isAtAnyLarvae[0].NUTRITION_CAPACITY).inSeconds(10)
-      isAtAnyLarvae[0].nutrition = cap(0, isAtAnyLarvae[0].NUTRITION_CAPACITY)(isAtAnyLarvae[0].nutrition)
-      return
-    }
-
-    // Became flyToPollenToRefill
-    if (!isPollenSackFull() && pollenHex.length > 0) {
-      pollenHex[0].claimSlot(bee)
-      bee.flyTo(pollenHex[0])
-      return
-    }
-      
-    // Became flyToBroodling
-    if (larvaeHex.length > 0 && !isPollenSackEmpty()) {
-      larvaeHex[0].claimSlot(bee)
-      bee.flyTo(larvaeHex[0])
-      return
-    }
-    */
-
     bee.flyTo(null)
   }
 
