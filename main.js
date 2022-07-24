@@ -478,9 +478,9 @@ function createMap(m) {
     setSelected(hexGrid[2][2])
     replaceSelectedHex('wax')
     activateAdjacent(2, 2)
-    setSelected(hexGrid[2][3])
-    replaceSelectedHex('honey').setHoney(30)
-    activateAdjacent(2, 3)
+    //setSelected(hexGrid[2][3])
+    //replaceSelectedHex('honey').setHoney(30)
+    //activateAdjacent(2, 3)
   }
 
   if (m === 'prepared') {
@@ -928,13 +928,17 @@ function makeHungry(bee) {
 
 function makeParticleCreator(bee) {
   bee.particleDelay = 0
+  bee.particleActive = true
   let transferRate = 0
 
+  bee.disableParticle = () => bee.particleActive = false
+
   tickers.push(time => {
+    if (!bee.particleActive) return
     if (bee.pollenSack < bee.POLLEN_SACK_CAPACITY) return
 
     if (bee.particleDelay <= 0) {
-      transferRate = Math.random() * 1
+      transferRate = (Math.random() * 1) + 0.8
       bee.particleDelay = 1
 
       const pollenPixel = Sprite.fromImage('pollen-pixel.png')
@@ -942,10 +946,12 @@ function makeParticleCreator(bee) {
       pollenPixel.position.y = bee.position.y + 4 + (Math.random() * 3) - 1.5
       let lifetime = 0
       tickers.push(time => {
+        if (!bee.particleActive) return
         pollenPixel.position.y += 0.0003 * FPS * gameSpeed
         lifetime += transferTo(1).inSeconds(1)
         if (lifetime > 1) {
           foreground.removeChild(pollenPixel)
+          delete pollenPixel
         }
       })
       foreground.addChild(pollenPixel)
@@ -1061,9 +1067,13 @@ function createBee(parent, type, startPosition) {
   honeyDrop.position.y = 6
   bee.addChild(honeyDrop)
   const nectarDrop = Sprite.fromImage('drop-nectar.png')
-  nectarDrop.position.x = 1
+  nectarDrop.position.x = 0
   nectarDrop.position.y = 5
   bee.addChild(nectarDrop)
+  const waxDrop = Sprite.fromImage('drop-wax.png')
+  waxDrop.position.x = -2
+  waxDrop.position.y = 5
+  bee.addChild(waxDrop)
   const beeExclamation = Sprite.fromImage('exclamation-warning-severe.png')
   beeExclamation.position.x = 12
   beeExclamation.position.y = -2
@@ -1330,7 +1340,6 @@ function createBee(parent, type, startPosition) {
 
   function nurser() {
     if (bee.feedBee()) return
-    if (DEBUG) debugger;
     if (refillPollen()) return
     if (nurseBroodling()) return
     if (cleanBrood()) return
@@ -1447,9 +1456,16 @@ function createBee(parent, type, startPosition) {
   tickers.push(time => {
     bee.visible = true
 
+    if (bee.position.y === 25) return
+
     if (bee.isDead()) {
       bee.texture = Texture.fromImage('bee-drone-dead.png')
+      honeyDrop.visible = false
+      nectarDrop.visible = false
+      waxDrop.visible = false
       beeAddon.visible = false
+      beeExclamation.visible = false
+      bee.disableParticle()
       if (bee.position.y !== 25) {
         bee.position.x = 65 + (Math.random() * 100)
         bee.position.y = 25
@@ -1463,6 +1479,7 @@ function createBee(parent, type, startPosition) {
 
     honeyDrop.visible = isHoneySackFull()
     nectarDrop.visible = isNectarSackFull()
+    waxDrop.visible = isWaxSackFull()
 
     if (bee.vx !== 0 || bee.vy !== 0) {
       (bee.vx >= -0.15 || bee.vx === 0) ? bee.scale.set(1, 1) : bee.scale.set(-1, 1) //
