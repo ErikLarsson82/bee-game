@@ -470,13 +470,10 @@ function createMap(m) {
    
   if (m === 'default') {
     seeds = 2
-    createBee(beeContainer, 'idle').setHunger(40).setAge(80 - 20)
-    createBee(beeContainer, 'idle').setHunger(42).setAge(70 - 20)
-    createBee(beeContainer, 'idle').setHunger(50).setAge(60 - 20)
-    createBee(beeContainer, 'idle').setHunger(60).setAge(50 - 20)
-    createBee(beeContainer, 'idle').setHunger(70).setAge(40 - 20)
-    createBee(beeContainer, 'idle').setHunger(100).setAge(13)
-    createBee(beeContainer, 'idle').setHunger(100).setAge(10)
+    createBee(beeContainer, 'idle').setHunger(40).setAge(80)
+    createBee(beeContainer, 'idle').setHunger(42).setAge(60)
+    createBee(beeContainer, 'idle').setHunger(50).setAge(20)
+    createBee(beeContainer, 'idle').setHunger(80).setAge(10)
     createBee(beeContainer, 'idle').setHunger(100).setAge(6)
     createBee(beeContainer, 'idle').setHunger(100).setAge(5)
     createBee(beeContainer, 'idle').setHunger(100).setAge(0)
