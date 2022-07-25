@@ -471,10 +471,14 @@ function createMap(m) {
   createQueen(beeContainer)
    
   if (m === 'default') {
-    createBee(beeContainer, 'nurser').setHunger(20).setAge(10)
-    createBee(beeContainer, 'forager').setHunger(40).setAge(20)
-    createBee(beeContainer, 'worker').setHunger(60).setAge(30)
-    createBee(beeContainer, 'idle').setHunger(100).setAge(40)
+    createBee(beeContainer, 'idle').setHunger(25).setAge(90 - 20)
+    createBee(beeContainer, 'idle').setHunger(35).setAge(80 - 20)
+    createBee(beeContainer, 'idle').setHunger(40).setAge(70 - 20)
+    createBee(beeContainer, 'idle').setHunger(50).setAge(60 - 20)
+    createBee(beeContainer, 'idle').setHunger(60).setAge(50 - 20)
+    createBee(beeContainer, 'idle').setHunger(70).setAge(40 - 20)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(30 - 20)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(20 - 20)
 
     setSelected(hexGrid[2][2])
     replaceSelectedHex('wax')
@@ -1038,7 +1042,7 @@ function createQueen(parent) {
     queenLegAddon.visible = (queenSprite.vx === 0 && queenSprite.vy === 0 && targetBrood) && Math.sin(queenSprite.animationTicker) > 0
 
     if (targetBrood && season === 'summer') {
-      queenSprite.delay += transferTo(1).inSeconds(300)
+      queenSprite.delay += transferTo(1).inSeconds(30)
       if (queenSprite.delay < 1) return true
       queenSprite.delay = 0
       targetBrood.setContents('egg')
@@ -1354,7 +1358,9 @@ function createBee(parent, type, startPosition) {
     if (bee.feedBee()) return
     if (refillPollen()) return
     if (nurseBroodling()) return
-    if (cleanBrood()) return
+    if (season !== 'summer') {
+      if (cleanBrood()) return
+    }  
     if (flyToPollenToRefill()) return
     if (flyToBroodling()) return
     if (flyToCleanBrood()) return
@@ -1903,11 +1909,14 @@ function cellBrood(x, y, parent) {
     broodSprite.lifecycle += transferTo(225).inSeconds(225)
 
     // Transitions
-    if (broodSprite.lifecycle > 20 && broodSprite.content === 'egg') {
+    const eggDuration = 30
+    const larvaeDuration = 300
+    const puppaDuration = 500
+    if (broodSprite.lifecycle > eggDuration && broodSprite.content === 'egg') {
       broodSprite.setContents('larvae')      
-    } else if (broodSprite.lifecycle > 20 + 105 && broodSprite.content === 'larvae') {
+    } else if (broodSprite.lifecycle > eggDuration + larvaeDuration && broodSprite.content === 'larvae') {
       broodSprite.setContents('puppa')
-    } else if (broodSprite.lifecycle > 20 + 105 + 50 && broodSprite.content === 'puppa') {
+    } else if (broodSprite.lifecycle > eggDuration + larvaeDuration + puppaDuration && broodSprite.content === 'puppa') {
       broodSprite.setContents('empty')
       createBee(beeContainer, 'idle', { x: broodSprite.position.x, y: broodSprite.position.y - 5 })
     }
