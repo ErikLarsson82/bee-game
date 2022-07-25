@@ -375,7 +375,7 @@ function createFlowers() {
     
     flower.scale.x = flipped ? -1 : 1
     flower.anchor.set(flipped ? 0.55 : 0.27, 0.2)
-    flower.position.x = (WIDTH / 4) + positions[f] ? positions[f] : f
+    flower.position.x = (WIDTH / 4) + (positions[f] ? positions[f] : f)
     flower.position.y = 330
     flowerBed.addChild(flower)
 
