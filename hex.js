@@ -70,6 +70,7 @@ const DIRECTIONS_POINTY_EVEN = {
 }
 
 const DIRECTIONS_FLAT_ODD = {
+  '-': { x: 0, y: 0 },
   'N': { x: 0, y: -1},
   'NE': { x: 1, y: 0 },
   'NW': { x: -1, y: 0 },
@@ -78,6 +79,7 @@ const DIRECTIONS_FLAT_ODD = {
   'SW': { x: -1, y: 1},
 }
 const DIRECTIONS_FLAT_EVEN = {
+  '-': { x: 0, y: 0 },
   'NW': { x: -1, y: -1},
   'NE': { x: 1, y: -1},
   'N': { x: 0, y: -1},

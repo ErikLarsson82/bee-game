@@ -242,25 +242,25 @@ function setup() {
   jobsPanel.position.y = 95
   background.addChild(jobsPanel)
 
-  const unassignedText = new PIXI.Text('-', { ...fontConfig, fill: 'black' })
+  const unassignedText = new PIXI.Text('-', { ...fontConfig, fill: 'white' })
   unassignedText.anchor.set(1, 0)
   unassignedText.position.x = 73
   unassignedText.position.y = 3
   jobsPanel.addChild(unassignedText)
 
-  const foragerText = new PIXI.Text('-', { ...fontConfig, fill: 'black' })
+  const foragerText = new PIXI.Text('-', { ...fontConfig, fill: 'white' })
   foragerText.anchor.set(1, 0)
   foragerText.position.x = 52
   foragerText.position.y = 41.5
   jobsPanel.addChild(foragerText)
 
-  const nurserText = new PIXI.Text('-', { ...fontConfig, fill: 'black' })
+  const nurserText = new PIXI.Text('-', { ...fontConfig, fill: 'white' })
   nurserText.anchor.set(1, 0)
   nurserText.position.x = 50
   nurserText.position.y = 79.5
   jobsPanel.addChild(nurserText)
 
-  const workerText = new PIXI.Text('-', { ...fontConfig, fill: 'black' })
+  const workerText = new PIXI.Text('-', { ...fontConfig, fill: 'white' })
   workerText.anchor.set(1, 0)
   workerText.position.x = 53
   workerText.position.y = 117.5
@@ -282,7 +282,6 @@ function setup() {
   hexGrid = new Array(5).fill().map((_, x) => 
     new Array(5).fill().map((_, y) => cellDisabled(x, y, hexForeground))
   )
-  hexGrid[2][2] = cellEmpty(2, 2, hexForeground, hexBackground)
   
   selectedSprite = new Container()
   selectedSprite.visible = false
@@ -470,21 +469,26 @@ function createMap(m) {
   createQueen(beeContainer)
    
   if (m === 'default') {
-    createBee(beeContainer, 'idle').setHunger(25).setAge(90 - 20)
-    createBee(beeContainer, 'idle').setHunger(35).setAge(80 - 20)
-    createBee(beeContainer, 'idle').setHunger(40).setAge(70 - 20)
+    createBee(beeContainer, 'idle').setHunger(35).setAge(90 - 20)
+    createBee(beeContainer, 'idle').setHunger(40).setAge(80 - 20)
+    createBee(beeContainer, 'idle').setHunger(42).setAge(70 - 20)
     createBee(beeContainer, 'idle').setHunger(50).setAge(60 - 20)
     createBee(beeContainer, 'idle').setHunger(60).setAge(50 - 20)
     createBee(beeContainer, 'idle').setHunger(70).setAge(40 - 20)
     createBee(beeContainer, 'idle').setHunger(100).setAge(30 - 20)
     createBee(beeContainer, 'idle').setHunger(100).setAge(20 - 20)
 
-    setSelected(hexGrid[2][2])
-    replaceSelectedHex('wax')
-    activateAdjacent(2, 2)
-    setSelected(hexGrid[2][3])
-    replaceSelectedHex('honey').setHoney(30)
-    activateAdjacent(2, 3)
+    replaceHex([2, 2], 'wax', 'activate')
+    replaceHex([2, 3], 'honey', 'activate').setHoney(30)
+  }
+
+  if (m === 'die test') {
+    createBee(beeContainer, 'idle').setHunger(60).setAge(99.8)
+    createBee(beeContainer, 'idle').setHunger(60).setAge(99.7)
+    createBee(beeContainer, 'idle').setHunger(40).setAge(70 - 20)
+    
+    replaceHex([2, 2], 'wax', 'activate')
+    replaceHex([2, 3], 'honey', 'activate').setHoney(30)
   }
 
   if (m === 'stress') {
@@ -830,15 +834,21 @@ const f = {
   prepared: cellPrepared
 }
 
-function replaceHex(coordinate, type) {
-  hexForeground.removeChild(hexGrid[coordinate[0]][coordinate[1]])
-  delete hexGrid[coordinate[0]][coordinate[1]]
+function replaceHex(coordinate, type, activate) {
+  const [x, y] = coordinate
+
+  if (activate === 'activate') activateAdjacent(x, y)
+
+  hexForeground.removeChild(hexGrid[x][y])
+  delete hexGrid[x][y]
   
   if (!f[type]) {
     console.error('No type!')
   }
-  const newHex = f[type](coordinate[0], coordinate[1], hexForeground)
-  hexGrid[coordinate[0]][coordinate[1]] = newHex
+  const newHex = f[type](x, y, hexForeground)
+  hexGrid[x][y] = newHex
+
+
   return newHex
 }
 
@@ -992,7 +1002,8 @@ const isForager = b => b.type === 'forager'
 const isIdle = b => b.type === 'idle'
 
 function jobs(addOrRemove, type) {
-  const availableBees = bees.filter(addOrRemove === 'add' ? isIdle : x=>x.type===type)
+  const aliveBees = bees.filter(bee => !bee.isDead())
+  const availableBees = aliveBees.filter(addOrRemove === 'add' ? isIdle : x=>x.type===type)
 
   if (availableBees.length > 0) {
     availableBees[0].setType(addOrRemove === 'add' ? type : 'idle')
