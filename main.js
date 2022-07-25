@@ -475,8 +475,11 @@ function createMap(m) {
     createBee(beeContainer, 'idle').setHunger(50).setAge(60 - 20)
     createBee(beeContainer, 'idle').setHunger(60).setAge(50 - 20)
     createBee(beeContainer, 'idle').setHunger(70).setAge(40 - 20)
-    createBee(beeContainer, 'idle').setHunger(100).setAge(30 - 20)
-    createBee(beeContainer, 'idle').setHunger(100).setAge(20 - 20)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(13)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(10)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(6)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(5)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
 
     replaceHex([2, 2], 'wax', 'activate')
     replaceHex([3, 2], 'wax', 'activate')
@@ -1236,8 +1239,8 @@ function createBee(parent, type, startPosition) {
       flower.claimSlot(bee)
       flower.pollinationLevel += transferTo(flower.POLLINATION_REQUIREMENT).inSeconds(200)
       flower.pollinationLevel = cap(0, flower.POLLINATION_REQUIREMENT)(flower.pollinationLevel)
-      bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(60)
-      bee.nectarSack += transferTo(bee.NECTAR_SACK_CAPACITY).inSeconds(60)
+      bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(40)
+      bee.nectarSack += transferTo(bee.NECTAR_SACK_CAPACITY).inSeconds(40)
       bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
       bee.nectarSack = cap(0, bee.NECTAR_SACK_CAPACITY)(bee.nectarSack)
       if (isPollenSackFull() && isNectarSackFull()) {
@@ -1369,7 +1372,7 @@ function createBee(parent, type, startPosition) {
   }
 
   function ageBee() {
-    bee.age += transferTo(100).inMinutes(60)
+    bee.age += transferTo(100).inMinutes(70)
     if (bee.age >= 100) return true
   }
 
@@ -1453,10 +1456,10 @@ function createBee(parent, type, startPosition) {
     if (!hex) return false
     hex.claimSlot(bee)
 
-    hex.honey += transferTo(hex.HONEY_HEX_CAPACITY / 3).inSeconds(10)
+    hex.honey += transferTo(hex.HONEY_HEX_CAPACITY / 3).inSeconds(5)
     hex.honey = cap(0, hex.HONEY_HEX_CAPACITY)(hex.honey)
 
-    bee.honeySack -= transferTo(bee.HONEY_SACK_CAPACITY).inSeconds(10)
+    bee.honeySack -= transferTo(bee.HONEY_SACK_CAPACITY).inSeconds(5)
     bee.honeySack = cap(0, bee.HONEY_SACK_CAPACITY)(bee.honeySack)
 
     if (isHoneySackEmpty() || hex.isHoneyFull()) {
