@@ -87,7 +87,7 @@ settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST // Default pixel-scaling
 app.renderer.view.style.position = 'absolute'
 app.renderer.view.style.display = 'block'
 
-let cycles = [4, 1, 4, 2, 4, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30]
+let cycles = [5, 1, 5, 2, 5, 2, 4, 3, 4, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30]
 
 let gameSpeed = 1
 let paused = false
@@ -469,7 +469,7 @@ function createMap(m) {
   createQueen(beeContainer)
    
   if (m === 'default') {
-    createBee(beeContainer, 'idle').setHunger(35).setAge(90 - 20)
+    seeds = 2
     createBee(beeContainer, 'idle').setHunger(40).setAge(80 - 20)
     createBee(beeContainer, 'idle').setHunger(42).setAge(70 - 20)
     createBee(beeContainer, 'idle').setHunger(50).setAge(60 - 20)
@@ -479,7 +479,9 @@ function createMap(m) {
     createBee(beeContainer, 'idle').setHunger(100).setAge(20 - 20)
 
     replaceHex([2, 2], 'wax', 'activate')
+    replaceHex([3, 2], 'wax', 'activate')
     replaceHex([2, 3], 'honey', 'activate').setHoney(30)
+    replaceHex([3, 3], 'honey', 'activate').setHoney(30)
   }
 
   if (m === 'die test') {
@@ -1099,6 +1101,8 @@ function createQueen(parent) {
 function createBee(parent, type, startPosition) {
   const bee = Sprite.fromImage('bee-drone-body.png')
   const beeAddon = Sprite.fromImage('bee-drone-legs.png')
+  beeAddon.position.x = -1
+  beeAddon.position.y = -1
   bee.addChild(beeAddon)
   const honeyDrop = Sprite.fromImage('drop-honey.png')
   honeyDrop.position.x = 2
@@ -1393,10 +1397,10 @@ function createBee(parent, type, startPosition) {
     if (nurseBroodling()) return
     if (season !== 'summer') {
       if (cleanBrood()) return
+      if (flyToCleanBrood()) return
     }  
     if (flyToPollenToRefill()) return
     if (flyToBroodling()) return
-    if (flyToCleanBrood()) return
     bee.flyTo(null)
   }
 
