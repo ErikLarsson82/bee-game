@@ -301,8 +301,6 @@ function setup() {
   })
   hexForeground.addChild(selectedSprite)
 
-  createFlowers()
-
   warning = Sprite.fromImage('images/ui/warning.png')
   warning.position.x = 180
   warning.position.y = 50  
@@ -315,6 +313,7 @@ function setup() {
   addJobsButtons(jobsPanel)
 
   createMap(MAP_SELECTION)
+  createFlowers()
 
   app.ticker.add((delta) => gameLoop(delta))
 
@@ -376,7 +375,7 @@ function createFlowers() {
     
     flower.scale.x = flipped ? -1 : 1
     flower.anchor.set(flipped ? 0.55 : 0.27, 0.2)
-    flower.position.x = (WIDTH / 4) + positions[f]
+    flower.position.x = (WIDTH / 4) + positions[f] ? positions[f] : f
     flower.position.y = 330
     flowerBed.addChild(flower)
 
@@ -486,6 +485,29 @@ function createMap(m) {
     setSelected(hexGrid[2][3])
     replaceSelectedHex('honey').setHoney(30)
     activateAdjacent(2, 3)
+  }
+
+  if (m === 'stress') {
+    seeds = 100
+
+    for (let i = 0; i <100; i++) {
+      createBee(beeContainer, 'forager') //.setPollen(30)
+    }
+    for (let i = 0; i <1; i++) {
+      createBee(beeContainer, 'nurser')
+    }
+    for (let i = 0; i <1; i++) {
+      createBee(beeContainer, 'worker')
+    }
+    
+    for (let x = 0; x < 5; x++) {
+      for (let y = 0; y < 5; y++) {
+        setSelected(hexGrid[x][y])
+        const type = ['pollen', 'honey', 'wax', 'brood', 'converter'][Math.floor(Math.random()*5)]
+        replaceSelectedHex(type)
+        activateAdjacent(x, y)  
+      }
+    }
   }
 
   if (m === 'prepared') {
@@ -1212,12 +1234,12 @@ function createBee(parent, type, startPosition) {
   }
 
   function flyToFlower() {
-    const unclaimedFlowers = flowers.filter(flower => flower.isUnclaimed(bee))
+    const flower = flowers.find(flower => flower.isUnclaimed(bee))
     const needsResource = !(isPollenSackFull() && isNectarSackFull())
 
-    if (needsResource && unclaimedFlowers[0]) {
-      unclaimedFlowers[0].claimSlot(bee)
-      bee.flyTo(unclaimedFlowers[0])
+    if (needsResource && flower) {
+      flower.claimSlot(bee)
+      bee.flyTo(flower)
       return true
     }
     return false
