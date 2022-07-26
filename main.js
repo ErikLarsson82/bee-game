@@ -478,6 +478,8 @@ function createMap(m) {
     createBee(beeContainer, 'idle').setHunger(100).setAge(5)
     createBee(beeContainer, 'idle').setHunger(100).setAge(0)
 
+    replaceHex([1, 2], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([1, 3], 'prepared', 'activate').instantlyPrepare()
     replaceHex([2, 2], 'wax', 'activate')
     replaceHex([3, 2], 'wax', 'activate')
     replaceHex([2, 3], 'honey', 'activate').setHoney(30)
@@ -1150,7 +1152,10 @@ function createBee(parent, type, startPosition) {
   bee.setHoney = amount => { bee.honeySack = cap(0, bee.HONEY_SACK_CAPACITY)(amount); return bee }
   bee.type = type || 'unassigned'
   bee.setType = type => { bee.type = type; bee.idle = getIdlePosition(type) }
-  
+  bee.showBee = () => bee.visible = true
+  bee.hideBee = () => bee.visible = false
+  bee.determineIfVisible = () => bee.isAtType('converter') ? bee.hideBee() : bee.showBee()
+
   const isPollenSackFull = () => bee.pollenSack >= bee.POLLEN_SACK_CAPACITY
   const isPollenSackEmpty = () => !(bee.pollenSack > 0)
 
@@ -1174,8 +1179,11 @@ function createBee(parent, type, startPosition) {
         return 'Cannot find pollen hexagon'
       }
     }
+    if (bee.type === 'worker' && !bee.isMoving() && isHoneySackFull() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) {
+      return 'Honey sack full, cannot\nfind honey hexagon\nto deposit honey too'
+    }
     if (bee.type === 'worker' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) {
-      return 'Cannot find converter hex'
+      return 'Cannot find a converter\nhex filled with nectar'
     }
     if (bee.type === 'idle') {
       return 'Bee is idle'
@@ -1405,9 +1413,10 @@ function createBee(parent, type, startPosition) {
   }
 
   function worker() {
+    bee.determineIfVisible()
     if (ageBee()) return
     if (season === 'summer') {
-      bee.consumeEnergy()   
+      bee.consumeEnergy()
       if (prepareCell()) return
       if (refillWax()) return
       if (flyToWax()) return
@@ -1839,7 +1848,14 @@ function cellWax(x, y, parent) {
 
 function cellConverter(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
-  const converterSprite = Sprite.fromImage('cell-converter.png')
+  const converterSprite = Sprite.fromImage('images/hex/nectar/cell-nectar-empty.png')
+  
+  const animationSprite = Sprite.fromImage('images/hex/nectar/cell-conversion-animation-a.png')
+  animationSprite.position.y = -2
+  animationSprite.visible = true
+  animationSprite.delay = 0
+  converterSprite.addChild(animationSprite)
+  
   makeSelectable(converterSprite, 'converter')
   makeOccupiable(converterSprite)
   makeHexDetectable(converterSprite)
@@ -1862,17 +1878,35 @@ function cellConverter(x, y, parent) {
   }
 
   tickers.push(time => {
-    if (bees.filter(samePosition(converterSprite)).length > 0) {
-      converterSprite.texture = Texture.fromImage('cell-converter-occupied.png')
-      return
+    animationSprite.delay++
+    animationSprite.delay = animationSprite.delay < 12 ? animationSprite.delay : 0
+    const hasAnyBee = bees.find(samePosition(converterSprite))
+    const isOccupied = hasAnyBee !== undefined
+    const isConverting = hasAnyBee && hasAnyBee.type === 'worker'
+    if (isConverting) {
+      animationSprite.visible = true
+      animationSprite.texture = animationSprite.delay > 6
+        ? Texture.fromImage('images/hex/nectar/cell-conversion-animation-a.png')
+        : Texture.fromImage('images/hex/nectar/cell-conversion-animation-b.png')
+    } else {
+      animationSprite.visible = false
     }
 
-    if (converterSprite.nectar >= converterSprite.NECTAR_CAPACITY) {
-      converterSprite.texture = Texture.fromImage('cell-converter-full.png')   
-      return
+    if (converterSprite.nectar > converterSprite.NECTAR_CAPACITY * 0.9) {
+      converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-full.png')
+    } else if (converterSprite.nectar > converterSprite.NECTAR_CAPACITY * 0.72) {
+      converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-a.png')
+    } else if (converterSprite.nectar > converterSprite.NECTAR_CAPACITY * 0.66 ) {
+      converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-b.png')
+    } else if (converterSprite.nectar > converterSprite.NECTAR_CAPACITY * 0.5) {
+      converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-c.png')
+    } else if (converterSprite.nectar > converterSprite.NECTAR_CAPACITY * 0.25) {
+      converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-d.png')
+    } else if (converterSprite.nectar > converterSprite.NECTAR_CAPACITY * 0.05) {
+      converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-e.png')
+    } else {
+      converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-empty.png')
     }
-
-    converterSprite.texture = Texture.fromImage('cell-converter.png')   
   })
 
   converterSprite.type = 'converter'
