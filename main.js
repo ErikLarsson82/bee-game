@@ -1785,7 +1785,7 @@ function cellHoney(x, y, parent) {
 
 function cellWax(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
-  const waxSprite = Sprite.fromImage('images/hex/hex-wax-0.png')
+  const waxSprite = Sprite.fromImage('images/hex/wax/cell-wax-full.png')
   makeSelectable(waxSprite, 'wax')
   makeOccupiable(waxSprite)
   waxSprite.position.x = pixelCoordinate.x
@@ -1799,12 +1799,26 @@ function cellWax(x, y, parent) {
   waxSprite.isWaxEmpty = () => waxSprite.wax <= 0
   
   tickers.push(time => {
-    if (waxSprite.wax >= waxSprite.WAX_HEX_CAPACITY) {
-      waxSprite.texture = Texture.fromImage('images/hex/hex-wax-1.png')
-    }
+    
     if (waxSprite.wax <= 0) {
       waxSprite.wax = 1 // this is dirty
       replaceHex([x, y], 'prepared').instantlyPrepare()
+    }
+
+    if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.96) {
+      waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-full.png')
+    } else if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.72) {
+      waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-a.png')
+    } else if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.66 ) {
+      waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-b.png')
+    } else if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.5) {
+      waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-c.png')
+    } else if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.25) {
+      waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-d.png')
+    } else if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.12) {
+      waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-e.png')
+    } else {
+      waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-f.png')
     }
   })
 
