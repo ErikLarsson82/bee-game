@@ -279,8 +279,8 @@ function setup() {
     populationText.text = `Colony population ${ aliveBees.length + 1 }    ${ foragers } / ${ nurses } / ${ workers }` 
   })
   
-  hexGrid = new Array(5).fill().map((_, x) => 
-    new Array(5).fill().map((_, y) => cellDisabled(x, y, hexForeground))
+  hexGrid = new Array(9).fill().map((_, x) => 
+    new Array(9).fill().map((_, y) => cellDisabled(x, y, hexForeground))
   )
   
   selectedSprite = new Container()
@@ -302,7 +302,7 @@ function setup() {
 
   warning = Sprite.fromImage('images/ui/warning.png')
   warning.position.x = 180
-  warning.position.y = 50  
+  warning.position.y = 30  
   warning.visible = false
   ui.addChild(warning)
 
@@ -478,12 +478,15 @@ function createMap(m) {
     createBee(beeContainer, 'idle').setHunger(100).setAge(5)
     createBee(beeContainer, 'idle').setHunger(100).setAge(0)
 
-    replaceHex([1, 2], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([1, 3], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([2, 2], 'wax', 'activate')
-    replaceHex([3, 2], 'wax', 'activate')
-    replaceHex([2, 3], 'honey', 'activate').setHoney(30)
-    replaceHex([3, 3], 'honey', 'activate').setHoney(30)
+    replaceHex([0, 0], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([0, 8], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([8, 0], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([8, 8], 'prepared', 'activate').instantlyPrepare()
+
+    replaceHex([4, 4], 'wax', 'activate')
+    replaceHex([4, 5], 'wax', 'activate')
+    replaceHex([5, 4], 'honey', 'activate').setHoney(30)
+    replaceHex([3, 4], 'honey', 'activate').setHoney(30)
   }
 
   if (m === 'die test') {
@@ -763,15 +766,15 @@ function makeFlyable(sprite) {
     if (x === 0 && y === 0) return
     const direction = new PIXI.Point(x, y).normalize()
 
-    sprite.vx += direction.x * 0.008 * (gameSpeed * 5)
-    sprite.vy += direction.y * 0.008 * (gameSpeed * 5)
+    sprite.vx += direction.x * 0.016 * (gameSpeed * 5)
+    sprite.vy += direction.y * 0.016 * (gameSpeed * 5)
 
     const distanceToTarget = distance(sprite, targetSprite)
 
     let velocity = new PIXI.Point(sprite.vx, sprite.vy)
 
-    if (velocity.magnitude() > velocity.normalize().magnitude() * 0.07 * gameSpeed) {
-      velocity = new PIXI.Point(velocity.normalize().x * 0.07 * gameSpeed, velocity.normalize().y * 0.07 * gameSpeed)
+    if (velocity.magnitude() > velocity.normalize().magnitude() * 0.14 * gameSpeed) {
+      velocity = new PIXI.Point(velocity.normalize().x * 0.14 * gameSpeed, velocity.normalize().y * 0.14 * gameSpeed)
     }
     sprite.vx = velocity.x
     sprite.vy = velocity.y
@@ -1044,8 +1047,8 @@ function createQueen(parent) {
   queenSprite.addChild(queenLegAddon)
   
   queenSprite.idle = {
-    x: 260,
-    y: 80
+    x: 250,
+    y: 56
   }
   goIdle(queenSprite)
   queenSprite.animationTicker = Math.random() * 100
