@@ -1936,6 +1936,13 @@ function cellConverter(x, y, parent) {
 function cellBrood(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const broodSprite = Sprite.fromImage('cell-brood-empty.png')
+
+  const broodExclamation = Sprite.fromImage('exclamation-warning-severe.png')
+  broodExclamation.position.x = 14
+  broodExclamation.position.y = -6
+  broodExclamation.visible = true
+  broodSprite.addChild(broodExclamation)
+
   makeSelectable(broodSprite, 'brood')
   makeOccupiable(broodSprite)
   broodSprite.position.x = pixelCoordinate.x
@@ -1984,6 +1991,7 @@ function cellBrood(x, y, parent) {
 
   tickers.push(time => {
     setTexture()
+    broodExclamation.visible = broodSprite.content === 'larvae' && broodSprite.nutrition < 20
     if (!broodSprite.content) return
     if (broodSprite.content === 'empty') return
     if (broodSprite.content === 'dead') {
