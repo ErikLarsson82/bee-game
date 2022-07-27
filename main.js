@@ -30,7 +30,7 @@
 
 // Anchor everything at 0.5 to fix placements 
 
-// Dont occupy the pollen hexes when they are empty
+// Do not occupy the pollen hexes when they are empty
 
 // Eventlog
 
@@ -44,9 +44,15 @@ const fontConfig = {
     fill: 'black'
 }
 
+// Works on PC =  "PICO-8 mono Regular"'
+// Works on MAC = 'pico8'
 const picoFontConfig = {
-    fontFamily: 'PICO-8 mono Regular',
+    fontFamily: 'pico8',
     fill: 'white'
+}
+
+const largeFont = {
+    fontSize: 8
 }
 
 const l = console.log
@@ -65,7 +71,7 @@ const speeds = {
 
 const Container = PIXI.Container,
     autoDetectRenderer = PIXI.autoDetectRenderer,
-    Loader = PIXI.loader,
+    loader = PIXI.loader,
     resources = PIXI.loader.resources,
     Sprite = PIXI.Sprite,
     Graphics = PIXI.Graphics,
@@ -73,7 +79,8 @@ const Container = PIXI.Container,
     PictureSprite = PIXI.extras.PictureSprite
     settings = PIXI.settings
 
-Loader.add("pico8-mono.ttf")
+loader.add("pico8-mono.ttf")
+loader.load(setup)
 
 const WIDTH = 1063
 const HEIGHT = 735
@@ -166,20 +173,20 @@ function setup() {
     uiTopBar.beginFill(0x000000)
     uiTopBar.drawRect(0, 0, 1024, 20)
     
-    populationText = new PIXI.Text('Loading', { ...fontConfig, fill: 'white' })
+    populationText = new PIXI.Text('Loading', { ...picoFontConfig, ...largeFont })
     populationText.position.x = 5
     populationText.position.y = 2
     uiTopBar.addChild(populationText)
 
-    const dayCycle = new PIXI.Text('Loading', { ...fontConfig, fill: 'white' })
-    dayCycle.position.x = 230
+    const dayCycle = new PIXI.Text('Loading', { ...picoFontConfig, ...largeFont })
+    dayCycle.position.x = 210
     dayCycle.position.y = 2
     uiTopBar.addChild(dayCycle)
     tickers.push(time => {
       dayCycle.text = 'Year ' + year + ' Day ' + day + ' Hour ' + Math.round(hour)
     })
 
-    const seasonCycle = new PIXI.Text('Loading', { ...fontConfig, fill: 'white' })
+    const seasonCycle = new PIXI.Text('Loading', { ...picoFontConfig, ...largeFont })
     seasonCycle.position.x = 400
     seasonCycle.position.y = 2
     uiTopBar.addChild(seasonCycle)
@@ -187,9 +194,9 @@ function setup() {
       seasonCycle.text = season === 'summer' ? 'Summer' : 'Winter'
     })
 
-    const pausedText = new PIXI.Text('Playing', { ...fontConfig, fill: 'white' })
+    const pausedText = new PIXI.Text('Playing', { ...picoFontConfig, ...largeFont })
     pausedText.position.x = 480
-    pausedText.position.y = 2
+    pausedText.position.y = 3
     uiTopBar.addChild(pausedText)
 
     const pauseFrame = new Graphics()
@@ -276,7 +283,7 @@ function setup() {
     foragerText.text = foragers
     nurserText.text = nurses
     workerText.text = workers
-    populationText.text = `Colony population ${ aliveBees.length + 1 }    ${ foragers } / ${ nurses } / ${ workers }` 
+    populationText.text = `Colony population ${ aliveBees.length + 1 }` 
   })
   
   hexGrid = new Array(9).fill().map((_, x) => 
@@ -2175,5 +2182,5 @@ window.addEventListener('keydown', e => {
 })
 
 
-setup()
+// setup()
 
