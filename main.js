@@ -404,7 +404,7 @@ function createFlowers() {
   for (var f = 0; f < seeds; f++) {
     const flower = Sprite.fromImage('images/scene/flower.png')
 
-    const flowerExclamation = Sprite.fromImage('exclamation-warning-severe.png')
+    const flowerExclamation = Sprite.fromImage('exclamation-warning-mild.png')
     flowerExclamation.position.x = 20
     flowerExclamation.position.y = -20
     flowerExclamation.visible = false
@@ -776,6 +776,7 @@ function makeOccupiable(parent) {
 
   parent.slot = null
   parent.slotCounter = 0
+  
   parent.isUnclaimed = attemptee => {
     if (!attemptee) {
       console.error('Needs input')
@@ -783,10 +784,12 @@ function makeOccupiable(parent) {
     }
     return parent.slot === null || parent.slot === attemptee
   }
+
   parent.claimSlot = item => {
     parent.slot = item
     parent.slotCounter = secondsToTicks(1)
   }
+
   addTicker('game-stuff', time => {
     if (parent.slot) {
       parent.slotCounter = parent.slotCounter - gameSpeed
