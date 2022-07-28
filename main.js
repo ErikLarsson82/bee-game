@@ -145,8 +145,13 @@ function setup() {
     uiTopBar.beginFill(0x000000)
     uiTopBar.drawRect(0, 0, 1024, 20)
     
+    const colonyLabel = new PIXI.Text('Colony population', { ...picoFontConfig, ...largeFont, fill: 'gray' })
+    colonyLabel.position.x = 5
+    colonyLabel.position.y = 4
+    uiTopBar.addChild(colonyLabel)
+
     populationText = new PIXI.Text('Loading', { ...picoFontConfig, ...largeFont })
-    populationText.position.x = 5
+    populationText.position.x = 156
     populationText.position.y = 4
     uiTopBar.addChild(populationText)
 
@@ -277,7 +282,7 @@ function setup() {
     foragerText.text = foragers
     nurserText.text = nurses
     workerText.text = workers
-    populationText.text = `Colony population ${ aliveBees.length + 1 }` 
+    populationText.text = aliveBees.length + 1 
   })
   
   hexGrid = new Array(9).fill().map((_, x) => 
