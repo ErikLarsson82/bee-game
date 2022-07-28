@@ -1,10 +1,9 @@
 // Speed affects "physics-engine"-buggen
 // Anchor everything at 0.5 to fix placements 
-// Update UI even though game is paused
 // Clickable Shadows on idle spots
 // Circle selection on Bees
 // Selection on flower
-// Warning on flowers 
+// Testa noll padding mellan hexagoner
 
 const MAP_SELECTION = 'default'
 let DEBUG = false
@@ -94,8 +93,8 @@ let flowerBed = null
 
 let hexGrid = []
 let flowers = []
+let tickers = []
 const bees = []
-const tickers = []
 
 function setup() {
   const container = new Container()
@@ -150,35 +149,32 @@ function setup() {
     colonyLabel.position.y = 4
     uiTopBar.addChild(colonyLabel)
 
-    populationText = new PIXI.Text('Loading', { ...picoFontConfig, ...largeFont })
+    populationText = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
     populationText.position.x = 156
     populationText.position.y = 4
     uiTopBar.addChild(populationText)
 
-    const timelineText = new PIXI.Text('Loading', { ...picoFontConfig, ...largeFont, fill: 'gray' })
+    const timelineText = new PIXI.Text('Year   Day   Hour', { ...picoFontConfig, ...largeFont, fill: 'gray' })
     timelineText.position.x = 210
     timelineText.position.y = 4
     uiTopBar.addChild(timelineText)
-    tickers.push(time => {
-      timelineText.text = 'Year   Day   Hour'
-    })
-
-    const yearLabel = new PIXI.Text('Loading', { ...picoFontConfig, ...largeFont })
+    
+    const yearLabel = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
     yearLabel.position.x = 250
     yearLabel.position.y = 4
     uiTopBar.addChild(yearLabel)
 
-    const dayLabel = new PIXI.Text('Loading', { ...picoFontConfig, ...largeFont })
+    const dayLabel = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
     dayLabel.position.x = 300
     dayLabel.position.y = 4
     uiTopBar.addChild(dayLabel)
 
-    const hourLabel = new PIXI.Text('Loading', { ...picoFontConfig, ...largeFont })
+    const hourLabel = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
     hourLabel.position.x = 354
     hourLabel.position.y = 4
     uiTopBar.addChild(hourLabel)
 
-    tickers.push(time => {
+    addTicker('ui', time => {
       yearLabel.text = year
       dayLabel.text = day
       hourLabel.text = Math.round(hour)
@@ -189,7 +185,7 @@ function setup() {
     seasonCycle.position.x = 396
     seasonCycle.position.y = 4
     uiTopBar.addChild(seasonCycle)
-    tickers.push(time => {
+    addTicker('ui', time => {
       seasonCycle.text = season === 'summer' ? 'Summer' : 'Winter'
     })
 
@@ -230,7 +226,7 @@ function setup() {
   nightDimmer.drawRect(0, 0, WIDTH / 2, HEIGHT / 2)
   nightDimmer.alpha = 0
   nightDimmer.visible = true
-  tickers.push(time => {
+  addTicker('game-stuff', time => {
     const isNight = hour > 21
     const isDay = !isNight
     if (nightDimmer.alpha < 0.4 && isNight) {
@@ -272,7 +268,7 @@ function setup() {
   workerText.position.y = 117.5
   jobsPanel.addChild(workerText)
   
-  tickers.push(time => {
+  addTicker('ui', time => {
     const aliveBees = bees.filter(b => !b.isDead())
     const idles = aliveBees.filter(b => b.type === 'idle').length
     const foragers = aliveBees.filter(b => b.type === 'forager').length
@@ -295,7 +291,7 @@ function setup() {
   selectedSpriteSub.position.x = -2
   selectedSpriteSub.position.y = -2
   selectedSprite.addChild(selectedSpriteSub)  
-  tickers.push(time => {
+  addTicker('ui', time => {
     if (selected) {
       selectedSprite.visible = true
       selectedSprite.position.x = selected.position.x
@@ -338,10 +334,41 @@ function isDayBeforeWinter() {
   return cycles[0] === 1 && season === 'summer'
 }
 
+function addTicker(type, func) {
+  const id = Math.random() + '_' + Math.random() + '_' + Math.random() + '_' + Math.random()
+  tickers.push({
+    id,
+    type,
+    func,
+    remove: false
+  })
+  return id
+}
+
+function removeTicker(id) {
+  tickers.forEach(ticker => {
+    if (ticker.id === id) {
+      ticker.remove = true
+    }
+  })
+}
+
+function isUI(ticker) {
+  return ticker.type === 'ui'
+}
+
+function isGameStuff(ticker) {
+  return ticker.type === 'game-stuff'
+}
+
 function gameLoop(delta, manualTick) {
+  tickers = tickers.filter(ticker => ticker.remove === false)
+
+  tickers.filter(isUI).forEach(ticker => ticker.func());
+
   if (paused && !manualTick) return
   
-  tickers.forEach(f => f());
+  tickers.filter(isGameStuff).forEach(ticker => ticker.func());
 
   hour += transferTo(24).inMinutes(5)
 
@@ -428,7 +455,7 @@ function createFlowers() {
      return container
     }
 
-    tickers.push(() => {
+    addTicker('game-stuff', () => {
       flowerExclamation.visible = isDayBeforeWinter() && !flower.isPollinated()
       if (flower.isPollinated()) {
         flower.texture = Texture.fromImage('images/scene/flower-pollinated.png')        
@@ -711,7 +738,9 @@ function setSelected(item) {
   
   selected = item || null
 
-  if (!item) return;  
+  if (!item) {
+    return;  
+  }
   
   if (item.panelContent) {
     const { x, y } = item.panelPosition && item.panelPosition() || { x: 350, y: 100 }
@@ -756,7 +785,7 @@ function makeOccupiable(parent) {
     parent.slot = item
     parent.slotCounter = secondsToTicks(1)
   }
-  tickers.push(time => {
+  addTicker('game-stuff', time => {
     if (parent.slot) {
       parent.slotCounter = parent.slotCounter - gameSpeed
       if (parent.slotCounter <= 0) {
@@ -995,7 +1024,7 @@ function makeParticleCreator(bee) {
 
   bee.disableParticle = () => bee.particleActive = false
 
-  tickers.push(time => {
+  addTicker('game-stuff', time => {
     if (!bee.particleActive) return
     if (bee.pollenSack < bee.POLLEN_SACK_CAPACITY) return
 
@@ -1007,7 +1036,7 @@ function makeParticleCreator(bee) {
       pollenPixel.position.x = bee.position.x + 2 + (Math.random() * 4)
       pollenPixel.position.y = bee.position.y + 4 + (Math.random() * 3) - 1.5
       let lifetime = 0
-      tickers.push(time => {
+      addTicker('game-stuff', time => {
         if (!bee.particleActive) return
         pollenPixel.position.y += 0.0003 * FPS * gameSpeed
         lifetime += transferTo(1).inSeconds(1)
@@ -1079,7 +1108,7 @@ function createQueen(parent) {
     const text = new PIXI.Text('Loading', { ...fontConfig })
     text.position.x = 7
     text.position.y = 50
-    tickers.push(time => {
+    addTicker('ui', time => {
       let str = ''
       if (queenSprite.isAtType('brood')) {
         str = 'Laying egg'
@@ -1091,7 +1120,7 @@ function createQueen(parent) {
     return text
   }
 
-  tickers.push(time => {
+  addTicker('game-stuff', time => {
     queenSprite.animationTicker += speeds[gameSpeed]
     
     const targetBrood = queenSprite.isAtType('brood')
@@ -1216,7 +1245,7 @@ function createBee(parent, type, startPosition) {
     const text = new PIXI.Text('Loading', { ...fontConfig })
     text.position.x = 7
     text.position.y = 50
-    tickers.push(time => {
+    addTicker('ui', time => {
       let str = ''
       str += bee.isDead() ? 'Dead ;_;   ' : ''
       str += bee.type
@@ -1539,7 +1568,7 @@ function createBee(parent, type, startPosition) {
     return true
   }
 
-  tickers.push(time => {
+  addTicker('game-stuff', time => {
     bee.visible = true
 
     if (bee.position.y === 25) return
@@ -1713,7 +1742,7 @@ function cellPrepared(x, y, parent) {
     return container
   }
 
-  tickers.push(time => {
+  addTicker('game-stuff', time => {
     if (preparedCellSprite.done) {
       return;
     }
@@ -1747,7 +1776,7 @@ function cellHoney(x, y, parent) {
   honeySprite.isHoneyFull = () => honeySprite.honey >= honeySprite.HONEY_HEX_CAPACITY
   honeySprite.isHoneyEmpty = () => honeySprite.honey <= 0
   
-  tickers.push(time => {
+  addTicker('game-stuff', time => {
     if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.75) {
       honeySprite.texture = Texture.fromImage('cell-honey-full.png')
     } else if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.50) {
@@ -1819,7 +1848,7 @@ function cellWax(x, y, parent) {
   waxSprite.isWaxFull = () => waxSprite.wax >= waxSprite.WAX_HEX_CAPACITY
   waxSprite.isWaxEmpty = () => waxSprite.wax <= 0
   
-  tickers.push(time => {
+  addTicker('game-stuff', time => {
     
     if (waxSprite.wax <= 0) {
       waxSprite.wax = 1 // this is dirty
@@ -1906,13 +1935,13 @@ function cellConverter(x, y, parent) {
     const text = new PIXI.Text('Loading', { ...fontConfig })
     text.position.x = 7
     text.position.y = 50
-    tickers.push(time => {
+    addTicker('ui', time => {
       text.text = `Nectar   ${ Math.round(converterSprite.nectar) }`
     })
     return text
   }
 
-  tickers.push(time => {
+  addTicker('game-stuff', time => {
     animationSprite.delay++
     animationSprite.delay = animationSprite.delay < 12 ? animationSprite.delay : 0
     const hasAnyBee = bees.find(samePosition(converterSprite))
@@ -1958,7 +1987,7 @@ function cellBrood(x, y, parent) {
   const broodExclamation = Sprite.fromImage('exclamation-warning-severe.png')
   broodExclamation.position.x = 14
   broodExclamation.position.y = -6
-  broodExclamation.visible = true
+  broodExclamation.visible = false
   broodSprite.addChild(broodExclamation)
 
   makeSelectable(broodSprite, 'brood')
@@ -1991,6 +2020,7 @@ function cellBrood(x, y, parent) {
   }
   broodSprite.isWellFed = () => broodSprite.nutrition >= broodSprite.NUTRITION_CAPACITY - 10
   broodSprite.isDead = () => broodSprite.content === 'dead'
+  broodSprite.togglePause = () => broodSprite.paused = !broodSprite.paused
 
   const setTexture = () => {
     const item = broodSprite.content
@@ -2007,7 +2037,7 @@ function cellBrood(x, y, parent) {
     }
   }
 
-  tickers.push(time => {
+  addTicker('game-stuff', time => {
     setTexture()
     broodExclamation.visible = broodSprite.content === 'larvae' && broodSprite.nutrition < 20
     if (!broodSprite.content) return
@@ -2050,7 +2080,7 @@ function cellBrood(x, y, parent) {
     const text = new PIXI.Text('Loading', { ...fontConfig })
     text.position.x = 7
     text.position.y = 50
-    tickers.push(time => {
+    addTicker('ui', time => {
       const line2 = broodSprite.content === 'larvae' ? '\nNutrients: ' + Math.round(broodSprite.nutrition) : ''
       const line3 = ['egg', 'larvae', 'puppa'].includes(broodSprite.content) ? '\nLifecycle: ' + Math.round(broodSprite.lifecycle) : ''
       const line4 = '\n\n' + (broodSprite.content === 'dead' ? 'Larvae needs pollen to survive' : '')
@@ -2059,9 +2089,7 @@ function cellBrood(x, y, parent) {
     })
     c.addChild(text)
 
-    c.addChild(Button(5, 110, 'toggle active', () => {
-      broodSprite.paused = !broodSprite.paused
-    }))
+    c.addChild(Button(5, 110, 'toggle active', () => broodSprite.togglePause()))
     return c
   }
   
@@ -2084,7 +2112,7 @@ function cellPollen(x, y, parent) {
   pollenSprite.setPollen = (pollen) => pollenSprite.pollen = pollen
   pollenSprite.isPollenFull = () => pollenSprite.pollen >= pollenSprite.POLLEN_HEX_CAPACITY
   pollenSprite.isPollenEmpty = () => pollenSprite.pollen <= 0
-  tickers.push(time => {
+  addTicker('game-stuff', time => {
     if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.75) {
       pollenSprite.texture = Texture.fromImage('cell-pollen-full.png')
     } else if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.50) {
@@ -2100,7 +2128,7 @@ function cellPollen(x, y, parent) {
     const text = new PIXI.Text('Loading', { ...fontConfig })
     text.position.x = 7
     text.position.y = 50
-    tickers.push(time => text.text = 'Pollen   ' + Math.round(pollenSprite.pollen))
+    addTicker('ui', time => text.text = 'Pollen   ' + Math.round(pollenSprite.pollen))
     return text
   }
   
@@ -2112,7 +2140,7 @@ function ProgressBar(x, y, type, tickerData, max) {
   const progressSprite = Sprite.fromImage('images/ui/progress-bar/progress-' + type + '.png')
   progressSprite.position.x = x
   progressSprite.position.y = y
-  tickers.push(time => {
+  addTicker('ui', time => {
     const _max = max === undefined ? 100 : max
     progressSprite.width = (tickerData() / max) * 21  
   })
@@ -2135,11 +2163,15 @@ function Button(x, y, content, callback, hoverover, hoverout, _size) {
     hoverout && hoverout()
     buttonSprite.texture = Texture.fromImage(`images/ui/button-${size}/button-${size}-standard.png`)
   }
-  buttonSprite.mousedown = () => {
+  buttonSprite.mouseup = () => {
     if (swallow) return
     swallow = true
     buttonSprite.texture = Texture.fromImage(`images/ui/button-${size}/button-${size}-click.png`)
-    setTimeout(callback, 50)
+    setTimeout(() => {
+      callback()
+      swallow = false
+      buttonSprite.texture = Texture.fromImage(`images/ui/button-${size}/button-${size}-hover.png`)
+    }, 50)
   }
 
   if (typeof content === 'string') {
