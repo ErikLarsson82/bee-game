@@ -1157,9 +1157,18 @@ function createQueen(parent) {
 
 function createBee(parent, type, startPosition) {
   const bee = Sprite.fromImage('bee-drone-body.png')
+  bee.opacity = 1
+
+  const animationSprite = Sprite.fromImage('images/hex/nectar/cell-conversion-animation-a.png')
+  animationSprite.position.y = -2
+  animationSprite.visible = true
+  animationSprite.delay = 0
+  bee.addChild(animationSprite)
+  
   const beeAddon = Sprite.fromImage('bee-drone-legs.png')
   beeAddon.position.x = -1
   beeAddon.position.y = -1
+  beeAddon.opacity = 1
   bee.addChild(beeAddon)
   const honeyDrop = Sprite.fromImage('drop-honey.png')
   honeyDrop.position.x = 2
@@ -1207,10 +1216,16 @@ function createBee(parent, type, startPosition) {
   bee.setHoney = amount => { bee.honeySack = cap(0, bee.HONEY_SACK_CAPACITY)(amount); return bee }
   bee.type = type || 'unassigned'
   bee.setType = type => { bee.type = type; bee.idle = getIdlePosition(type) }
-  bee.showBee = () => bee.visible = true
-  bee.hideBee = () => bee.visible = false
   bee.determineIfVisible = () => bee.isAtType('converter') ? bee.hideBee() : bee.showBee()
-
+  bee.showBee = () => {
+    bee.opacity = 1
+    beeAddon.visible = true
+  }
+  bee.hideBee = () => {
+    bee.opacity = 0
+    beeAddon.visible = false
+  }
+  
   const isPollenSackFull = () => bee.pollenSack >= bee.POLLEN_SACK_CAPACITY
   const isPollenSackEmpty = () => !(bee.pollenSack > 0)
 
@@ -1574,7 +1589,24 @@ function createBee(parent, type, startPosition) {
   }
 
   addTicker('game-stuff', time => {
-    bee.visible = true
+    // bee.visible = true
+
+    {
+      animationSprite.delay++
+      animationSprite.delay = animationSprite.delay < 12 ? animationSprite.delay : 0
+      // const hasAnyBee = bees.find(samePosition(converterSprite))
+      // const isOccupied = hasAnyBee !== undefined
+      // const isConverting = hasAnyBee && hasAnyBee.type === 'worker'
+      const isConverting = bee.isAtType('converter') && bee.type === 'worker'
+      if (isConverting) {
+        animationSprite.visible = true
+        animationSprite.texture = animationSprite.delay > 6
+          ? Texture.fromImage('images/hex/nectar/cell-conversion-animation-a.png')
+          : Texture.fromImage('images/hex/nectar/cell-conversion-animation-b.png')
+      } else {
+        animationSprite.visible = false
+      }
+    }
 
     if (bee.position.y === 25) return
 
@@ -1915,12 +1947,6 @@ function cellConverter(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const converterSprite = Sprite.fromImage('images/hex/nectar/cell-nectar-empty.png')
   
-  const animationSprite = Sprite.fromImage('images/hex/nectar/cell-conversion-animation-a.png')
-  animationSprite.position.y = -2
-  animationSprite.visible = false
-  animationSprite.delay = 0
-  converterSprite.addChild(animationSprite)
-  
   makeSelectable(converterSprite, 'converter')
   makeOccupiable(converterSprite)
   makeHexDetectable(converterSprite)
@@ -1966,20 +1992,6 @@ function cellConverter(x, y, parent) {
   }
 
   addTicker('game-stuff', time => {
-    animationSprite.delay++
-    animationSprite.delay = animationSprite.delay < 12 ? animationSprite.delay : 0
-    const hasAnyBee = bees.find(samePosition(converterSprite))
-    const isOccupied = hasAnyBee !== undefined
-    const isConverting = hasAnyBee && hasAnyBee.type === 'worker'
-    if (isConverting) {
-      animationSprite.visible = true
-      animationSprite.texture = animationSprite.delay > 6
-        ? Texture.fromImage('images/hex/nectar/cell-conversion-animation-a.png')
-        : Texture.fromImage('images/hex/nectar/cell-conversion-animation-b.png')
-    } else {
-      animationSprite.visible = false
-    }
-
     if (converterSprite.nectar > converterSprite.NECTAR_CAPACITY * 0.9) {
       converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-full.png')
     } else if (converterSprite.nectar > converterSprite.NECTAR_CAPACITY * 0.72) {
