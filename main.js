@@ -219,6 +219,8 @@ function setup() {
   }
 
   backgroundScene = Sprite.fromImage('images/scene/background-summer.png')
+  backgroundScene.interactive = true
+  backgroundScene.mouseup = () => setSelected(null)
   background.addChild(backgroundScene)
 
   nightDimmer = new Graphics()
