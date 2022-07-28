@@ -1914,7 +1914,7 @@ function cellConverter(x, y, parent) {
   
   const animationSprite = Sprite.fromImage('images/hex/nectar/cell-conversion-animation-a.png')
   animationSprite.position.y = -2
-  animationSprite.visible = true
+  animationSprite.visible = false
   animationSprite.delay = 0
   converterSprite.addChild(animationSprite)
   
@@ -2110,6 +2110,7 @@ function cellPollen(x, y, parent) {
   pollenSprite.setPollen = (pollen) => pollenSprite.pollen = pollen
   pollenSprite.isPollenFull = () => pollenSprite.pollen >= pollenSprite.POLLEN_HEX_CAPACITY
   pollenSprite.isPollenEmpty = () => pollenSprite.pollen <= 0
+  
   addTicker('game-stuff', time => {
     if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.75) {
       pollenSprite.texture = Texture.fromImage('cell-pollen-full.png')
@@ -2122,12 +2123,37 @@ function cellPollen(x, y, parent) {
     }
   })
 
+  pollenSprite.panelLabel = () => false
+  pollenSprite.panelPosition = () => ({ x: pixelCoordinate.x + 8, y: pixelCoordinate.y + 5 })
+
   pollenSprite.panelContent = () => {
-    const text = new PIXI.Text('Loading', { ...fontConfig })
-    text.position.x = 7
-    text.position.y = 50
-    addTicker('ui', time => text.text = 'Pollen   ' + Math.round(pollenSprite.pollen))
-    return text
+    const container = new Container()
+    
+    const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
+    whiteLine.position.x = 0
+    whiteLine.position.y = -30
+    container.addChild(whiteLine)
+
+    const content = Sprite.fromImage('images/ui/content-pollen-hex.png')
+    content.position.x = 72
+    content.position.y = -29
+    container.addChild(content)
+
+    container.addChild(ProgressBar(113, -15, 'pollen', () => pollenSprite.pollen, pollenSprite.POLLEN_HEX_CAPACITY))
+
+    const textHeading = new PIXI.Text('POLLEN HEX', { ...picoFontConfig })
+    textHeading.scale.set(0.15, 0.15)
+    textHeading.position.x = 90
+    textHeading.position.y = -26
+    container.addChild(textHeading)
+
+    const textDescription = new PIXI.Text('POLLEN', { ...picoFontConfig, fill: '#96a5bc' })
+    textDescription.scale.set(0.15, 0.15)
+    textDescription.position.x = 86
+    textDescription.position.y = -16
+    container.addChild(textDescription)
+
+    return container
   }
   
   parent.addChild(pollenSprite)
