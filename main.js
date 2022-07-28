@@ -1929,14 +1929,37 @@ function cellConverter(x, y, parent) {
   converterSprite.isNectarFull = () => converterSprite.nectar >= converterSprite.NECTAR_CAPACITY
   converterSprite.isNectarEmpty = () => converterSprite.nectar <= 0
  
+  converterSprite.panelLabel = () => false
+  converterSprite.panelPosition = () => ({ x: pixelCoordinate.x + 8, y: pixelCoordinate.y + 5 })
+
   converterSprite.panelContent = () => {
-    const text = new PIXI.Text('Loading', { ...fontConfig })
-    text.position.x = 7
-    text.position.y = 50
-    addTicker('ui', time => {
-      text.text = `Nectar   ${ Math.round(converterSprite.nectar) }`
-    })
-    return text
+    const container = new Container()
+    
+    const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
+    whiteLine.position.x = 0
+    whiteLine.position.y = -30
+    container.addChild(whiteLine)
+
+    const content = Sprite.fromImage('images/ui/content-nectar-hex.png')
+    content.position.x = 72
+    content.position.y = -29
+    container.addChild(content)
+
+    container.addChild(ProgressBar(113, -15, 'nectar', () => converterSprite.nectar, converterSprite.NECTAR_CAPACITY))
+
+    const textHeading = new PIXI.Text('NECTAR HEX', { ...picoFontConfig })
+    textHeading.scale.set(0.15, 0.15)
+    textHeading.position.x = 90
+    textHeading.position.y = -26
+    container.addChild(textHeading)
+
+    const textDescription = new PIXI.Text('NECTAR', { ...picoFontConfig, fill: '#96a5bc' })
+    textDescription.scale.set(0.15, 0.15)
+    textDescription.position.x = 86
+    textDescription.position.y = -16
+    container.addChild(textDescription)
+
+    return container
   }
 
   addTicker('game-stuff', time => {
