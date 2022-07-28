@@ -1,38 +1,10 @@
-// Amelies kommentarer:
-// - Kunna bestämma vilka bin som gör vad
-// Jobb:
-// --- nursers
-// --- foragers
-// --- architect (behöver vax?)
-// --- honey maker (behöver byggnad?)
-// --- undertaker (behöver byggnad?)
-
-// - Hus till varje bi!
-// - Workers (eller vilka som helst) måste bygga celler med vax
-// - Skapa vax!
-// - "Hej, jag har ingen bikupa får jag vara med er?" :)
-
 // Speed affects "physics-engine"-buggen
-
-// Speed 0, 1x, 2x and 4x
-
-// Slider to determine the amount of pollenation and bringing resources back to base
-
-// Too much focus on pollenation -> no resources (but many flowers)
-
-// Focus on gathering resources -> no or reduced amount of flowers (but short term resource gains)
-
-// Either use decimals or not, but dont mix
-
-// Have worker bees convert hexes
-
-// Things should be globally pauseable
-
 // Anchor everything at 0.5 to fix placements 
-
-// Do not occupy the pollen hexes when they are empty
-
-// Eventlog
+// Update UI even though game is paused
+// Clickable Shadows on idle spots
+// Circle selection on Bees
+// Selection on flower
+// Warning on flowers 
 
 const MAP_SELECTION = 'default'
 let DEBUG = false
@@ -335,6 +307,10 @@ function setup() {
   document.addEventListener('visibilitychange', handleVisibilityChange, false)
 }
 
+function isDayBeforeWinter() {
+  return cycles[0] === 1 && season === 'summer'
+}
+
 function gameLoop(delta, manualTick) {
   if (paused && !manualTick) return
   
@@ -346,7 +322,7 @@ function gameLoop(delta, manualTick) {
     hour = 0
     day++
     cycles[0]--
-    if (cycles[0] === 1 && season === 'summer') {
+    if (isDayBeforeWinter()) {
       warning.visible = true
     }
     if (cycles[0] === 0) {
@@ -371,6 +347,13 @@ function createFlowers() {
   const positions = [10, -50, 60, -110, 120, -160, 170]
   for (var f = 0; f < seeds; f++) {
     const flower = Sprite.fromImage('images/scene/flower.png')
+
+    const flowerExclamation = Sprite.fromImage('exclamation-warning-severe.png')
+    flowerExclamation.position.x = 20
+    flowerExclamation.position.y = -20
+    flowerExclamation.visible = false
+    flower.addChild(flowerExclamation)
+
     const flipped = Math.random() < 0.5
     makeOccupiable(flower)
     makeSelectable(flower, 'flower')
@@ -380,8 +363,8 @@ function createFlowers() {
     flower.isPollinated = () => flower.pollinationLevel >= flower.POLLINATION_REQUIREMENT
     
     flower.scale.x = flipped ? -1 : 1
-    flower.anchor.set(flipped ? 0.55 : 0.27, 0.2)
-    flower.position.x = (WIDTH / 4) + (positions[f] ? positions[f] : f)
+    flower.anchor.set(flipped ? 0.6 : 0.2, 0.2)
+    flower.position.x = Math.round((WIDTH / 4) + (positions[f] ? positions[f] : f))
     flower.position.y = 330
     flowerBed.addChild(flower)
 
@@ -419,6 +402,7 @@ function createFlowers() {
     }
 
     tickers.push(() => {
+      flowerExclamation.visible = isDayBeforeWinter() && !flower.isPollinated()
       if (flower.isPollinated()) {
         flower.texture = Texture.fromImage('images/scene/flower-pollinated.png')        
       }
