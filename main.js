@@ -147,28 +147,50 @@ function setup() {
     
     populationText = new PIXI.Text('Loading', { ...picoFontConfig, ...largeFont })
     populationText.position.x = 5
-    populationText.position.y = 2
+    populationText.position.y = 4
     uiTopBar.addChild(populationText)
 
-    const dayCycle = new PIXI.Text('Loading', { ...picoFontConfig, ...largeFont })
-    dayCycle.position.x = 210
-    dayCycle.position.y = 2
-    uiTopBar.addChild(dayCycle)
+    const timelineText = new PIXI.Text('Loading', { ...picoFontConfig, ...largeFont, fill: 'gray' })
+    timelineText.position.x = 210
+    timelineText.position.y = 4
+    uiTopBar.addChild(timelineText)
     tickers.push(time => {
-      dayCycle.text = 'Year ' + year + ' Day ' + day + ' Hour ' + Math.round(hour)
+      timelineText.text = 'Year   Day   Hour'
     })
 
+    const yearLabel = new PIXI.Text('Loading', { ...picoFontConfig, ...largeFont })
+    yearLabel.position.x = 250
+    yearLabel.position.y = 4
+    uiTopBar.addChild(yearLabel)
+
+    const dayLabel = new PIXI.Text('Loading', { ...picoFontConfig, ...largeFont })
+    dayLabel.position.x = 300
+    dayLabel.position.y = 4
+    uiTopBar.addChild(dayLabel)
+
+    const hourLabel = new PIXI.Text('Loading', { ...picoFontConfig, ...largeFont })
+    hourLabel.position.x = 354
+    hourLabel.position.y = 4
+    uiTopBar.addChild(hourLabel)
+
+    tickers.push(time => {
+      yearLabel.text = year
+      dayLabel.text = day
+      hourLabel.text = Math.round(hour)
+    })
+
+
     const seasonCycle = new PIXI.Text('Loading', { ...picoFontConfig, ...largeFont })
-    seasonCycle.position.x = 400
-    seasonCycle.position.y = 2
+    seasonCycle.position.x = 396
+    seasonCycle.position.y = 4
     uiTopBar.addChild(seasonCycle)
     tickers.push(time => {
       seasonCycle.text = season === 'summer' ? 'Summer' : 'Winter'
     })
 
     const pausedText = new PIXI.Text('Playing', { ...picoFontConfig, ...largeFont })
-    pausedText.position.x = 480
-    pausedText.position.y = 3
+    pausedText.position.x = 470
+    pausedText.position.y = 4
     uiTopBar.addChild(pausedText)
 
     const pauseFrame = new Graphics()
