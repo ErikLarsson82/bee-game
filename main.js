@@ -363,37 +363,50 @@ function isGameStuff(ticker) {
   return ticker.type === 'game-stuff'
 }
 
+function isBee() {
+
+}
+
 function gameLoop(delta, manualTick) {
   tickers = tickers.filter(ticker => ticker.remove === false)
 
   tickers.filter(isUI).forEach(ticker => ticker.func());
 
+  if (selected && selected.panelContent) {
+    const { x, y } = selected.panelPosition && selected.panelPosition() || { x: 350, y: 100 }
+    panel.position.x = x
+    panel.position.y = y
+  }
+
   if (paused && !manualTick) return
   
   tickers.filter(isGameStuff).forEach(ticker => ticker.func());
 
-  hour += transferTo(24).inMinutes(5)
+  {
+    // Time management
+    hour += transferTo(24).inMinutes(5)
 
-  if (hour > 24) {
-    hour = 0
-    day++
-    cycles[0]--
-    if (isDayBeforeWinter()) {
-      warning.visible = true
-    }
-    if (cycles[0] === 0) {
-      warning.visible = false
-      cycles = cycles.slice(1)
-      season = season === 'summer' ? 'winter' : 'summer'
-      if (season === 'summer') {
-        backgroundScene.texture = Texture.fromImage('images/scene/background-summer.png')        
-        year++
-        day = 1
-        createFlowers()
-      } else {
-        backgroundScene.texture = Texture.fromImage('images/scene/background-winter.png')
-        killFlowers()
-        killBroodlings()
+    if (hour > 24) {
+      hour = 0
+      day++
+      cycles[0]--
+      if (isDayBeforeWinter()) {
+        warning.visible = true
+      }
+      if (cycles[0] === 0) {
+        warning.visible = false
+        cycles = cycles.slice(1)
+        season = season === 'summer' ? 'winter' : 'summer'
+        if (season === 'summer') {
+          backgroundScene.texture = Texture.fromImage('images/scene/background-summer.png')        
+          year++
+          day = 1
+          createFlowers()
+        } else {
+          backgroundScene.texture = Texture.fromImage('images/scene/background-winter.png')
+          killFlowers()
+          killBroodlings()
+        }
       }
     }
   }
@@ -517,7 +530,7 @@ function createMap(m) {
    
   if (m === 'default') {
     seeds = 2
-    createBee(beeContainer, 'idle').setHunger(40).setAge(80)
+    createBee(beeContainer, 'idle').setHunger(40).setAge(80).setPollen(120).setWax(60).setNectar(60).setHoney(10)
     createBee(beeContainer, 'idle').setHunger(42).setAge(60)
     createBee(beeContainer, 'idle').setHunger(50).setAge(20)
     createBee(beeContainer, 'idle').setHunger(80).setAge(10)
@@ -743,13 +756,8 @@ function setSelected(item) {
   if (!item) {
     return;  
   }
-  
-  if (item.panelContent) {
-    const { x, y } = item.panelPosition && item.panelPosition() || { x: 350, y: 100 }
-    panel.position.x = x
-    panel.position.y = y
-    panel.addChild(item.panelContent())
-  }
+
+  panel.addChild(item.panelContent())
 
   if (item.label && !(item.panelLabel && item.panelLabel() !== true)) {
     const panelText = new PIXI.Text(item.label, { ...fontConfig })
@@ -977,24 +985,24 @@ function getIdlePosition(type) {
 }
 
 function makeHungry(bee) {
-  const HUNGER_CAPACITY = 100
-  bee.hunger = HUNGER_CAPACITY
+  bee.HUNGER_CAPACITY = 100
+  bee.hunger = bee.HUNGER_CAPACITY
   bee.isDead = () => bee.hunger <= 0 || bee.age >= 100
-  bee.isWellFed = () => bee.hunger >= HUNGER_CAPACITY
+  bee.isWellFed = () => bee.hunger >= bee.HUNGER_CAPACITY
   bee.isHungry = () => bee.hunger < 30
-  bee.setHunger = amount => { bee.hunger = cap(0, HUNGER_CAPACITY)(amount); return bee }
+  bee.setHunger = amount => { bee.hunger = cap(0, bee.HUNGER_CAPACITY)(amount); return bee }
 
   bee.consumeEnergy = () => {
     // A bee will survive approx 15 minuter at speed 1 with a full belly, which is 15 min * 60 sec = 900 sec
     // 900 sec * 144 FPS = 129600 game ticks
     // 100 hunger value points / 129600 gameticks = 0.00077160 reduction in hunger each tick
-    bee.hunger -= transferTo(HUNGER_CAPACITY).inSeconds(900)
-    bee.hunger = cap(0, HUNGER_CAPACITY)(bee.hunger)
+    bee.hunger -= transferTo(bee.HUNGER_CAPACITY).inSeconds(900)
+    bee.hunger = cap(0, bee.HUNGER_CAPACITY)(bee.hunger)
   }
 
   bee.eat = () => {
-    bee.hunger += transferTo(HUNGER_CAPACITY).inSeconds(20)      
-    bee.hunger = cap(0, HUNGER_CAPACITY)(bee.hunger)
+    bee.hunger += transferTo(bee.HUNGER_CAPACITY).inSeconds(20)      
+    bee.hunger = cap(0, bee.HUNGER_CAPACITY)(bee.hunger)
   }
 
   bee.feedBee = () => {
@@ -1209,11 +1217,12 @@ function createBee(parent, type, startPosition) {
   bee.setAge = amount => { bee.age = amount; return bee }
   bee.pollenSack = 0
   bee.setPollen = amount => { bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(amount); return bee }
-  bee.waxSack = 0
   bee.nectarSack = 0
   bee.setNectar = amount => { bee.nectarSack = cap(0, bee.NECTAR_SACK_CAPACITY)(amount); return bee }
   bee.honeySack = 0
   bee.setHoney = amount => { bee.honeySack = cap(0, bee.HONEY_SACK_CAPACITY)(amount); return bee }
+  bee.waxSack = 0
+  bee.setWax = amount => { bee.waxSack = cap(0, bee.WAX_SACK_CAPACITY)(amount); return bee }
   bee.type = type || 'unassigned'
   bee.setType = type => { bee.type = type; bee.idle = getIdlePosition(type) }
   bee.determineIfVisible = () => bee.isAtType('converter') ? bee.hideBee() : bee.showBee()
@@ -1240,20 +1249,20 @@ function createBee(parent, type, startPosition) {
 
   const helperText = () => {
     if (bee.type === 'forager' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y && isPollenSackFull()) {
-      return 'Cannot find pollen hexagon'
+      return 'Cannot find\npollen hexagon'
     }
     if (bee.type === 'nurser' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) {
       if (isPollenSackFull()) {
-        return 'Cannot find larvae'
+        return 'Cannot find\nlarvae'
       } else {
-        return 'Cannot find pollen hexagon'
+        return 'Cannot find\npollen hexagon'
       }
     }
     if (bee.type === 'worker' && !bee.isMoving() && isHoneySackFull() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) {
-      return 'Honey sack full, cannot\nfind honey hexagon\nto deposit honey too'
+      return 'Honey sack\nfull. Cannot\nfind honey\nhexagon to\ndeposit honey\ntoo'
     }
     if (bee.type === 'worker' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) {
-      return 'Cannot find a converter\nhex filled with nectar'
+      return 'Cannot find a\nconverter hex\nfilled with\nnectar'
     }
     if (bee.type === 'idle') {
       return 'Bee is idle'
@@ -1261,26 +1270,54 @@ function createBee(parent, type, startPosition) {
     return ''
   }
 
+  bee.panelLabel = () => false
+  bee.panelPosition = () => ({ x: bee.position.x + 8, y: bee.position.y + 5 })
+
   bee.panelContent = () => {
-    const text = new PIXI.Text('Loading', { ...fontConfig })
-    text.position.x = 7
-    text.position.y = 50
-    addTicker('ui', time => {
-      let str = ''
-      str += bee.isDead() ? 'Dead ;_;   ' : ''
-      str += bee.type
-      str += '\n\n'
-      str += helperText()
-      str += '\n\n'
-      str += 'Pollen  ' + Math.round(bee.pollenSack) + '\n'
-      str += 'Nectar  ' + Math.round(bee.nectarSack) + '\n'
-      str += 'Wax     ' + Math.round(bee.waxSack) + '\n'
-      str += 'Honey   ' + Math.round(bee.honeySack) + '\n\n'
-      str += 'Hunger  ' + Math.round(bee.hunger) + '\n'
-      str += 'Age     ' + Math.round(bee.age)
-      text.text = str
+    const container = new Container()
+    
+    const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
+    whiteLine.position.x = 0
+    whiteLine.position.y = -30
+    container.addChild(whiteLine)
+
+    const content = Sprite.fromImage('images/ui/content-boilerplate.png')
+    content.position.x = 72
+    content.position.y = -29
+    container.addChild(content)
+
+    const p = [-15, -15 + (1 * 9), -15 + (2 * 9), -15 + (3 * 9), -15 + (4 * 9)]
+    container.addChild(ProgressBar(112, p[0], 'hunger', () => bee.hunger, bee.HUNGER_CAPACITY))
+    container.addChild(ProgressBar(112, p[1], 'honey', () => bee.honeySack, bee.HONEY_SACK_CAPACITY))
+    container.addChild(ProgressBar(112, p[2], 'nectar', () => bee.nectarSack, bee.NECTAR_SACK_CAPACITY))
+    container.addChild(ProgressBar(112, p[3], 'wax', () => bee.waxSack, bee.WAX_SACK_CAPACITY))
+    container.addChild(ProgressBar(112, p[4], 'pollen', () => bee.pollenSack, bee.POLLEN_SACK_CAPACITY))
+    
+    const textHeading = new PIXI.Text('BEE', { ...picoFontConfig })
+    textHeading.scale.set(0.15, 0.15)
+    textHeading.position.x = 100
+    textHeading.position.y = -26
+    container.addChild(textHeading)
+
+    const texts = ['HUNGER', 'HONEY', 'NECTAR', 'WAX', 'POLLEN']
+
+    texts.forEach((text, idx) => {
+      const textDescription = new PIXI.Text(text, { ...picoFontConfig, fill: '#96a5bc' })
+      textDescription.scale.set(0.15, 0.15)
+      textDescription.position.x = 82
+      textDescription.position.y = -16 + (idx * 9)
+      container.addChild(textDescription)
     })
-    return text
+
+    const helper = new PIXI.Text('Loading...', { ...picoFontConfig })
+    helper.scale.set(0.15, 0.15)
+    helper.position.x = 82
+    helper.position.y = 35
+    container.addChild(helper)
+
+    addTicker('ui', () => helper.text = helperText())
+    
+    return container
   }
 
   function flyToAndDepositNectar() {
