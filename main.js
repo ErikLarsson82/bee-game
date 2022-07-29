@@ -531,7 +531,7 @@ function createMap(m) {
    
   if (m === 'default') {
     seeds = 2
-    createBee(beeContainer, 'idle').setHunger(5).setAge(80)
+    createBee(beeContainer, 'idle').setHunger(40).setAge(80)
     createBee(beeContainer, 'idle').setHunger(42).setAge(60)
     createBee(beeContainer, 'idle').setHunger(50).setAge(20)
     createBee(beeContainer, 'idle').setHunger(80).setAge(10)
