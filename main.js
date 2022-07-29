@@ -1887,13 +1887,14 @@ function cellPrepared(x, y, parent) {
     return container
   }
 
-  addTicker('game-stuff', time => {
+  addTicker('ui', time => {
     if (preparedCellSprite.done) {
       spriteExclamation.visible = false
       return;
     }
     spriteExclamation.visible = needsHelp()
-    
+  })
+  addTicker('game-stuff', time => {
     if (preparedCellSprite.completeness >= 100) {
       preparedCellSprite.texture = Texture.fromImage('cell-prepared-complete.png')
       if (selected === preparedCellSprite) setSelected(null)
