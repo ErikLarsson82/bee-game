@@ -773,8 +773,6 @@ function activateAdjacent(_x, _y) {
 }
 
 function setSelected(item) {
-  console.log(item)
-  debugger;
   // start with cleanup of panel
   panel.removeChildren()
   
