@@ -1157,24 +1157,6 @@ function createQueen(parent) {
     return container
   }
 
-  /*
-  queenSprite.panelContent = () => {
-    const text = new PIXI.Text('Loading', { ...fontConfig })
-    text.position.x = 7
-    text.position.y = 50
-    addTicker('ui', time => {
-      let str = ''
-      if (queenSprite.isAtType('brood')) {
-        str = 'Laying egg'
-      } else if (!queenSprite.isMoving()) {
-        str = 'Cannot find empty brood\nhexagon to lay eggs in'
-      }      
-      text.text = str
-    })
-    return text
-  }
-  */
-
   addTicker('game-stuff', time => {
     queenSprite.animationTicker += speeds[gameSpeed]
     
