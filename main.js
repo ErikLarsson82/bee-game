@@ -5,7 +5,7 @@
 // Selection on flower
 // Testa noll padding mellan hexagoner
 
-const MAP_SELECTION = 'loe'
+const MAP_SELECTION = 'default'
 let DEBUG = false
 
 const fontConfig = {
@@ -47,8 +47,9 @@ const Container = PIXI.Container,
     Sprite = PIXI.Sprite,
     Graphics = PIXI.Graphics,
     Texture = PIXI.Texture,
-    PictureSprite = PIXI.extras.PictureSprite
-    settings = PIXI.settings
+    PictureSprite = PIXI.extras.PictureSprite,
+    settings = PIXI.settings,
+    Transform = PIXI.Transform
 
 loader.add("pico8-mono.ttf")
 loader.load(setup)
@@ -848,6 +849,8 @@ function makeFlyable(sprite) {
     }
     const x = targetSprite.position.x - sprite.position.x
     const y = targetSprite.position.y - sprite.position.y
+
+    sprite.setShadowPosition()
     if (x === 0 && y === 0) return
     const direction = new PIXI.Point(x, y).normalize()
 
@@ -867,6 +870,8 @@ function makeFlyable(sprite) {
     sprite.position.x += sprite.vx
     sprite.position.y += sprite.vy
     snapTo(sprite, targetSprite)
+
+    sprite.setShadowPosition()
   }
   sprite.isMoving = () => {
     return sprite.vx !== 0 || sprite.vy !== 0
@@ -1001,7 +1006,7 @@ function getIdlePosition(type) {
   }[type]
 
   const beesPerRow = 7
-  const filteredBees = bees.filter(x => x.type === type)
+  const filteredBees = bees.filter(x => x.type === type && !x.isDead())
   
   return {
     x: 200 - (filteredBees.length % beesPerRow * 11),
@@ -1142,6 +1147,8 @@ function createQueen(parent) {
   makeFlyable(queenSprite)
   makeHexDetectable(queenSprite)
 
+  queenSprite.setShadowPosition = () => {}
+
   const helperText = () => {
     if (season === 'winter') return 'Does not\nlay eggs\nin winter'
     if (queenSprite.isAtType('brood')) return 'Laying egg'
@@ -1215,7 +1222,10 @@ function createQueen(parent) {
 function createBee(parent, type, startPosition) {
   const bee = Sprite.fromImage('bee-drone-body.png')
   bee.opacity = 1
-
+  
+  const shadow = Sprite.fromImage('images/bee/shadow.png')
+  bee.addChild(shadow)
+  
   const animationSprite = Sprite.fromImage('images/hex/nectar/cell-conversion-animation-a.png')
   animationSprite.position.y = -2
   animationSprite.visible = true
@@ -1674,15 +1684,21 @@ function createBee(parent, type, startPosition) {
     return true
   }
 
-  addTicker('game-stuff', time => {
-    // bee.visible = true
+  bee.setShadowPosition = () => {
+    const xPos = 0 - bee.position.x + bee.idle.x + 2
+    shadow.position.x = bee.scale.x === 1 ? xPos : -xPos - 8
+    shadow.position.y = 0 - bee.position.y + bee.idle.y + 4
+  }
 
+  addTicker('ui', time => {
+    bee.setShadowPosition()
+  })
+
+  addTicker('game-stuff', time => {
+    bee.setShadowPosition()
     {
       animationSprite.delay++
       animationSprite.delay = animationSprite.delay < 12 ? animationSprite.delay : 0
-      // const hasAnyBee = bees.find(samePosition(converterSprite))
-      // const isOccupied = hasAnyBee !== undefined
-      // const isConverting = hasAnyBee && hasAnyBee.type === 'worker'
       const isConverting = bee.isAtType('converter') && bee.type === 'worker'
       if (isConverting) {
         animationSprite.visible = true
@@ -1750,6 +1766,8 @@ function createBee(parent, type, startPosition) {
     if (bee.type === 'nurser') nurser()
     if (bee.type === 'worker') worker()
     if (bee.type === 'idle') idle()
+    
+    bee.setShadowPosition()
   })
 
   bees.push(bee)
@@ -2492,7 +2510,4 @@ window.addEventListener('keydown', e => {
     
   setGameSpeedText()
 })
-
-
-// setup()
 
