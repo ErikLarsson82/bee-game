@@ -531,7 +531,7 @@ function createMap(m) {
    
   if (m === 'default') {
     seeds = 2
-    createBee(beeContainer, 'idle').setHunger(40).setAge(80)
+    createBee(beeContainer, 'idle').setHunger(5).setAge(80)
     createBee(beeContainer, 'idle').setHunger(42).setAge(60)
     createBee(beeContainer, 'idle').setHunger(50).setAge(20)
     createBee(beeContainer, 'idle').setHunger(80).setAge(10)
@@ -1304,8 +1304,23 @@ function createBee(parent, type, startPosition) {
   const isWaxSackEmpty = () => !(bee.waxSack > 0)
 
   const helperText = () => {
+    if (bee.type === 'dead' && bee.hunger === 0) {
+      return 'Bee died\nof hunger'
+    }
+    if (bee.type === 'dead') {
+      return 'Bee died\nof old age'
+    }
+    if (bee.type === 'worker' && bee.isHungry()) {
+      return '  Bee is\nhungry\n\nWorkers\neat when\nmaking honey'
+    }
+    if (bee.type !== 'worker' && bee.isHungry()) {
+      return '  Bee is\nhungry\n\nNeeds access\nto honey\nhexagon'
+    }
     if (bee.type === 'forager' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y && isPollenSackFull()) {
-      return 'Cannot find\npollen hexagon'
+      return 'Cannot find\nunoccupied\npollen hexagon'
+    }
+    if (bee.type === 'forager' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) {
+      return 'Cannot find\nunoccupied\nflower'
     }
     if (bee.type === 'nurser' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) {
       if (isPollenSackFull()) {
@@ -1319,12 +1334,6 @@ function createBee(parent, type, startPosition) {
     }
     if (bee.type === 'worker' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) {
       return 'Cannot find a\nconverter hex\nfilled with\nnectar'
-    }
-    if (bee.type === 'dead' && bee.hunger === 0) {
-      return 'Bee died\nof hunger'
-    }
-    if (bee.type === 'dead') {
-      return 'Bee died\nof old age'
     }
     if (bee.type === 'idle') {
       return 'Bee needs\na job'
@@ -1347,6 +1356,12 @@ function createBee(parent, type, startPosition) {
     content.position.x = 72
     content.position.y = -29
     container.addChild(content)
+
+    const beeExclamationLabel = Sprite.fromImage('exclamation-warning-severe.png')
+    beeExclamationLabel.position.x = 84
+    beeExclamationLabel.position.y = 32
+    beeExclamationLabel.visible = false
+    container.addChild(beeExclamationLabel)
 
     const p = [-15, -15 + (1 * 9), -15 + (2 * 9), -15 + (3 * 9), -15 + (4 * 9)]
     container.addChild(ProgressBar(112, p[0], 'hunger', () => bee.hunger, bee.HUNGER_CAPACITY))
@@ -1377,7 +1392,10 @@ function createBee(parent, type, startPosition) {
     helper.position.y = 35
     container.addChild(helper)
 
-    addTicker('ui', () => helper.text = helperText())
+    addTicker('ui', () => {
+      beeExclamationLabel.visible = bee.isHungry() && !bee.isDead()
+      helper.text = helperText()
+    })
     
     return container
   }
