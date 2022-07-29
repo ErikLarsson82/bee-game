@@ -22,6 +22,10 @@ const picoFontConfig = {
     fill: 'white'
 }
 
+const smallFont = {
+    fontSize: 4
+}
+
 const largeFont = {
     fontSize: 8
 }
@@ -247,25 +251,25 @@ function setup() {
   jobsPanel.position.y = 95
   background.addChild(jobsPanel)
 
-  const unassignedText = new PIXI.Text('-', { ...fontConfig, fill: 'white' })
+  const unassignedText = new PIXI.Text('-', { ...picoFontConfig, ...smallFont })
   unassignedText.anchor.set(1, 0)
   unassignedText.position.x = 73
   unassignedText.position.y = 3
   jobsPanel.addChild(unassignedText)
 
-  const foragerText = new PIXI.Text('-', { ...fontConfig, fill: 'white' })
+  const foragerText = new PIXI.Text('-', { ...picoFontConfig, ...smallFont })
   foragerText.anchor.set(1, 0)
   foragerText.position.x = 52
   foragerText.position.y = 41.5
   jobsPanel.addChild(foragerText)
 
-  const nurserText = new PIXI.Text('-', { ...fontConfig, fill: 'white' })
+  const nurserText = new PIXI.Text('-', { ...picoFontConfig, ...smallFont })
   nurserText.anchor.set(1, 0)
   nurserText.position.x = 50
   nurserText.position.y = 79.5
   jobsPanel.addChild(nurserText)
 
-  const workerText = new PIXI.Text('-', { ...fontConfig, fill: 'white' })
+  const workerText = new PIXI.Text('-', { ...picoFontConfig, ...smallFont })
   workerText.anchor.set(1, 0)
   workerText.position.x = 53
   workerText.position.y = 117.5
@@ -2032,7 +2036,7 @@ function cellHoney(x, y, parent) {
     textDescription.position.y = -16
     container.addChild(textDescription)
 
-    const button = Button(70, 30, 'Convert to Wax', () => {
+    const button = Button(84, -6, 'Make Wax', () => {
       replaceHex([x, y], 'wax')
       setSelected(null) 
     })
@@ -2393,7 +2397,7 @@ function cellBrood(x, y, parent) {
     })
 
 
-    const button = Button(70, 20, 'Toggle active', () => broodSprite.togglePause())
+    const button = Button(83, 60, 'Disable', () => broodSprite.togglePause())
     container.addChild(button)
     
     return container
@@ -2507,7 +2511,7 @@ function Button(x, y, content, callback, hoverover, hoverout, _size) {
   }
 
   if (typeof content === 'string') {
-    const buttonText = new PIXI.Text(content, { ...fontConfig })
+    const buttonText = new PIXI.Text(content, { ...picoFontConfig, ...smallFont })
     buttonText.position.x = 7
     buttonText.position.y = 3
     buttonSprite.addChild(buttonText)    
