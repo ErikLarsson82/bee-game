@@ -1631,6 +1631,7 @@ function createBee(parent, type, startPosition) {
     bee.determineIfVisible()
     if (ageBee()) return
     if (depositHoney()) return
+    if (refillWax()) return
     if (season === 'summer') {
       bee.consumeEnergy()
     } else {
@@ -1638,7 +1639,6 @@ function createBee(parent, type, startPosition) {
     }
     if (prepareCell()) return
     if (flyToPrepareCell()) return
-    if (refillWax()) return
     if (flyToWax()) return
     if (flyToHoney()) return
     if (convertNectar()) return
