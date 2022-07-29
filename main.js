@@ -1630,22 +1630,19 @@ function createBee(parent, type, startPosition) {
   function worker() {
     bee.determineIfVisible()
     if (ageBee()) return
+    if (depositHoney()) return
     if (season === 'summer') {
       bee.consumeEnergy()
-      if (prepareCell()) return
-      if (refillWax()) return
-      if (flyToWax()) return
-      if (flyToPrepareCell()) return
-      if (depositHoney()) return
-      if (flyToHoney()) return
-      if (convertNectar()) return
-      if (flyToConverter()) return
     } else {
       if (bee.feedBee()) return
-      if (prepareCell()) return
-      if (flyToPrepareCell()) return
     }
-    
+    if (prepareCell()) return
+    if (flyToPrepareCell()) return
+    if (refillWax()) return
+    if (flyToWax()) return
+    if (flyToHoney()) return
+    if (convertNectar()) return
+    if (flyToConverter()) return
     bee.flyTo(null)
   }
 
