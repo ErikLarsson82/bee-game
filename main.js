@@ -538,14 +538,6 @@ function createMap(m) {
     createBee(beeContainer, 'idle').setHunger(100).setAge(6)
     createBee(beeContainer, 'idle').setHunger(100).setAge(5)
     createBee(beeContainer, 'idle').setHunger(100).setAge(0)
-    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
-    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
-    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
-    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
-    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
-    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
-    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
-    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
 
     replaceHex([0, 0], 'prepared', 'activate').instantlyPrepare()
     replaceHex([0, 8], 'prepared', 'activate').instantlyPrepare()
@@ -1387,16 +1379,17 @@ function createBee(parent, type, startPosition) {
 
     const beeExclamationLabel = Sprite.fromImage('exclamation-warning-severe.png')
     beeExclamationLabel.position.x = 84
-    beeExclamationLabel.position.y = 32
+    beeExclamationLabel.position.y = 37
     beeExclamationLabel.visible = false
     container.addChild(beeExclamationLabel)
 
-    const p = [-15, -15 + (1 * 9), -15 + (2 * 9), -15 + (3 * 9), -15 + (4 * 9)]
+    const p = [-15, -15 + (1 * 9), -15 + (2 * 9), -15 + (3 * 9), -15 + (4 * 9), -15 + (5 * 9)]
     container.addChild(ProgressBar(112, p[0], 'hunger', () => bee.hunger, bee.HUNGER_CAPACITY))
     container.addChild(ProgressBar(112, p[1], 'honey', () => bee.honeySack, bee.HONEY_SACK_CAPACITY))
     container.addChild(ProgressBar(112, p[2], 'nectar', () => bee.nectarSack, bee.NECTAR_SACK_CAPACITY))
     container.addChild(ProgressBar(112, p[3], 'wax', () => bee.waxSack, bee.WAX_SACK_CAPACITY))
     container.addChild(ProgressBar(112, p[4], 'pollen', () => bee.pollenSack, bee.POLLEN_SACK_CAPACITY))
+    container.addChild(ProgressBar(112, p[5], 'age', () => bee.age, 100))
     
     const textHeading = new PIXI.Text('BEE', { ...picoFontConfig })
     textHeading.scale.set(0.15, 0.15)
@@ -1404,7 +1397,7 @@ function createBee(parent, type, startPosition) {
     textHeading.position.y = -26
     container.addChild(textHeading)
 
-    const texts = ['HUNGER', 'HONEY', 'NECTAR', 'WAX', 'POLLEN']
+    const texts = ['HUNGER', 'HONEY', 'NECTAR', 'WAX', 'POLLEN', 'AGE']
 
     texts.forEach((text, idx) => {
       const textDescription = new PIXI.Text(text, { ...picoFontConfig, fill: '#96a5bc' })
@@ -1417,7 +1410,7 @@ function createBee(parent, type, startPosition) {
     const helper = new PIXI.Text('Loading...', { ...picoFontConfig })
     helper.scale.set(0.15, 0.15)
     helper.position.x = 82
-    helper.position.y = 35
+    helper.position.y = 39
     container.addChild(helper)
 
     addTicker('ui', () => {
