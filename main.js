@@ -773,6 +773,8 @@ function activateAdjacent(_x, _y) {
 }
 
 function setSelected(item) {
+  console.log(item)
+  debugger;
   // start with cleanup of panel
   panel.removeChildren()
   
@@ -1897,7 +1899,7 @@ function cellPrepared(x, y, parent) {
   addTicker('game-stuff', time => {
     if (preparedCellSprite.completeness >= 100) {
       preparedCellSprite.texture = Texture.fromImage('cell-prepared-complete.png')
-      if (selected === preparedCellSprite) setSelected(null)
+      if (selected === preparedCellSprite && !preparedCellSprite.done) setSelected(null)
       preparedCellSprite.done = true
       return
     }
