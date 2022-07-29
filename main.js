@@ -538,6 +538,14 @@ function createMap(m) {
     createBee(beeContainer, 'idle').setHunger(100).setAge(6)
     createBee(beeContainer, 'idle').setHunger(100).setAge(5)
     createBee(beeContainer, 'idle').setHunger(100).setAge(0)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
 
     replaceHex([0, 0], 'prepared', 'activate').instantlyPrepare()
     replaceHex([0, 8], 'prepared', 'activate').instantlyPrepare()
@@ -987,8 +995,9 @@ function transferTo(capacity) {
   }
 }
 
-function getIdlePosition(type) {
+function typeIdlePos(type, pos) {
   const rowHeight = 38
+  const beesPerRow = 8
   const y = {
     unassigned: 112,
     idle: 112,
@@ -998,13 +1007,32 @@ function getIdlePosition(type) {
     worker: 112 + (3 * rowHeight),
   }[type]
 
-  const beesPerRow = 7
-  const filteredBees = bees.filter(x => x.type === type && !x.isDead())
-  
   return {
-    x: 200 - (filteredBees.length % beesPerRow * 11),
-    y: y + (Math.floor(filteredBees.length / beesPerRow) * 10)
+    x: 210 - (pos % beesPerRow) * 11,
+    y: y + (Math.floor(pos / beesPerRow) * 10)
   }
+}
+
+function getIdlePosition(type) {
+  const filteredBees = bees.filter(x => x.type === type && !x.isDead())
+  let found = false
+  let idx = 0
+  let comparee = null
+  do {
+    comparee = typeIdlePos(type, idx)
+    const occupied = filteredBees.find(({ idle }) => {
+      const { x, y } = idle
+      return comparee.x === x && comparee.y === y
+    })
+    if (occupied) {
+      idx++
+    } else {
+      found = true
+    }
+    
+  } while(!found)
+
+  return comparee
 }
 
 function makeHungry(bee) {
