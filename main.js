@@ -5,7 +5,7 @@
 // Selection on flower
 // Testa noll padding mellan hexagoner
 
-const MAP_SELECTION = 'default'
+const MAP_SELECTION = 'loe'
 let DEBUG = false
 
 const fontConfig = {
@@ -530,7 +530,7 @@ function createMap(m) {
    
   if (m === 'default') {
     seeds = 2
-    createBee(beeContainer, 'idle').setHunger(40).setAge(80).setPollen(120).setWax(60).setNectar(60).setHoney(10)
+    createBee(beeContainer, 'idle').setHunger(40).setAge(80) // .setPollen(120).setWax(60).setNectar(60).setHoney(10)
     createBee(beeContainer, 'idle').setHunger(42).setAge(60)
     createBee(beeContainer, 'idle').setHunger(50).setAge(20)
     createBee(beeContainer, 'idle').setHunger(80).setAge(10)
@@ -539,7 +539,7 @@ function createMap(m) {
     createBee(beeContainer, 'idle').setHunger(100).setAge(0)
 
     replaceHex([0, 0], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([1, 1], 'pollen', 'activate').setPollen(60 )
+    // replaceHex([1, 1], 'pollen', 'activate').setPollen(60 )
     replaceHex([0, 8], 'prepared', 'activate').instantlyPrepare()
     replaceHex([8, 0], 'prepared', 'activate').instantlyPrepare()
     replaceHex([8, 8], 'prepared', 'activate').instantlyPrepare()
@@ -548,6 +548,30 @@ function createMap(m) {
     replaceHex([4, 5], 'wax', 'activate')
     replaceHex([5, 4], 'honey', 'activate').setHoney(30)
     replaceHex([3, 4], 'honey', 'activate').setHoney(30)
+  }
+
+  if (m === 'loe') {
+    seeds = 2
+    createBee(beeContainer, 'idle').setHunger(40).setAge(80).setWax(10) //.setNectar(60).setHoney(10)
+    createBee(beeContainer, 'idle').setHunger(42).setAge(60).setWax(10)
+    createBee(beeContainer, 'idle').setHunger(50).setAge(20).setWax(10)
+    createBee(beeContainer, 'idle').setHunger(80).setAge(10).setWax(10)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(6).setWax(10)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(5).setWax(10)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(0).setWax(10)
+
+    // replaceHex([0, 0], 'prepared', 'activate').instantlyPrepare()
+    // replaceHex([1, 1], 'pollen', 'activate').setPollen(60 )
+    // replaceHex([0, 8], 'prepared', 'activate').instantlyPrepare()
+    // replaceHex([8, 0], 'prepared', 'activate').instantlyPrepare()
+    // replaceHex([8, 8], 'prepared', 'activate').instantlyPrepare()
+
+    replaceHex([4, 4], 'wax', 'activate')
+    replaceHex([4, 5], 'wax', 'activate')
+    replaceHex([5, 4], 'honey', 'activate').setHoney(30)
+    replaceHex([3, 4], 'honey', 'activate').setHoney(30)
+    replaceHex([4, 5], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([4, 3], 'prepared', 'activate').instantlyPrepare()
   }
 
   if (m === 'die test') {
@@ -1792,6 +1816,13 @@ function cellEmpty(x, y, parent, parent2) {
 function cellPrepared(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const preparedCellSprite = Sprite.fromImage('cell-prepared-partial1.png')
+
+  const spriteExclamation = Sprite.fromImage('exclamation-warning-severe.png')
+  spriteExclamation.position.x = 14
+  spriteExclamation.position.y = -6
+  spriteExclamation.visible = false
+  preparedCellSprite.addChild(spriteExclamation)
+
   makeSelectable(preparedCellSprite, 'prepared')
   makeOccupiable(preparedCellSprite)
   preparedCellSprite.position.x = pixelCoordinate.x
@@ -1804,6 +1835,8 @@ function cellPrepared(x, y, parent) {
   preparedCellSprite.instantlyPrepare = () => {
     preparedCellSprite.completeness = 100
   }
+
+  const needsHelp = () => preparedCellSprite.completeness <= 100 && bees.filter(({ type }) => type === 'worker').length === 0
   
   preparedCellSprite.panelLabel = () => false
   preparedCellSprite.panelPosition = () => ({ x: pixelCoordinate.x + 8, y: pixelCoordinate.y + 5 })
@@ -1827,20 +1860,40 @@ function cellPrepared(x, y, parent) {
       container.addChild(Button(70, -12, contentPollen, () => replaceSelectedHex('pollen'), null, null, 'large'))
       container.addChild(Button(100, -1, contentNectar, () => replaceSelectedHex('converter'), null, null, 'large'))
     } else {
-      const content = Sprite.fromImage('images/ui/content-hexagon.png')
+      const content = Sprite.fromImage('images/ui/content-prepared.png')
       content.position.x = 72
       content.position.y = -29
       container.addChild(content)
 
+      const text = '  1.Have wax\n\n  2.Have\n  worker bees'
+      const helperText = new PIXI.Text(text, { ...picoFontConfig, fill: '#96a5bc' })
+      helperText.scale.set(0.15, 0.15)
+      helperText.position.x = 80
+      helperText.position.y = -6
+      container.addChild(helperText)
+
       container.addChild(ProgressBar(113, -15, 'build', () => preparedCellSprite.completeness, 100))
+
+      addTicker('ui', time => {
+        if (needsHelp()) {
+          helperText.visible = true
+          content.texture = Texture.fromImage('images/ui/content-prepared-help.png')
+        } else {
+          helperText.visible = false
+          content.texture = Texture.fromImage('images/ui/content-prepared.png')
+        }
+      })
     }
     return container
   }
 
   addTicker('game-stuff', time => {
     if (preparedCellSprite.done) {
+      spriteExclamation.visible = false
       return;
     }
+    spriteExclamation.visible = needsHelp()
+    
     if (preparedCellSprite.completeness >= 100) {
       preparedCellSprite.texture = Texture.fromImage('cell-prepared-complete.png')
       if (selected === preparedCellSprite) setSelected(null)
@@ -2158,7 +2211,7 @@ function cellBrood(x, y, parent) {
       broodSprite.setContents('larvae')      
     } else if (broodSprite.lifecycle > eggDuration + larvaeDuration && broodSprite.content === 'larvae') {
       broodSprite.setContents('puppa')
-    } else if (broodSprite.lifecycle > eggDuration + larvaeDuration + puppaDuration && broodSprite.content === 'puppa') {
+    } else if (broodSprite.lifecycle > eggDuration + larvaeDuration + puppaDuration && broodSprite.content === 'puppa' && season === 'summer') {
       broodSprite.setContents('empty')
       createBee(beeContainer, 'idle', { x: broodSprite.position.x, y: broodSprite.position.y - 5 })
     }
@@ -2240,6 +2293,9 @@ function cellBrood(x, y, parent) {
     const helperText = () => {
       if (broodSprite.content === 'dead') {
         return 'Larvae needs\npollen from\nnurser bees\nto survive'
+      }
+      if (broodSprite.content === 'puppa' && season === 'winter') {
+        return 'Puppa will\nhatch first\nday of summer'
       }
       return ''
     }
