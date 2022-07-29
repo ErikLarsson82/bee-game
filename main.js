@@ -1265,7 +1265,7 @@ function createBee(parent, type, startPosition) {
       return 'Cannot find a\nconverter hex\nfilled with\nnectar'
     }
     if (bee.type === 'idle') {
-      return 'Bee is idle'
+      return 'Bee needs\na job'
     }
     return ''
   }
