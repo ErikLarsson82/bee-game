@@ -61,7 +61,7 @@ document.body.appendChild(app.view)
 
 app.renderer.view.style.imageRendering = 'pixelated'
 app.renderer.backgroundColor = 0x755737
-settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST // Default pixel-scaling
+settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST // Pixel-scaling
 
 app.renderer.view.style.position = 'absolute'
 app.renderer.view.style.display = 'block'
@@ -531,7 +531,7 @@ function createMap(m) {
    
   if (m === 'default') {
     seeds = 2
-    createBee(beeContainer, 'idle').setHunger(40).setAge(80) // .setPollen(120).setWax(60).setNectar(60).setHoney(10)
+    createBee(beeContainer, 'idle').setHunger(40).setAge(80)
     createBee(beeContainer, 'idle').setHunger(42).setAge(60)
     createBee(beeContainer, 'idle').setHunger(50).setAge(20)
     createBee(beeContainer, 'idle').setHunger(80).setAge(10)
@@ -540,7 +540,6 @@ function createMap(m) {
     createBee(beeContainer, 'idle').setHunger(100).setAge(0)
 
     replaceHex([0, 0], 'prepared', 'activate').instantlyPrepare()
-    // replaceHex([1, 1], 'pollen', 'activate').setPollen(60 )
     replaceHex([0, 8], 'prepared', 'activate').instantlyPrepare()
     replaceHex([8, 0], 'prepared', 'activate').instantlyPrepare()
     replaceHex([8, 8], 'prepared', 'activate').instantlyPrepare()
@@ -553,19 +552,13 @@ function createMap(m) {
 
   if (m === 'loe') {
     seeds = 2
-    createBee(beeContainer, 'idle').setHunger(40).setAge(80).setWax(10) //.setNectar(60).setHoney(10)
+    createBee(beeContainer, 'idle').setHunger(40).setAge(80).setWax(10)
     createBee(beeContainer, 'idle').setHunger(42).setAge(60).setWax(10)
     createBee(beeContainer, 'idle').setHunger(50).setAge(20).setWax(10)
     createBee(beeContainer, 'idle').setHunger(80).setAge(10).setWax(10)
     createBee(beeContainer, 'idle').setHunger(100).setAge(6).setWax(10)
     createBee(beeContainer, 'idle').setHunger(100).setAge(5).setWax(10)
     createBee(beeContainer, 'idle').setHunger(100).setAge(0).setWax(10)
-
-    // replaceHex([0, 0], 'prepared', 'activate').instantlyPrepare()
-    // replaceHex([1, 1], 'pollen', 'activate').setPollen(60 )
-    // replaceHex([0, 8], 'prepared', 'activate').instantlyPrepare()
-    // replaceHex([8, 0], 'prepared', 'activate').instantlyPrepare()
-    // replaceHex([8, 8], 'prepared', 'activate').instantlyPrepare()
 
     replaceHex([4, 4], 'wax', 'activate')
     replaceHex([4, 5], 'wax', 'activate')
@@ -1028,6 +1021,10 @@ function makeHungry(bee) {
     // 100 hunger value points / 129600 gameticks = 0.00077160 reduction in hunger each tick
     bee.hunger -= transferTo(bee.HUNGER_CAPACITY).inSeconds(900)
     bee.hunger = cap(0, bee.HUNGER_CAPACITY)(bee.hunger)
+
+    if (bee.hunger <= 0) {
+      bee.setType('dead')
+    }
   }
 
   bee.eat = () => {
@@ -1323,6 +1320,12 @@ function createBee(parent, type, startPosition) {
     if (bee.type === 'worker' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) {
       return 'Cannot find a\nconverter hex\nfilled with\nnectar'
     }
+    if (bee.type === 'dead' && bee.hunger === 0) {
+      return 'Bee died\nof hunger'
+    }
+    if (bee.type === 'dead') {
+      return 'Bee died\nof old age'
+    }
     if (bee.type === 'idle') {
       return 'Bee needs\na job'
     }
@@ -1544,7 +1547,10 @@ function createBee(parent, type, startPosition) {
 
   function ageBee() {
     bee.age += transferTo(100).inMinutes(70)
-    if (bee.age >= 100) return true
+    if (bee.age >= 100) {
+      bee.setType('dead')
+      return true
+    }
   }
 
   function idle() {
