@@ -1117,6 +1117,47 @@ function createQueen(parent) {
   makeFlyable(queenSprite)
   makeHexDetectable(queenSprite)
 
+  const helperText = () => {
+    if (season === 'winter') return 'Does not\nlay eggs\nin winter'
+    if (queenSprite.isAtType('brood')) return 'Laying egg'
+    if (!queenSprite.isMoving()) return 'Cannot find\nempty brood\nhexagon to\nlay eggs in'
+    return '-'
+  }   
+
+  queenSprite.panelLabel = () => false
+  queenSprite.panelPosition = () => ({ x: queenSprite.position.x + 8, y: queenSprite.position.y + 5 })
+
+  queenSprite.panelContent = () => {
+    const container = new Container()
+    
+    const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
+    whiteLine.position.x = 0
+    whiteLine.position.y = -30
+    container.addChild(whiteLine)
+
+    const content = Sprite.fromImage('images/ui/content-queen.png')
+    content.position.x = 72
+    content.position.y = -29
+    container.addChild(content)
+
+    const textHeading = new PIXI.Text('QUEEN', { ...picoFontConfig })
+    textHeading.scale.set(0.15, 0.15)
+    textHeading.position.x = 100
+    textHeading.position.y = -26
+    container.addChild(textHeading)
+
+    const helper = new PIXI.Text('Loading...', { ...picoFontConfig })
+    helper.scale.set(0.15, 0.15)
+    helper.position.x = 82
+    helper.position.y = -14
+    container.addChild(helper)
+
+    addTicker('ui', () => helper.text = helperText())
+    
+    return container
+  }
+
+  /*
   queenSprite.panelContent = () => {
     const text = new PIXI.Text('Loading', { ...fontConfig })
     text.position.x = 7
@@ -1132,6 +1173,7 @@ function createQueen(parent) {
     })
     return text
   }
+  */
 
   addTicker('game-stuff', time => {
     queenSprite.animationTicker += speeds[gameSpeed]
