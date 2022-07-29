@@ -1686,7 +1686,7 @@ function createBee(parent, type, startPosition) {
 
   bee.setShadowPosition = () => {
     const xPos = 0 - bee.position.x + bee.idle.x + 2
-    shadow.position.x = bee.scale.x === 1 ? xPos : -xPos - 8
+    shadow.position.x = bee.scale.x === 1 ? xPos : -xPos - 6
     shadow.position.y = 0 - bee.position.y + bee.idle.y + 4
   }
 
