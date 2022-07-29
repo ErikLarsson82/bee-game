@@ -539,6 +539,7 @@ function createMap(m) {
     createBee(beeContainer, 'idle').setHunger(100).setAge(0)
 
     replaceHex([0, 0], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([1, 1], 'pollen', 'activate').setPollen(60 )
     replaceHex([0, 8], 'prepared', 'activate').instantlyPrepare()
     replaceHex([8, 0], 'prepared', 'activate').instantlyPrepare()
     replaceHex([8, 8], 'prepared', 'activate').instantlyPrepare()
@@ -2097,6 +2098,9 @@ function cellBrood(x, y, parent) {
   
   // Stored in seconds for easy transitions
   broodSprite.lifecycle = 0
+  const eggDuration = 30
+  const larvaeDuration = 300
+  const puppaDuration = 500    
   
   broodSprite.content = 'empty'
   broodSprite.NUTRITION_CAPACITY = 100
@@ -2150,9 +2154,6 @@ function cellBrood(x, y, parent) {
     broodSprite.lifecycle += transferTo(225).inSeconds(225)
 
     // Transitions
-    const eggDuration = 30
-    const larvaeDuration = 300
-    const puppaDuration = 500
     if (broodSprite.lifecycle > eggDuration && broodSprite.content === 'egg') {
       broodSprite.setContents('larvae')      
     } else if (broodSprite.lifecycle > eggDuration + larvaeDuration && broodSprite.content === 'larvae') {
@@ -2171,25 +2172,113 @@ function cellBrood(x, y, parent) {
     }
   })
 
+  broodSprite.panelLabel = () => false
+  broodSprite.panelPosition = () => ({ x: pixelCoordinate.x + 8, y: pixelCoordinate.y + 5 })
+
   broodSprite.panelContent = () => {
-    const c = new Container()
+    const container = new Container()
+    
+    const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
+    whiteLine.position.x = 0
+    whiteLine.position.y = -30
+    container.addChild(whiteLine)
 
-    const text = new PIXI.Text('Loading', { ...fontConfig })
-    text.position.x = 7
-    text.position.y = 50
-    addTicker('ui', time => {
-      const line2 = broodSprite.content === 'larvae' ? '\nNutrients: ' + Math.round(broodSprite.nutrition) : ''
-      const line3 = ['egg', 'larvae', 'puppa'].includes(broodSprite.content) ? '\nLifecycle: ' + Math.round(broodSprite.lifecycle) : ''
-      const line4 = '\n\n' + (broodSprite.content === 'dead' ? 'Larvae needs pollen to survive' : '')
-      const line5 = '\n\n' + (broodSprite.paused ? 'paused' : 'active')
-      text.text = broodSprite.content + line2 + line3 + line4 + line5      
+    const content = Sprite.fromImage('images/ui/content-brood.png')
+    content.position.x = 72
+    content.position.y = -29
+    container.addChild(content)
+
+    const textHeading = new PIXI.Text('BROOD HEX', { ...picoFontConfig })
+    textHeading.scale.set(0.15, 0.15)
+    textHeading.position.x = 90
+    textHeading.position.y = -26
+    container.addChild(textHeading)
+
+    const textState = new PIXI.Text('-', { ...picoFontConfig, fill: '#96a5bc' })
+    textState.scale.set(0.15, 0.15)
+    textState.position.x = 80
+    textState.position.y = -16
+    container.addChild(textState)
+
+    const eggLifecycleBar = ProgressBar(113, -6, 'lifecycle', () => broodSprite.lifecycle, eggDuration)
+    container.addChild(eggLifecycleBar)
+
+    const larvaeLifecycleBar = ProgressBar(113, -6, 'lifecycle', () => broodSprite.lifecycle - eggDuration, larvaeDuration)
+    container.addChild(larvaeLifecycleBar)
+
+    const puppaLifecycleBar = ProgressBar(113, -6, 'lifecycle', () => broodSprite.lifecycle - eggDuration - larvaeDuration, puppaDuration)
+    container.addChild(puppaLifecycleBar)
+
+    const nutrientsBar = ProgressBar(113, 3, 'nutrition', () => broodSprite.nutrition, broodSprite.NUTRITION_CAPACITY)
+    container.addChild(nutrientsBar)
+
+    const textProgress = new PIXI.Text('Progress', { ...picoFontConfig, fill: '#96a5bc' })
+    textProgress.scale.set(0.15, 0.15)
+    textProgress.position.x = 80
+    textProgress.position.y = -8
+    container.addChild(textProgress)
+
+    const textNutrients = new PIXI.Text('Nutrient', { ...picoFontConfig, fill: '#96a5bc' })
+    textNutrients.scale.set(0.15, 0.15)
+    textNutrients.position.x = 80
+    textNutrients.position.y = 1
+    textNutrients.visible = false
+    container.addChild(textNutrients)
+
+    const paused = new PIXI.Text('-', { ...picoFontConfig })
+    paused.scale.set(0.15, 0.15)
+    paused.position.x = 82
+    paused.position.y = 15 
+    container.addChild(paused)
+
+    const helper = new PIXI.Text('Loading...', { ...picoFontConfig })
+    helper.scale.set(0.15, 0.15)
+    helper.position.x = 82
+    helper.position.y = 35
+    container.addChild(helper)
+
+    const helperText = () => {
+      if (broodSprite.content === 'dead') {
+        return 'Larvae needs\npollen from\nnurser bees\nto survive'
+      }
+      return ''
+    }
+
+    addTicker('ui', () => {
+      textState.text = broodSprite.content
+      const isDead = broodSprite.content === 'dead'
+      const isEmpty = broodSprite.content === 'empty'
+      const isEgg = broodSprite.content === 'egg'
+      const isLarvae = broodSprite.content === 'larvae'
+      const isPuppa = broodSprite.content === 'puppa'
+      if (isEmpty || isDead) {
+        content.texture = Texture.fromImage('images/ui/content-brood.png')
+      } else if (isLarvae) {
+        content.texture = Texture.fromImage('images/ui/content-larvae.png')
+      } else if (isEgg || isPuppa) {
+        content.texture = Texture.fromImage('images/ui/content-egg-puppa.png')
+      }
+      textProgress.visible = !isEmpty && !isDead
+      
+      eggLifecycleBar.visible = isEgg
+      larvaeLifecycleBar.visible = isLarvae
+      puppaLifecycleBar.visible = isPuppa
+      
+      textNutrients.visible = isLarvae
+      nutrientsBar.visible = isLarvae
+
+      paused.text = broodSprite.paused ? 'paused' : 'active'
+
+      helper.text = helperText()
     })
-    c.addChild(text)
 
-    c.addChild(Button(5, 110, 'toggle active', () => broodSprite.togglePause()))
-    return c
+
+    const button = Button(70, 20, 'Toggle active', () => broodSprite.togglePause())
+    container.addChild(button)
+    
+    return container
   }
-  
+
   parent.addChild(broodSprite)
   return broodSprite
 }
