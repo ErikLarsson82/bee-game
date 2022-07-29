@@ -70,11 +70,11 @@ settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST // Pixel-scaling
 app.renderer.view.style.position = 'absolute'
 app.renderer.view.style.display = 'block'
 
-let cycles = [5, 1, 5, 2, 5, 2, 4, 3, 4, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30]
+let cycles = [1, 1, 5, 2, 5, 2, 4, 3, 4, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30]
 
 let gameSpeed = 1
 let paused = false
-let hour = 0
+let hour = 23
 let day = 1
 let year = 1
 let seeds = 1
@@ -535,7 +535,7 @@ function createMap(m) {
    
   if (m === 'default') {
     seeds = 2
-    createBee(beeContainer, 'idle').setHunger(40).setAge(80)
+    createBee(beeContainer, 'worker').setHunger(4).setAge(80).setHoney(60)
     createBee(beeContainer, 'idle').setHunger(42).setAge(60)
     createBee(beeContainer, 'idle').setHunger(50).setAge(20)
     createBee(beeContainer, 'idle').setHunger(80).setAge(10)
@@ -1637,17 +1637,17 @@ function createBee(parent, type, startPosition) {
   function worker() {
     bee.determineIfVisible()
     if (ageBee()) return
-    if (depositHoney()) return
-    if (refillWax()) return
     if (season === 'summer') {
+      if (depositHoney()) return
+      if (flyToHoney()) return
       bee.consumeEnergy()
     } else {
       if (bee.feedBee()) return
     }
+    if (refillWax()) return
     if (prepareCell()) return
     if (flyToPrepareCell()) return
     if (flyToWax()) return
-    if (flyToHoney()) return
     if (convertNectar()) return
     if (flyToConverter()) return
     bee.flyTo(null)
