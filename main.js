@@ -851,15 +851,22 @@ function makeFlyable(sprite) {
     if (x === 0 && y === 0) return
     const direction = new PIXI.Point(x, y).normalize()
 
-    sprite.vx += direction.x * 0.016 * (gameSpeed * 5)
-    sprite.vy += direction.y * 0.016 * (gameSpeed * 5)
+    sprite.vx += direction.x * 0.030 * (gameSpeed * 5)
+    sprite.vy += direction.y * 0.030 * (gameSpeed * 5)
 
     const distanceToTarget = distance(sprite, targetSprite)
 
+    let maxSpeed = 0.28
+
+    if (distanceToTarget < 12) maxSpeed = 0.17
+    if (distanceToTarget < 9) maxSpeed = 0.12
+    if (distanceToTarget < 6) maxSpeed = 0.07
+    if (distanceToTarget < 3) maxSpeed = 0.05
+
     let velocity = new PIXI.Point(sprite.vx, sprite.vy)
 
-    if (velocity.magnitude() > velocity.normalize().magnitude() * 0.14 * gameSpeed) {
-      velocity = new PIXI.Point(velocity.normalize().x * 0.14 * gameSpeed, velocity.normalize().y * 0.14 * gameSpeed)
+    if (velocity.magnitude() > velocity.normalize().magnitude() * maxSpeed * gameSpeed) {
+      velocity = new PIXI.Point(velocity.normalize().x * maxSpeed * gameSpeed, velocity.normalize().y * maxSpeed * gameSpeed)
     }
     sprite.vx = velocity.x
     sprite.vy = velocity.y
