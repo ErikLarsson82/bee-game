@@ -288,8 +288,8 @@ function setup() {
     populationText.text = aliveBees.length + 1 
   })
   
-  hexGrid = new Array(9).fill().map((_, x) => 
-    new Array(9).fill().map((_, y) => cellDisabled(x, y, hexForeground))
+  hexGrid = new Array(13).fill().map((_, x) => 
+    new Array(20).fill().map((_, y) => cellDisabled(x, y, hexForeground))
   )
   
   selectedSprite = new Container()
@@ -323,7 +323,7 @@ function setup() {
   createMap(MAP_SELECTION)
   createFlowers()
 
-  app.ticker.add((delta) => gameLoop(delta))
+  app.ticker.add((delta) => gameloop(delta))
 
   function handleVisibilityChange() {
     if (document.visibilityState === 'hidden') {
@@ -372,7 +372,7 @@ function isBee() {
 
 }
 
-function gameLoop(delta, manualTick) {
+function gameloop(delta, manualTick) {
   tickers = tickers.filter(ticker => ticker.remove === false)
 
   tickers.filter(isUI).forEach(ticker => ticker.func());
@@ -2534,7 +2534,7 @@ window.addEventListener('keydown', e => {
 
   //T, for gameTick
   if (e.keyCode === 84) {
-    gameLoop(16.66, true)
+    gameloop(16.66, true)
   }
 
   // 1

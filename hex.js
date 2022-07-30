@@ -1,13 +1,14 @@
 
 const OFFSET_X = 226
 const OFFSET_Y = 66
-const SIZE = 12
+const VERTICAL_SIZE = 6
+const HORIZONTAL_SIZE = 9
 
-const WIDTH_FLAT = 2 * SIZE
-const HEIGHT_FLAT = Math.sqrt(3) * SIZE
+const WIDTH_FLAT = 2 * HORIZONTAL_SIZE
+const HEIGHT_FLAT = Math.sqrt(3) * VERTICAL_SIZE
 
-const WIDTH_POINTY = Math.sqrt(3) * SIZE
-const HEIGHT_POINTY = 2 * SIZE
+const WIDTH_POINTY = Math.sqrt(3) * HORIZONTAL_SIZE
+const HEIGHT_POINTY = 2 * VERTICAL_SIZE
 
 // “odd-q” vertical layout, shoves odd columns down
 function toLocalCoordinateFlat(index) {
