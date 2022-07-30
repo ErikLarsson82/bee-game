@@ -293,15 +293,23 @@ function setup() {
   
   selectedSprite = new Container()
   selectedSprite.visible = false
-  const selectedSpriteSub = Sprite.fromImage('cell-selected.png')
+  const selectedSpriteSub = Sprite.fromImage('images/ui/selection-cell.png')
   selectedSpriteSub.position.x = -2
   selectedSpriteSub.position.y = -2
   selectedSprite.addChild(selectedSpriteSub)  
   addTicker('ui', time => {
     if (selected) {
+      if (selected.label === 'bee') {
+        selectedSpriteSub.texture = Texture.fromImage('images/ui/selection-circle.png')
+        selectedSprite.position.x = selected.position.x + 2
+        selectedSprite.position.y = selected.position.y + 1
+      } else {
+        selectedSpriteSub.texture = Texture.fromImage('images/ui/selection-cell.png')
+        selectedSprite.position.x = selected.position.x
+        selectedSprite.position.y = selected.position.y
+      }
       selectedSprite.visible = true
-      selectedSprite.position.x = selected.position.x
-      selectedSprite.position.y = selected.position.y
+      
     } else {
       selectedSprite.visible = false
     }
@@ -1430,22 +1438,23 @@ function createBee(parent, type, startPosition) {
     const container = new Container()
     
     const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
-    whiteLine.position.x = 0
-    whiteLine.position.y = -30
+    whiteLine.position.x = -3
+    whiteLine.position.y = -38
     container.addChild(whiteLine)
 
     const content = Sprite.fromImage('images/ui/content-boilerplate.png')
     content.position.x = 72
-    content.position.y = -29
+    content.position.y = -37
     container.addChild(content)
 
     const beeExclamationLabel = Sprite.fromImage('exclamation-warning-severe.png')
     beeExclamationLabel.position.x = 84
-    beeExclamationLabel.position.y = 37
+    beeExclamationLabel.position.y = 29
     beeExclamationLabel.visible = false
     container.addChild(beeExclamationLabel)
 
-    const p = [-15, -15 + (1 * 9), -15 + (2 * 9), -15 + (3 * 9), -15 + (4 * 9), -15 + (5 * 9)]
+    const bs = -23
+    const p = [bs, bs + (1 * 9), bs + (2 * 9), bs + (3 * 9), bs + (4 * 9), bs + (5 * 9)]
     container.addChild(ProgressBar(112, p[0], 'hunger', () => bee.hunger, bee.HUNGER_CAPACITY))
     container.addChild(ProgressBar(112, p[1], 'honey', () => bee.honeySack, bee.HONEY_SACK_CAPACITY))
     container.addChild(ProgressBar(112, p[2], 'nectar', () => bee.nectarSack, bee.NECTAR_SACK_CAPACITY))
@@ -1456,7 +1465,7 @@ function createBee(parent, type, startPosition) {
     const textHeading = new PIXI.Text('BEE', { ...picoFontConfig })
     textHeading.scale.set(0.15, 0.15)
     textHeading.position.x = 100
-    textHeading.position.y = -26
+    textHeading.position.y = -34
     container.addChild(textHeading)
 
     const texts = ['HUNGER', 'HONEY', 'NECTAR', 'WAX', 'POLLEN', 'AGE']
@@ -1465,14 +1474,14 @@ function createBee(parent, type, startPosition) {
       const textDescription = new PIXI.Text(text, { ...picoFontConfig, fill: '#96a5bc' })
       textDescription.scale.set(0.15, 0.15)
       textDescription.position.x = 82
-      textDescription.position.y = -16 + (idx * 9)
+      textDescription.position.y = -24 + (idx * 9)
       container.addChild(textDescription)
     })
 
     const helper = new PIXI.Text('Loading...', { ...picoFontConfig })
     helper.scale.set(0.15, 0.15)
     helper.position.x = 82
-    helper.position.y = 39
+    helper.position.y = 31
     container.addChild(helper)
 
     addTicker('ui', () => {
