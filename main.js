@@ -323,7 +323,7 @@ function setup() {
   createMap(MAP_SELECTION)
   createFlowers()
 
-  app.ticker.add((delta) => gameLoop(delta))
+  app.ticker.add((delta) => gameloop(delta))
 
   function handleVisibilityChange() {
     if (document.visibilityState === 'hidden') {
@@ -341,15 +341,25 @@ function isDayBeforeWinter() {
   return cycles[0] === 1 && season === 'summer'
 }
 
+function generateRandomId() {
+  const chars = 'abcdefghijklmnopqrstuvx'
+  let str = ''
+  for (let i = 0; i < 20; i++) {
+    str += chars[Math.floor(Math.random()*(chars.length-1))]
+  }
+  return str + '_' + Math.random()
+}
+
 function addTicker(type, func) {
-  const id = Math.random() + '_' + Math.random() + '_' + Math.random() + '_' + Math.random()
-  tickers.push({
+  const id = generateRandomId()
+  const tickerObject = {
     id,
     type,
     func,
     remove: false
-  })
-  return id
+  }
+  tickers.push(tickerObject)
+  return tickerObject
 }
 
 function removeTicker(id) {
@@ -372,8 +382,14 @@ function isBee() {
 
 }
 
-function gameLoop(delta, manualTick) {
-  tickers = tickers.filter(ticker => ticker.remove === false)
+function gameloop(delta, manualTick) {
+  const newTickers = tickers.filter(ticker => ticker.remove === false)
+  if (tickers.length > newTickers.length) {
+    newTickers.filter(ticker => ticker.remove).forEach(ticker => {
+      delete ticker
+    })
+    tickers = tickers.filter(ticker => ticker.remove === false)
+  }
 
   tickers.filter(isUI).forEach(ticker => ticker.func());
 
@@ -554,6 +570,11 @@ function createMap(m) {
     replaceHex([3, 4], 'honey', 'activate').setHoney(30)
   }
 
+  if (m === 'die') {
+    seeds = 2
+    createBee(beeContainer, 'idle').setHunger(1).setPollen(60)
+  }
+
   if (m === 'loe') {
     seeds = 2
     createBee(beeContainer, 'idle').setHunger(40).setAge(80).setWax(10)
@@ -587,19 +608,19 @@ function createMap(m) {
     for (let i = 0; i <100; i++) {
       createBee(beeContainer, 'forager') //.setPollen(30)
     }
-    for (let i = 0; i <1; i++) {
+    for (let i = 0; i <100; i++) {
       createBee(beeContainer, 'nurser')
     }
-    for (let i = 0; i <1; i++) {
+    for (let i = 0; i <100; i++) {
       createBee(beeContainer, 'worker')
     }
     
     for (let x = 0; x < 5; x++) {
       for (let y = 0; y < 5; y++) {
-        setSelected(hexGrid[x][y])
         const type = ['pollen', 'honey', 'wax', 'brood', 'converter'][Math.floor(Math.random()*5)]
-        replaceSelectedHex(type)
-        activateAdjacent(x, y)  
+        replaceHex([x, y], type, 'activate')
+        // replaceSelectedHex(type)
+        //activateAdjacent(x, y)  
       }
     }
   }
@@ -1095,8 +1116,13 @@ function makeParticleCreator(bee) {
 
   bee.disableParticle = () => bee.particleActive = false
 
-  addTicker('game-stuff', time => {
-    if (!bee.particleActive) return
+  bee.removeParticleTicker = () => {
+    bee.disableParticle()
+    bee.particleTicker.remove = true
+  }
+
+  bee.particleTicker = addTicker('game-stuff', time => {
+    if (!bee.particleActive) return bee.removeParticleTicker()
     if (bee.pollenSack < bee.POLLEN_SACK_CAPACITY) return
 
     if (bee.particleDelay <= 0) {
@@ -1107,11 +1133,18 @@ function makeParticleCreator(bee) {
       pollenPixel.position.x = bee.position.x + 2 + (Math.random() * 4)
       pollenPixel.position.y = bee.position.y + 4 + (Math.random() * 3) - 1.5
       let lifetime = 0
-      addTicker('game-stuff', time => {
-        if (!bee.particleActive) return
+      const removeParticle = () => pollenPixel.particle.remove = true 
+      pollenPixel.particle = addTicker('game-stuff', time => {
+        if (!bee.particleActive) {
+          removeParticle()
+          foreground.removeChild(pollenPixel)
+          delete pollenPixel
+          return
+        }
         pollenPixel.position.y += 0.0003 * FPS * gameSpeed
         lifetime += transferTo(1).inSeconds(1)
         if (lifetime > 1) {
+          removeParticle()
           foreground.removeChild(pollenPixel)
           delete pollenPixel
         }
@@ -1320,6 +1353,12 @@ function createBee(parent, type, startPosition) {
   bee.hideBee = () => {
     bee.opacity = 0
     beeAddon.visible = false
+  }
+
+  bee.destroy = () => {
+    bee.removeUiTicker()
+    bee.removeTicker()
+    bee.removeParticleTicker()
   }
   
   const isPollenSackFull = () => bee.pollenSack >= bee.POLLEN_SACK_CAPACITY
@@ -1604,12 +1643,14 @@ function createBee(parent, type, startPosition) {
   }
 
   function idle() {
+    bee.showBee()
     if (ageBee()) return
     if (bee.feedBee()) return
     bee.flyTo(null)
   }
 
   function forager() {
+    bee.showBee()
     if (ageBee()) return
     if (bee.feedBee()) return
     if (pollinateFlower()) return
@@ -1621,6 +1662,7 @@ function createBee(parent, type, startPosition) {
   }
 
   function nurser() {
+    bee.showBee()
     if (ageBee()) return
     if (bee.feedBee()) return
     if (refillPollen()) return
@@ -1743,11 +1785,15 @@ function createBee(parent, type, startPosition) {
     shadow.position.y = 0 - bee.position.y + bee.idle.y + 4
   }
 
-  addTicker('ui', time => {
+  bee.removeUiTicker = () => bee.uiTicker.remove = true
+
+  bee.uiTicker = addTicker('ui', time => {
     bee.setShadowPosition()
   })
 
-  addTicker('game-stuff', time => {
+  bee.removeTicker = () => bee.ticker.remove = true
+
+  bee.ticker = addTicker('game-stuff', time => {
     bee.setShadowPosition()
     {
       animationSprite.delay++
@@ -1777,6 +1823,7 @@ function createBee(parent, type, startPosition) {
         bee.position.x = 65 + (Math.random() * 100)
         bee.position.y = 25
       }
+      bee.destroy()
       return
     }
 
@@ -2534,7 +2581,7 @@ window.addEventListener('keydown', e => {
 
   //T, for gameTick
   if (e.keyCode === 84) {
-    gameLoop(16.66, true)
+    gameloop(16.66, true)
   }
 
   // 1
@@ -2560,6 +2607,20 @@ window.addEventListener('keydown', e => {
     gameSpeed = 64
     paused = false
   }
+
+  /*
+  // enter
+  if (e.keyCode === 13) {
+    for (let i = 0; i < 100; i++) {
+      createBee(beeContainer, 'idle').setHunger(0.01).setPollen(60)
+    }
+  }
+
+  // a
+  if (e.keyCode === 65) {
+    createBee(beeContainer, 'idle').setHunger(0.01).setPollen(60)
+  }
+  */
     
   setGameSpeedText()
 })
