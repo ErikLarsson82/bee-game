@@ -74,7 +74,7 @@ let cycles = [5, 1, 5, 2, 5, 2, 4, 3, 4, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 
 
 let gameSpeed = 1
 let paused = false
-let hour = 23
+let hour = 0
 let day = 1
 let year = 1
 let seeds = 1
