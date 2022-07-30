@@ -91,7 +91,6 @@ let selectedSprite = null
 let beeContainer = null
 let nightDimmer = null
 let backgroundScene = null
-let warning = null
 let hexBackground = null
 let hexForeground = null
 let flowerBed = null
@@ -309,12 +308,6 @@ function setup() {
   })
   hexForeground.addChild(selectedSprite)
 
-  warning = Sprite.fromImage('images/ui/warning.png')
-  warning.position.x = 180
-  warning.position.y = 30  
-  warning.visible = false
-  ui.addChild(warning)
-
   panel = new Container()
   ui.addChild(panel)
 
@@ -411,11 +404,7 @@ function gameloop(delta, manualTick) {
       hour = 0
       day++
       cycles[0]--
-      if (isDayBeforeWinter()) {
-        warning.visible = true
-      }
       if (cycles[0] === 0) {
-        warning.visible = false
         cycles = cycles.slice(1)
         season = season === 'summer' ? 'winter' : 'summer'
         if (season === 'summer') {
@@ -1186,6 +1175,27 @@ function decreaseForagers() {
 
 function createQueen(parent) {
   const queenSprite = PIXI.Sprite.fromImage('bee-queen.png')
+
+  const dialogueSprite = PIXI.Sprite.fromImage('images/queen/dialogue.png')
+  dialogueSprite.dismissed = false
+  dialogueSprite.position.x = 0
+  dialogueSprite.position.y = -18
+  dialogueSprite.visible = false
+  dialogueSprite.interactive = true
+  dialogueSprite.buttonMode = true
+  dialogueSprite.mouseup = (e) => {
+    dialogueSprite.dismissed = true
+    setSelected(null)
+  }
+  queenSprite.addChild(dialogueSprite)
+
+  const textHeading = new PIXI.Text('WINTER IN ONE DAY', { ...picoFontConfig, fill: 'black' })
+  textHeading.scale.set(0.15, 0.15)
+  textHeading.position.x = 10
+  textHeading.position.y = 3
+  dialogueSprite.addChild(textHeading)
+
+
   makeSelectable(queenSprite, 'queen')
   queenSprite.type = 'queen'
   
@@ -1251,6 +1261,8 @@ function createQueen(parent) {
   }
 
   addTicker('game-stuff', time => {
+    dialogueSprite.visible = isDayBeforeWinter() && !dialogueSprite.dismissed
+    
     queenSprite.animationTicker += speeds[gameSpeed]
     
     const targetBrood = queenSprite.isAtType('brood')
