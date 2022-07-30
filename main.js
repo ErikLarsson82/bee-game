@@ -2030,7 +2030,7 @@ function cellPrepared(x, y, parent) {
 
 function cellHoney(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
-  const honeySprite = Sprite.fromImage('cell-honey-full.png')
+  const honeySprite = Sprite.fromImage('images/hex/honey/cell-honey-full.png')
   makeSelectable(honeySprite, 'honey')
   makeOccupiable(honeySprite)
   honeySprite.position.x = pixelCoordinate.x
@@ -2044,16 +2044,20 @@ function cellHoney(x, y, parent) {
   honeySprite.isHoneyEmpty = () => honeySprite.honey <= 0
   
   addTicker('game-stuff', time => {
-    if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.75) {
-      honeySprite.texture = Texture.fromImage('cell-honey-full.png')
-    } else if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.50) {
-      honeySprite.texture = Texture.fromImage('cell-honey-filling.png')
-    } else if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.25) {
-      honeySprite.texture = Texture.fromImage('cell-honey-partial.png')
-    } else if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.05) {
-      honeySprite.texture = Texture.fromImage('cell-honey-minimal.png')
+    if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.95) {
+      honeySprite.texture = Texture.fromImage('images/hex/honey/cell-honey-full.png')
+    } else if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.85) {
+      honeySprite.texture = Texture.fromImage('images/hex/honey/cell-honey-a.png')
+    } else if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.6) {
+      honeySprite.texture = Texture.fromImage('images/hex/honey/cell-honey-b.png')
+    } else if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.5) {
+      honeySprite.texture = Texture.fromImage('images/hex/honey/cell-honey-c.png')
+    } else if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.35) {
+      honeySprite.texture = Texture.fromImage('images/hex/honey/cell-honey-d.png')
+    } else if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.1) {
+      honeySprite.texture = Texture.fromImage('images/hex/honey/cell-honey-e.png')
     } else {
-      honeySprite.texture = Texture.fromImage('cell-honey-empty.png')
+      honeySprite.texture = Texture.fromImage('images/hex/honey/cell-honey-empty.png')
     }
   })
 
@@ -2130,12 +2134,14 @@ function cellWax(x, y, parent) {
       waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-b.png')
     } else if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.5) {
       waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-c.png')
-    } else if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.25) {
+    } else if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.4) {
       waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-d.png')
-    } else if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.12) {
+    } else if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.3) {
       waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-e.png')
-    } else {
+    } else if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.1) {
       waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-f.png')
+    } else {
+      waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-empty.png')
     }
   })
 
@@ -2461,7 +2467,7 @@ function cellBrood(x, y, parent) {
 
 function cellPollen(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
-  const pollenSprite = Sprite.fromImage('cell-pollen-empty.png')
+  const pollenSprite = Sprite.fromImage('images/hex/pollen/cell-pollen-empty.png')
   makeSelectable(pollenSprite, 'pollen')
   makeOccupiable(pollenSprite)
   pollenSprite.position.x = pixelCoordinate.x
@@ -2475,14 +2481,20 @@ function cellPollen(x, y, parent) {
   pollenSprite.isPollenEmpty = () => pollenSprite.pollen <= 0
   
   addTicker('game-stuff', time => {
-    if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.75) {
-      pollenSprite.texture = Texture.fromImage('cell-pollen-full.png')
-    } else if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.50) {
-      pollenSprite.texture = Texture.fromImage('cell-pollen-filling.png')
-    } else if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.25) {
-      pollenSprite.texture = Texture.fromImage('cell-pollen-partial.png')
+    if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.95) {
+      pollenSprite.texture = Texture.fromImage('images/hex/pollen/cell-pollen-full.png')
+    } else if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.8) {
+      pollenSprite.texture = Texture.fromImage('images/hex/pollen/cell-pollen-a.png')
+    } else if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.6) {
+      pollenSprite.texture = Texture.fromImage('images/hex/pollen/cell-pollen-b.png')
+    } else if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.5) {
+      pollenSprite.texture = Texture.fromImage('images/hex/pollen/cell-pollen-c.png')
+    } else if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.3) {
+      pollenSprite.texture = Texture.fromImage('images/hex/pollen/cell-pollen-d.png')
+    } else if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.1) {
+      pollenSprite.texture = Texture.fromImage('images/hex/pollen/cell-pollen-e.png')
     } else {
-      pollenSprite.texture = Texture.fromImage('cell-pollen-empty.png')
+      pollenSprite.texture = Texture.fromImage('images/hex/pollen/cell-pollen-empty.png')
     }
   })
 
