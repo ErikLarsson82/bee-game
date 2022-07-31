@@ -1255,16 +1255,16 @@ function decreaseForagers() {
 }
 
 function createQueen(parent) {
-  const queenSprite = PIXI.Sprite.fromImage('bee-queen.png')
+  const queenSprite = PIXI.Sprite.fromImage('images/queen/bee-queen.png')
 
   makeSelectable(queenSprite, 'queen')
   queenSprite.type = 'queen'
   
-  const queenWingAddon = Sprite.fromImage('bee-queen-wings-flapped.png')
+  const queenWingAddon = Sprite.fromImage('images/queen/bee-queen-wings-flapped.png')
   queenWingAddon.visible = false
   queenSprite.addChild(queenWingAddon)
   
-  const queenLegAddon = Sprite.fromImage('bee-queen-legs-jerk.png')
+  const queenLegAddon = Sprite.fromImage('images/queen/bee-queen-legs-jerk.png')
   queenLegAddon.visible = false
   queenSprite.addChild(queenLegAddon)
   
@@ -1352,7 +1352,7 @@ function createQueen(parent) {
 }
 
 function createBee(parent, type, startPosition) {
-  const bee = Sprite.fromImage('bee-drone-body.png')
+  const bee = Sprite.fromImage('images/bee/bee-drone-body.png')
   bee.opacity = 1
   
   const shadow = Sprite.fromImage('images/bee/shadow.png')
@@ -1364,7 +1364,7 @@ function createBee(parent, type, startPosition) {
   animationSprite.delay = 0
   bee.addChild(animationSprite)
   
-  const beeAddon = Sprite.fromImage('bee-drone-legs.png')
+  const beeAddon = Sprite.fromImage('images/bee/bee-drone-legs.png')
   beeAddon.position.x = -1
   beeAddon.position.y = -1
   beeAddon.opacity = 1
@@ -1885,7 +1885,7 @@ function createBee(parent, type, startPosition) {
     if (bee.position.y === deadPosition) return
 
     if (bee.isDead()) {
-      bee.texture = Texture.fromImage('bee-drone-dead.png')
+      bee.texture = Texture.fromImage('images/bee/bee-drone-dead.png')
       honeyDrop.visible = false
       nectarDrop.visible = false
       waxDrop.visible = false
@@ -1911,16 +1911,16 @@ function createBee(parent, type, startPosition) {
     if (bee.vx !== 0 || bee.vy !== 0) {
       (bee.vx >= -0.15 || bee.vx === 0) ? bee.scale.set(1, 1) : bee.scale.set(-1, 1) //
       if (Math.sin(bee.animationTicker) > 0) {
-        beeAddon.texture = Texture.fromImage('bee-drone-wings.png')
+        beeAddon.texture = Texture.fromImage('images/bee/bee-drone-wings.png')
       } else {
-        beeAddon.texture = Texture.fromImage('bee-drone-wings-flapped.png')
+        beeAddon.texture = Texture.fromImage('images/bee/bee-drone-wings-flapped.png')
       }
     } else {
       bee.scale.set(1, 1)
       if ((bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) || Math.sin(bee.animationTicker / 2) > 0) {
-        beeAddon.texture = Texture.fromImage('bee-drone-legs.png')
+        beeAddon.texture = Texture.fromImage('images/bee/bee-drone-legs.png')
       } else {
-        beeAddon.texture = Texture.fromImage('bee-drone-legs-jerk.png')
+        beeAddon.texture = Texture.fromImage('images/bee/bee-drone-legs-jerk.png')
       }
     }
 
