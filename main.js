@@ -1880,7 +1880,8 @@ function createBee(parent, type, startPosition) {
       }
     }
 
-    if (bee.position.y === 25) return
+    const deadPosition = 32
+    if (bee.position.y === deadPosition) return
 
     if (bee.isDead()) {
       bee.texture = Texture.fromImage('bee-drone-dead.png')
@@ -1890,9 +1891,9 @@ function createBee(parent, type, startPosition) {
       beeAddon.visible = false
       beeExclamation.visible = false
       bee.disableParticle()
-      if (bee.position.y !== 25) {
+      if (bee.position.y !== deadPosition) {
         bee.position.x = 65 + (Math.random() * 100)
-        bee.position.y = 25
+        bee.position.y = deadPosition
       }
       bee.destroy()
       return
