@@ -165,17 +165,20 @@ function setup() {
     uiTopBar.addChild(timelineText)
     
     const yearLabel = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
-    yearLabel.position.x = 250
+    yearLabel.anchor.set(1, 0)
+    yearLabel.position.x = 260
     yearLabel.position.y = 4
     uiTopBar.addChild(yearLabel)
 
     const dayLabel = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
-    dayLabel.position.x = 300
+    dayLabel.anchor.set(1, 0)
+    dayLabel.position.x = 308
     dayLabel.position.y = 4
     uiTopBar.addChild(dayLabel)
 
     const hourLabel = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
-    hourLabel.position.x = 354
+    hourLabel.anchor.set(1, 0)
+    hourLabel.position.x = 364
     hourLabel.position.y = 4
     uiTopBar.addChild(hourLabel)
 
