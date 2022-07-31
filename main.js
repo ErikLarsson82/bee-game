@@ -1528,7 +1528,7 @@ function createBee(parent, type, startPosition) {
       container.addChild(textDescription)
     })
 
-    const helper = new PIXI.Text('Loading...', { ...picoFontConfig })
+    const helper = new PIXI.Text('Loading...', { ...picoFontConfig, lineHeight: 44 })
     helper.scale.set(0.15, 0.15)
     helper.position.x = 82
     helper.position.y = 31
@@ -1536,7 +1536,7 @@ function createBee(parent, type, startPosition) {
 
     addTicker('ui', () => {
       beeExclamationLabel.visible = bee.isHungry() && !bee.isDead()
-      helper.text = helperText()
+      helper.text = helperText().toUpperCase()
     })
     
     return container
