@@ -2288,7 +2288,7 @@ function cellWax(x, y, parent) {
     whiteLine.position.y = -30
     container.addChild(whiteLine)
 
-    const content = Sprite.fromImage('images/ui/content-honey-hex.png')
+    const content = Sprite.fromImage('images/ui/content-wax-hex.png')
     content.position.x = 72
     content.position.y = -29
     container.addChild(content)
@@ -2667,7 +2667,7 @@ function ProgressBar(x, y, type, tickerData, max) {
   progressSprite.position.y = y
   addTicker('ui', time => {
     const _max = max === undefined ? 100 : max
-    progressSprite.width = (tickerData() / max) * 21  
+    progressSprite.width = cap(0, _max)((tickerData() / max) * 21)
   })
   return progressSprite
 }
