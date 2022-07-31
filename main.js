@@ -1092,13 +1092,14 @@ function transferTo(capacity) {
 function typeIdlePos(type, pos) {
   const rowHeight = 38
   const beesPerRow = 8
+  const baseline = 106
   const y = {
-    unassigned: 112,
-    idle: 112,
-    [null]: 112,
-    forager: 112 + (1 * rowHeight),
-    nurser: 112 + (2 * rowHeight),
-    worker: 112 + (3 * rowHeight),
+    unassigned: baseline,
+    idle: baseline,
+    [null]: baseline,
+    forager: baseline + (1 * rowHeight),
+    nurser: baseline + (2 * rowHeight),
+    worker: baseline + (3 * rowHeight),
   }[type]
 
   return {
