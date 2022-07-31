@@ -56,7 +56,12 @@ const Container = PIXI.Container,
     Transform = PIXI.Transform
 
 loader.add("pico8-mono.ttf")
+<<<<<<< HEAD
 loader.load(setup)
+=======
+// loader.load(setup)
+loader.load(setupSplash)
+>>>>>>> 95cfbca... Fixed selection being behind
 
 const WIDTH = 1063
 const HEIGHT = 735
@@ -307,7 +312,7 @@ function setup() {
       selectedSprite.visible = false
     }
   })
-  hexForeground.addChild(selectedSprite)
+  ui.addChild(selectedSprite)
 
   warning = Sprite.fromImage('images/ui/warning.png')
   warning.position.x = 180
