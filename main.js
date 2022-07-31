@@ -15,13 +15,10 @@ const picoFontConfig = {
     fill: 'white'
 }
 
-const smallFont = {
-    fontSize: 4
-}
-
-const largeFont = {
-    fontSize: 8
-}
+const smallFont = { fontSize: 4 }
+const largeFont = { fontSize: 8 }
+const massiveFont = { fontSize: 16 }
+const hugeFont = { fontSize: 50 }
 
 const l = console.log
 const pretty = number => Math.round(number/1000)
@@ -49,7 +46,8 @@ const Container = PIXI.Container,
     Transform = PIXI.Transform
 
 loader.add("pico8-mono.ttf")
-loader.load(setup)
+loader.load(setupSplash)
+// loader.load(setup)
 
 const WIDTH = 1063
 const HEIGHT = 735
@@ -57,7 +55,7 @@ const app = new PIXI.Application(WIDTH, HEIGHT, { antialias: false })
 document.body.appendChild(app.view)
 
 app.renderer.view.style.imageRendering = 'pixelated'
-app.renderer.backgroundColor = 0x755737
+app.renderer.backgroundColor = 0x000000
 settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST // Pixel-scaling
 
 app.renderer.view.style.position = 'absolute'
@@ -73,6 +71,7 @@ let year = 1
 let seeds = 1
 let season = 'summer'
 
+let scene = null
 let selected = null
 let queen = null
 
@@ -88,17 +87,72 @@ let backgroundScene = null
 let hexBackground = null
 let hexForeground = null
 let flowerBed = null
+let pausedText = null
+let pauseFrame = null
 
 let hexGrid = []
 let flowers = []
 let tickers = []
 const bees = []
 
-function setup() {
+function setupSplash() {
+  scene = 'splash'
+  
   const container = new Container()
   container.scale.x = 2
   container.scale.y = 2
+  app.stage.addChild(container)
 
+  const splashscreen = new Graphics()
+  splashscreen.beginFill(0xffd601)
+  splashscreen.drawRect(0, 0, WIDTH, HEIGHT)
+  container.addChild(splashscreen)
+
+  const title = new PIXI.Text('Bee Game', { ...picoFontConfig, ...hugeFont, fill: '#c96f10' })
+  title.anchor.set(0.5, 0)
+  title.position.x = Math.round(WIDTH / 2 / 2)
+  title.position.y = 30
+  container.addChild(title)
+
+  const catchphrase = new PIXI.Text('No bee puns guaranteed', { ...picoFontConfig, ...massiveFont, fill: 'black' })
+  catchphrase.anchor.set(0.5, 0)
+  catchphrase.position.x = Math.round(WIDTH / 2 / 2)
+  catchphrase.position.y = 110
+  container.addChild(catchphrase)
+
+  const welcomeBee = Sprite.fromImage('images/bee/bee-drone-reference.png')
+  welcomeBee.scale.x = 2
+  welcomeBee.scale.y = 2
+  welcomeBee.position.x = Math.round(WIDTH / 2 / 2) - 25
+  welcomeBee.position.y = Math.round(HEIGHT / 2 / 2) - 0
+  splashscreen.addChild(welcomeBee)
+
+  const welcomeHoney = Sprite.fromImage('cell-honey-full.png')
+  welcomeHoney.scale.x = 2
+  welcomeHoney.scale.y = 2
+  welcomeHoney.position.x = Math.round(WIDTH / 2 / 2) + 5
+  welcomeHoney.position.y = Math.round(HEIGHT / 2 / 2) - 1
+  splashscreen.addChild(welcomeHoney)
+
+  const callback = () => {
+    app.stage.removeChild(container)
+    setup()
+  }
+  const scaler = new Container()
+  scaler.scale.x = 2
+  scaler.scale.y = 2
+  container.addChild(scaler)
+
+  const button = Button(Math.round(WIDTH/2/2/2)-20, 120, '  Play', callback)
+  scaler.addChild(button)
+}
+
+function setup() {
+  scene = 'game'
+
+  const container = new Container()
+  container.scale.x = 2
+  container.scale.y = 2
   app.stage.addChild(container)
 
   background = new Container()
@@ -181,32 +235,16 @@ function setup() {
       hourLabel.text = Math.round(hour)
     })
 
-    const pausedText = new PIXI.Text('Playing', { ...picoFontConfig, ...largeFont })
+    pausedText = new PIXI.Text('Playing', { ...picoFontConfig, ...largeFont })
     pausedText.position.x = 470
     pausedText.position.y = 4
     uiTopBar.addChild(pausedText)
 
-    const pauseFrame = new Graphics()
+    pauseFrame = new Graphics()
     pauseFrame.lineStyle(10, 0x000000);
     pauseFrame.drawRect(0, 0, WIDTH / 2, HEIGHT / 2)
     ui.addChild(pauseFrame)
 
-    window.setGameSpeedText = () => {
-      if (paused) {
-        pausedText.text = 'Paused'
-      } else if (gameSpeed === 1) {
-        pausedText.text = '>'
-      } else if (gameSpeed === 4) {
-        pausedText.text = '>>'
-      } else if (gameSpeed === 8) {
-        pausedText.text = '>>>'
-      } else if (gameSpeed === 64) {
-        pausedText.text = '>>>>>>>'
-      }
-      pauseFrame.visible = paused
-    }
-    window.setGameSpeedText()
-    
     ui.addChild(uiTopBar)
   }
 
@@ -220,6 +258,11 @@ function setup() {
   nightDimmer.drawRect(0, 0, WIDTH / 2, HEIGHT / 2)
   nightDimmer.alpha = 0
   nightDimmer.visible = true
+
+  addTicker('ui', time => {
+    setGameSpeedText()
+  })
+
   addTicker('game-stuff', time => {
     const isNight = hour > 21
     const isDay = !isNight
@@ -327,6 +370,22 @@ function setup() {
     window.setGameSpeedText()
   }
   document.addEventListener('visibilitychange', handleVisibilityChange, false)
+}
+
+
+function setGameSpeedText() {
+  if (paused) {
+    pausedText.text = 'Paused'
+  } else if (gameSpeed === 1) {
+    pausedText.text = '>'
+  } else if (gameSpeed === 4) {
+    pausedText.text = '>>'
+  } else if (gameSpeed === 8) {
+    pausedText.text = '>>>'
+  } else if (gameSpeed === 64) {
+    pausedText.text = '>>>>>>>'
+  }
+  pauseFrame.visible = paused
 }
 
 function singularOrPluralDay(amount) {
@@ -2641,6 +2700,8 @@ function Button(x, y, content, callback, hoverover, hoverout, _size) {
 }
 
 window.addEventListener('keydown', e => {
+  if (scene !== 'game') return;
+
   //Space
   if (e.keyCode === 32) {
     paused = !paused
@@ -2688,7 +2749,5 @@ window.addEventListener('keydown', e => {
     createBee(beeContainer, 'idle').setHunger(0.01).setPollen(60)
   }
   */
-    
-  setGameSpeedText()
 })
 
