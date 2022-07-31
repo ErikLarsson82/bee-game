@@ -47,7 +47,7 @@ const Container = PIXI.Container,
 
 loader.add("pico8-mono.ttf")
 loader.load(setupSplash)
-// loader.load(setup)
+//loader.load(setup)
 
 const WIDTH = 1063
 const HEIGHT = 735
@@ -2214,9 +2214,20 @@ function cellHoney(x, y, parent) {
     textDescription.position.y = -16
     container.addChild(textDescription)
 
+    const notEnoughWarning = new PIXI.Text('NOT ENOUGH HONEY', { ...picoFontConfig, fill: 'white' })
+    notEnoughWarning.scale.set(0.15, 0.15)
+    notEnoughWarning.position.x = 76
+    notEnoughWarning.position.y = 10
+    notEnoughWarning.visible = false
+    container.addChild(notEnoughWarning)
+
     const button = Button(84, -6, 'Make Wax', () => {
-      replaceHex([x, y], 'wax')
-      setSelected(null) 
+      if (honeySprite.honey >= (honeySprite.HONEY_HEX_CAPACITY * 0.9)) {
+        replaceHex([x, y], 'wax')
+        setSelected(null) 
+      } else {
+        notEnoughWarning.visible = true
+      }
     })
     container.addChild(button)
 
