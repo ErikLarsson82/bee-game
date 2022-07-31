@@ -56,12 +56,7 @@ const Container = PIXI.Container,
     Transform = PIXI.Transform
 
 loader.add("pico8-mono.ttf")
-<<<<<<< HEAD
 loader.load(setup)
-=======
-// loader.load(setup)
-loader.load(setupSplash)
->>>>>>> 95cfbca... Fixed selection being behind
 
 const WIDTH = 1063
 const HEIGHT = 735
