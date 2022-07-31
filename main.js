@@ -46,8 +46,8 @@ const Container = PIXI.Container,
     Transform = PIXI.Transform
 
 loader.add("pico8-mono.ttf")
+// loader.load(setup)
 loader.load(setupSplash)
-//loader.load(setup)
 
 const WIDTH = 1063
 const HEIGHT = 735
@@ -346,7 +346,7 @@ function setup() {
       selectedSprite.visible = false
     }
   })
-  hexForeground.addChild(selectedSprite)
+  ui.addChild(selectedSprite)
 
   panel = new Container()
   ui.addChild(panel)
