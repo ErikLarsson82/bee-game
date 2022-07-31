@@ -507,13 +507,14 @@ function createFlowers() {
   for (var f = 0; f < seeds; f++) {
     const flower = Sprite.fromImage('images/scene/flower.png')
 
+    const flipped = Math.random() < 0.5
+
     const flowerExclamation = Sprite.fromImage('exclamation-warning-mild.png')
-    flowerExclamation.position.x = 20
+    flowerExclamation.position.x = flipped ? -10 : 10
     flowerExclamation.position.y = -20
     flowerExclamation.visible = false
     flower.addChild(flowerExclamation)
 
-    const flipped = Math.random() < 0.5
     makeOccupiable(flower)
     makeSelectable(flower, 'flower')
 
