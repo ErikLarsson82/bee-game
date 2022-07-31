@@ -52,7 +52,7 @@ loader.load(setupSplash)
 const WIDTH = 1063
 const HEIGHT = 735
 const app = new PIXI.Application(WIDTH, HEIGHT, { antialias: false })
-document.body.appendChild(app.view)
+document.getElementById('container').appendChild(app.view)
 
 app.renderer.view.style.imageRendering = 'pixelated'
 app.renderer.backgroundColor = 0x000000
@@ -135,6 +135,7 @@ function setupSplash() {
   splashscreen.addChild(welcomeHoney)
 
   const callback = () => {
+    document.body.style['background-color'] = '#fff4bc'
     app.stage.removeChild(container)
     setup()
   }

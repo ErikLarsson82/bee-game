@@ -4,17 +4,30 @@
 		<meta charset="utf-8">
 		<title>Bee game</title>
 		<style>
-	  	* {padding: 0; margin: 0}
-		
-		@font-face {
-		  font-family: pico8;
-		  src: url(pico8-mono.ttf);
-		}
+			body {
+				background-color: #ffd601;
+			}
+
+			#container {
+				display: flex;
+				justify-content: center;
+			}
+
+		  	* {
+		  		padding: 0;
+		  		margin: 0;
+		  	}
+			
+			@font-face {
+			  font-family: pico8;
+			  src: url(pico8-mono.ttf);
+			}
 		</style>
 	</head>
 	<script src="node_modules/pixi.js/dist/pixi.min.js"></script>
 	<script src="node_modules/@pixi/math-extras/dist/browser/math-extras.js"></script>
 	<body>
+		<div id="container"></div>
 		<span style="font-family: pico8"></span>
 		<script src="hex.js"></script>
 		<script src="main.js"></script>
