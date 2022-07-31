@@ -1,10 +1,3 @@
-// Speed affects "physics-engine"-buggen
-// Anchor everything at 0.5 to fix placements 
-// Clickable Shadows on idle spots
-// Circle selection on Bees
-// Selection on flower
-// Testa noll padding mellan hexagoner
-
 const MAP_SELECTION = 'default'
 let DEBUG = false
 
