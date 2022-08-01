@@ -1,10 +1,3 @@
-// Speed affects "physics-engine"-buggen
-// Anchor everything at 0.5 to fix placements 
-// Clickable Shadows on idle spots
-// Circle selection on Bees
-// Selection on flower
-// Testa noll padding mellan hexagoner
-
 const MAP_SELECTION = 'default'
 let DEBUG = false
 
@@ -22,13 +15,10 @@ const picoFontConfig = {
     fill: 'white'
 }
 
-const smallFont = {
-    fontSize: 4
-}
-
-const largeFont = {
-    fontSize: 8
-}
+const smallFont = { fontSize: 4 }
+const largeFont = { fontSize: 8 }
+const massiveFont = { fontSize: 16 }
+const hugeFont = { fontSize: 50 }
 
 const l = console.log
 const pretty = number => Math.round(number/1000)
@@ -56,15 +46,16 @@ const Container = PIXI.Container,
     Transform = PIXI.Transform
 
 loader.add("pico8-mono.ttf")
-loader.load(setup)
+// loader.load(setup)
+loader.load(setupSplash)
 
 const WIDTH = 1063
 const HEIGHT = 735
 const app = new PIXI.Application(WIDTH, HEIGHT, { antialias: false })
-document.body.appendChild(app.view)
+document.getElementById('container').appendChild(app.view)
 
 app.renderer.view.style.imageRendering = 'pixelated'
-app.renderer.backgroundColor = 0x755737
+app.renderer.backgroundColor = 0x000000
 settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST // Pixel-scaling
 
 app.renderer.view.style.position = 'absolute'
@@ -80,32 +71,89 @@ let year = 1
 let seeds = 1
 let season = 'summer'
 
+let scene = null
 let selected = null
 let queen = null
 
 let panel = null
 let background = null
 let ui = null
+let uiTopBar = null
 let populationText = null
 let selectedSprite = null
 let beeContainer = null
 let nightDimmer = null
 let backgroundScene = null
-let warning = null
 let hexBackground = null
 let hexForeground = null
 let flowerBed = null
+let pausedText = null
+let pauseFrame = null
 
 let hexGrid = []
 let flowers = []
 let tickers = []
 const bees = []
 
-function setup() {
+function setupSplash() {
+  scene = 'splash'
+  
   const container = new Container()
   container.scale.x = 2
   container.scale.y = 2
+  app.stage.addChild(container)
 
+  const splashscreen = new Graphics()
+  splashscreen.beginFill(0xffd601)
+  splashscreen.drawRect(0, 0, WIDTH, HEIGHT)
+  container.addChild(splashscreen)
+
+  const title = new PIXI.Text('Bee Game', { ...picoFontConfig, ...hugeFont, fill: '#c96f10' })
+  title.anchor.set(0.5, 0)
+  title.position.x = Math.round(WIDTH / 2 / 2)
+  title.position.y = 30
+  container.addChild(title)
+
+  const catchphrase = new PIXI.Text('No bee puns guaranteed', { ...picoFontConfig, ...massiveFont, fill: 'black' })
+  catchphrase.anchor.set(0.5, 0)
+  catchphrase.position.x = Math.round(WIDTH / 2 / 2)
+  catchphrase.position.y = 110
+  container.addChild(catchphrase)
+
+  const welcomeBee = Sprite.fromImage('images/bee/bee-drone-reference.png')
+  welcomeBee.scale.x = 2
+  welcomeBee.scale.y = 2
+  welcomeBee.position.x = Math.round(WIDTH / 2 / 2) - 25
+  welcomeBee.position.y = Math.round(HEIGHT / 2 / 2) - 0
+  splashscreen.addChild(welcomeBee)
+
+  const welcomeHoney = Sprite.fromImage('cell-honey-full.png')
+  welcomeHoney.scale.x = 2
+  welcomeHoney.scale.y = 2
+  welcomeHoney.position.x = Math.round(WIDTH / 2 / 2) + 5
+  welcomeHoney.position.y = Math.round(HEIGHT / 2 / 2) - 1
+  splashscreen.addChild(welcomeHoney)
+
+  const callback = () => {
+    document.body.style['background-color'] = '#fff4bc'
+    app.stage.removeChild(container)
+    setup()
+  }
+  const scaler = new Container()
+  scaler.scale.x = 2
+  scaler.scale.y = 2
+  container.addChild(scaler)
+
+  const button = Button(Math.round(WIDTH/2/2/2)-20, 120, '  Play', callback)
+  scaler.addChild(button)
+}
+
+function setup() {
+  scene = 'game'
+
+  const container = new Container()
+  container.scale.x = 2
+  container.scale.y = 2
   app.stage.addChild(container)
 
   background = new Container()
@@ -145,7 +193,7 @@ function setup() {
   }
 
   {
-    const uiTopBar = new Graphics()
+    uiTopBar = new Graphics()
     uiTopBar.beginFill(0x000000)
     uiTopBar.drawRect(0, 0, 1024, 20)
     
@@ -165,17 +213,20 @@ function setup() {
     uiTopBar.addChild(timelineText)
     
     const yearLabel = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
-    yearLabel.position.x = 250
+    yearLabel.anchor.set(1, 0)
+    yearLabel.position.x = 260
     yearLabel.position.y = 4
     uiTopBar.addChild(yearLabel)
 
     const dayLabel = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
-    dayLabel.position.x = 300
+    dayLabel.anchor.set(1, 0)
+    dayLabel.position.x = 308
     dayLabel.position.y = 4
     uiTopBar.addChild(dayLabel)
 
     const hourLabel = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
-    hourLabel.position.x = 354
+    hourLabel.anchor.set(1, 0)
+    hourLabel.position.x = 364
     hourLabel.position.y = 4
     uiTopBar.addChild(hourLabel)
 
@@ -185,41 +236,16 @@ function setup() {
       hourLabel.text = Math.round(hour)
     })
 
-
-    const seasonCycle = new PIXI.Text('Loading', { ...picoFontConfig, ...largeFont })
-    seasonCycle.position.x = 396
-    seasonCycle.position.y = 4
-    uiTopBar.addChild(seasonCycle)
-    addTicker('ui', time => {
-      seasonCycle.text = season === 'summer' ? 'Summer' : 'Winter'
-    })
-
-    const pausedText = new PIXI.Text('Playing', { ...picoFontConfig, ...largeFont })
+    pausedText = new PIXI.Text('Playing', { ...picoFontConfig, ...largeFont })
     pausedText.position.x = 470
     pausedText.position.y = 4
     uiTopBar.addChild(pausedText)
 
-    const pauseFrame = new Graphics()
+    pauseFrame = new Graphics()
     pauseFrame.lineStyle(10, 0x000000);
     pauseFrame.drawRect(0, 0, WIDTH / 2, HEIGHT / 2)
     ui.addChild(pauseFrame)
 
-    window.setGameSpeedText = () => {
-      if (paused) {
-        pausedText.text = 'Paused'
-      } else if (gameSpeed === 1) {
-        pausedText.text = '>'
-      } else if (gameSpeed === 4) {
-        pausedText.text = '>>'
-      } else if (gameSpeed === 8) {
-        pausedText.text = '>>>'
-      } else if (gameSpeed === 64) {
-        pausedText.text = '>>>>>>>'
-      }
-      pauseFrame.visible = paused
-    }
-    window.setGameSpeedText()
-    
     ui.addChild(uiTopBar)
   }
 
@@ -233,6 +259,11 @@ function setup() {
   nightDimmer.drawRect(0, 0, WIDTH / 2, HEIGHT / 2)
   nightDimmer.alpha = 0
   nightDimmer.visible = true
+
+  addTicker('ui', time => {
+    setGameSpeedText()
+  })
+
   addTicker('game-stuff', time => {
     const isNight = hour > 21
     const isDay = !isNight
@@ -294,31 +325,36 @@ function setup() {
   
   selectedSprite = new Container()
   selectedSprite.visible = false
-  const selectedSpriteSub = Sprite.fromImage('cell-selected.png')
+  const selectedSpriteSub = Sprite.fromImage('images/ui/selection-cell.png')
   selectedSpriteSub.position.x = -2
   selectedSpriteSub.position.y = -2
   selectedSprite.addChild(selectedSpriteSub)  
   addTicker('ui', time => {
     if (selected) {
+      if (selected.label === 'bee') {
+        selectedSpriteSub.texture = Texture.fromImage('images/ui/selection-circle.png')
+        selectedSprite.position.x = selected.position.x + 2
+        selectedSprite.position.y = selected.position.y + 1
+      } else {
+        selectedSpriteSub.texture = Texture.fromImage('images/ui/selection-cell.png')
+        selectedSprite.position.x = selected.position.x
+        selectedSprite.position.y = selected.position.y
+      }
       selectedSprite.visible = true
-      selectedSprite.position.x = selected.position.x
-      selectedSprite.position.y = selected.position.y
+      
     } else {
       selectedSprite.visible = false
     }
   })
   ui.addChild(selectedSprite)
 
-  warning = Sprite.fromImage('images/ui/warning.png')
-  warning.position.x = 180
-  warning.position.y = 30  
-  warning.visible = false
-  ui.addChild(warning)
-
   panel = new Container()
   ui.addChild(panel)
 
   addJobsButtons(jobsPanel)
+
+  createWarningSign()
+  createSeasonTracker()
 
   createMap(MAP_SELECTION)
   createFlowers()
@@ -335,6 +371,96 @@ function setup() {
     window.setGameSpeedText()
   }
   document.addEventListener('visibilitychange', handleVisibilityChange, false)
+}
+
+
+function setGameSpeedText() {
+  if (paused) {
+    pausedText.text = 'Paused'
+  } else if (gameSpeed === 1) {
+    pausedText.text = '>'
+  } else if (gameSpeed === 4) {
+    pausedText.text = '>>'
+  } else if (gameSpeed === 8) {
+    pausedText.text = '>>>'
+  } else if (gameSpeed === 64) {
+    pausedText.text = '>>>>>>>'
+  }
+  pauseFrame.visible = paused
+}
+
+function singularOrPluralDay(amount) {
+  if (amount === 1) return `${amount} day`
+  return `${amount} days`
+} 
+
+function createSeasonTracker() {
+  let storedCycles = null
+  let lastStoredCycle = null
+  let summerDayOffset = null
+
+  const seasonTracker = Sprite.fromImage('images/ui/season-tracker/background.png')
+  seasonTracker.position.x = 384
+  seasonTracker.position.y = 3
+  uiTopBar.addChild(seasonTracker)
+
+  const seasonTrackerLabel = new PIXI.Text('Loading', { ...picoFontConfig, fontSize: 4 })
+  seasonTrackerLabel.position.x = 378
+  seasonTrackerLabel.position.y = 13
+  uiTopBar.addChild(seasonTrackerLabel)
+
+  const summerProgress = Sprite.fromImage('images/ui/season-tracker/bar-summer.png')
+  const summerTexture = Texture.fromImage('images/ui/season-tracker/bar-summer.png')
+  const winterTexture = Texture.fromImage('images/ui/season-tracker/bar-winter.png')
+  summerProgress.position.x = 1
+  summerProgress.position.y = 1
+  seasonTracker.addChild(summerProgress)
+  
+  addTicker('ui', time => {
+    const isSummer = season === 'summer'
+    if (lastStoredCycle !== cycles.length) {
+      summerDayOffset = isSummer ? 0 : storedCycles
+      storedCycles = cycles[0]
+      lastStoredCycle = cycles.length
+    }
+    const maxWidth = 65
+    const dayFraction = (day-1-summerDayOffset) / storedCycles
+    const hourFraction = hour / (storedCycles * 24)
+    summerProgress.width = 65 * (dayFraction + hourFraction)
+    const seasonLabel = isSummer ? 'Summer' : 'Winter'
+    seasonTrackerLabel.text = `${seasonLabel} - ${singularOrPluralDay(cycles[0])} left` 
+    summerProgress.texture = isSummer
+      ? summerTexture
+      : winterTexture
+  })
+}
+
+function createWarningSign() {
+  const queenWarning = Sprite.fromImage('images/queen/dialogue.png')
+  queenWarning.dismissed = false
+  queenWarning.position.x = 0
+  queenWarning.position.y = 0
+  queenWarning.visible = true
+  queenWarning.interactive = true
+  queenWarning.buttonMode = true
+  queenWarning.mouseup = (e) => {
+    queenWarning.dismissed = true
+  }
+  foreground.addChild(queenWarning)
+
+  const textHeading = new PIXI.Text('WINTER IN ONE DAY', { ...picoFontConfig, fill: 'black' })
+  textHeading.scale.set(0.15, 0.15)
+  textHeading.position.x = 10
+  textHeading.position.y = 3
+  queenWarning.addChild(textHeading)
+
+  addTicker('game-stuff', () => {
+    queenWarning.position.x = queen.position.x - 2
+    queenWarning.position.y = queen.position.y - 18
+
+    if (season === 'winter') queenWarning.dismissed = false
+    queenWarning.visible = isDayBeforeWinter() && !queenWarning.dismissed
+  })
 }
 
 function isDayBeforeWinter() {
@@ -411,11 +537,7 @@ function gameloop(delta, manualTick) {
       hour = 0
       day++
       cycles[0]--
-      if (isDayBeforeWinter()) {
-        warning.visible = true
-      }
       if (cycles[0] === 0) {
-        warning.visible = false
         cycles = cycles.slice(1)
         season = season === 'summer' ? 'winter' : 'summer'
         if (season === 'summer') {
@@ -438,13 +560,14 @@ function createFlowers() {
   for (var f = 0; f < seeds; f++) {
     const flower = Sprite.fromImage('images/scene/flower.png')
 
+    const flipped = Math.random() < 0.5
+
     const flowerExclamation = Sprite.fromImage('exclamation-warning-mild.png')
-    flowerExclamation.position.x = 20
+    flowerExclamation.position.x = flipped ? -10 : 10
     flowerExclamation.position.y = -20
     flowerExclamation.visible = false
     flower.addChild(flowerExclamation)
 
-    const flipped = Math.random() < 0.5
     makeOccupiable(flower)
     makeSelectable(flower, 'flower')
 
@@ -1022,13 +1145,14 @@ function transferTo(capacity) {
 function typeIdlePos(type, pos) {
   const rowHeight = 38
   const beesPerRow = 8
+  const baseline = 106
   const y = {
-    unassigned: 112,
-    idle: 112,
-    [null]: 112,
-    forager: 112 + (1 * rowHeight),
-    nurser: 112 + (2 * rowHeight),
-    worker: 112 + (3 * rowHeight),
+    unassigned: baseline,
+    idle: baseline,
+    [null]: baseline,
+    forager: baseline + (1 * rowHeight),
+    nurser: baseline + (2 * rowHeight),
+    worker: baseline + (3 * rowHeight),
   }[type]
 
   return {
@@ -1185,15 +1309,16 @@ function decreaseForagers() {
 }
 
 function createQueen(parent) {
-  const queenSprite = PIXI.Sprite.fromImage('bee-queen.png')
+  const queenSprite = PIXI.Sprite.fromImage('images/queen/bee-queen.png')
+
   makeSelectable(queenSprite, 'queen')
   queenSprite.type = 'queen'
   
-  const queenWingAddon = Sprite.fromImage('bee-queen-wings-flapped.png')
+  const queenWingAddon = Sprite.fromImage('images/queen/bee-queen-wings-flapped.png')
   queenWingAddon.visible = false
   queenSprite.addChild(queenWingAddon)
   
-  const queenLegAddon = Sprite.fromImage('bee-queen-legs-jerk.png')
+  const queenLegAddon = Sprite.fromImage('images/queen/bee-queen-legs-jerk.png')
   queenLegAddon.visible = false
   queenSprite.addChild(queenLegAddon)
   
@@ -1281,7 +1406,7 @@ function createQueen(parent) {
 }
 
 function createBee(parent, type, startPosition) {
-  const bee = Sprite.fromImage('bee-drone-body.png')
+  const bee = Sprite.fromImage('images/bee/bee-drone-body.png')
   bee.opacity = 1
   
   const shadow = Sprite.fromImage('images/bee/shadow.png')
@@ -1293,7 +1418,7 @@ function createBee(parent, type, startPosition) {
   animationSprite.delay = 0
   bee.addChild(animationSprite)
   
-  const beeAddon = Sprite.fromImage('bee-drone-legs.png')
+  const beeAddon = Sprite.fromImage('images/bee/bee-drone-legs.png')
   beeAddon.position.x = -1
   beeAddon.position.y = -1
   beeAddon.opacity = 1
@@ -1418,22 +1543,23 @@ function createBee(parent, type, startPosition) {
     const container = new Container()
     
     const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
-    whiteLine.position.x = 0
-    whiteLine.position.y = -30
+    whiteLine.position.x = -3
+    whiteLine.position.y = -38
     container.addChild(whiteLine)
 
     const content = Sprite.fromImage('images/ui/content-boilerplate.png')
     content.position.x = 72
-    content.position.y = -29
+    content.position.y = -37
     container.addChild(content)
 
     const beeExclamationLabel = Sprite.fromImage('exclamation-warning-severe.png')
     beeExclamationLabel.position.x = 84
-    beeExclamationLabel.position.y = 37
+    beeExclamationLabel.position.y = 29
     beeExclamationLabel.visible = false
     container.addChild(beeExclamationLabel)
 
-    const p = [-15, -15 + (1 * 9), -15 + (2 * 9), -15 + (3 * 9), -15 + (4 * 9), -15 + (5 * 9)]
+    const bs = -23
+    const p = [bs, bs + (1 * 9), bs + (2 * 9), bs + (3 * 9), bs + (4 * 9), bs + (5 * 9)]
     container.addChild(ProgressBar(112, p[0], 'hunger', () => bee.hunger, bee.HUNGER_CAPACITY))
     container.addChild(ProgressBar(112, p[1], 'honey', () => bee.honeySack, bee.HONEY_SACK_CAPACITY))
     container.addChild(ProgressBar(112, p[2], 'nectar', () => bee.nectarSack, bee.NECTAR_SACK_CAPACITY))
@@ -1444,7 +1570,7 @@ function createBee(parent, type, startPosition) {
     const textHeading = new PIXI.Text('BEE', { ...picoFontConfig })
     textHeading.scale.set(0.15, 0.15)
     textHeading.position.x = 100
-    textHeading.position.y = -26
+    textHeading.position.y = -34
     container.addChild(textHeading)
 
     const texts = ['HUNGER', 'HONEY', 'NECTAR', 'WAX', 'POLLEN', 'AGE']
@@ -1453,19 +1579,19 @@ function createBee(parent, type, startPosition) {
       const textDescription = new PIXI.Text(text, { ...picoFontConfig, fill: '#96a5bc' })
       textDescription.scale.set(0.15, 0.15)
       textDescription.position.x = 82
-      textDescription.position.y = -16 + (idx * 9)
+      textDescription.position.y = -24 + (idx * 9)
       container.addChild(textDescription)
     })
 
-    const helper = new PIXI.Text('Loading...', { ...picoFontConfig })
+    const helper = new PIXI.Text('Loading...', { ...picoFontConfig, lineHeight: 44 })
     helper.scale.set(0.15, 0.15)
     helper.position.x = 82
-    helper.position.y = 39
+    helper.position.y = 31
     container.addChild(helper)
 
     addTicker('ui', () => {
       beeExclamationLabel.visible = bee.isHungry() && !bee.isDead()
-      helper.text = helperText()
+      helper.text = helperText().toUpperCase()
     })
     
     return container
@@ -1809,19 +1935,20 @@ function createBee(parent, type, startPosition) {
       }
     }
 
-    if (bee.position.y === 25) return
+    const deadPosition = 32
+    if (bee.position.y === deadPosition) return
 
     if (bee.isDead()) {
-      bee.texture = Texture.fromImage('bee-drone-dead.png')
+      bee.texture = Texture.fromImage('images/bee/bee-drone-dead.png')
       honeyDrop.visible = false
       nectarDrop.visible = false
       waxDrop.visible = false
       beeAddon.visible = false
       beeExclamation.visible = false
       bee.disableParticle()
-      if (bee.position.y !== 25) {
+      if (bee.position.y !== deadPosition) {
         bee.position.x = 65 + (Math.random() * 100)
-        bee.position.y = 25
+        bee.position.y = deadPosition
       }
       bee.destroy()
       return
@@ -1838,16 +1965,16 @@ function createBee(parent, type, startPosition) {
     if (bee.vx !== 0 || bee.vy !== 0) {
       (bee.vx >= -0.15 || bee.vx === 0) ? bee.scale.set(1, 1) : bee.scale.set(-1, 1) //
       if (Math.sin(bee.animationTicker) > 0) {
-        beeAddon.texture = Texture.fromImage('bee-drone-wings.png')
+        beeAddon.texture = Texture.fromImage('images/bee/bee-drone-wings.png')
       } else {
-        beeAddon.texture = Texture.fromImage('bee-drone-wings-flapped.png')
+        beeAddon.texture = Texture.fromImage('images/bee/bee-drone-wings-flapped.png')
       }
     } else {
       bee.scale.set(1, 1)
       if ((bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) || Math.sin(bee.animationTicker / 2) > 0) {
-        beeAddon.texture = Texture.fromImage('bee-drone-legs.png')
+        beeAddon.texture = Texture.fromImage('images/bee/bee-drone-legs.png')
       } else {
-        beeAddon.texture = Texture.fromImage('bee-drone-legs-jerk.png')
+        beeAddon.texture = Texture.fromImage('images/bee/bee-drone-legs-jerk.png')
       }
     }
 
@@ -2091,9 +2218,20 @@ function cellHoney(x, y, parent) {
     textDescription.position.y = -16
     container.addChild(textDescription)
 
+    const notEnoughWarning = new PIXI.Text('NOT ENOUGH HONEY', { ...picoFontConfig, fill: 'white' })
+    notEnoughWarning.scale.set(0.15, 0.15)
+    notEnoughWarning.position.x = 76
+    notEnoughWarning.position.y = 10
+    notEnoughWarning.visible = false
+    container.addChild(notEnoughWarning)
+
     const button = Button(84, -6, 'Make Wax', () => {
-      replaceHex([x, y], 'wax')
-      setSelected(null) 
+      if (honeySprite.honey >= (honeySprite.HONEY_HEX_CAPACITY * 0.9)) {
+        replaceHex([x, y], 'wax')
+        setSelected(null) 
+      } else {
+        notEnoughWarning.visible = true
+      }
     })
     container.addChild(button)
 
@@ -2541,7 +2679,7 @@ function ProgressBar(x, y, type, tickerData, max) {
   progressSprite.position.y = y
   addTicker('ui', time => {
     const _max = max === undefined ? 100 : max
-    progressSprite.width = (tickerData() / max) * 20
+    progressSprite.width = cap(0, _max)((tickerData() / max) * 20)
   })
   return progressSprite
 }
@@ -2586,6 +2724,8 @@ function Button(x, y, content, callback, hoverover, hoverout, _size) {
 }
 
 window.addEventListener('keydown', e => {
+  if (scene !== 'game') return;
+
   //Space
   if (e.keyCode === 32) {
     paused = !paused
@@ -2633,7 +2773,5 @@ window.addEventListener('keydown', e => {
     createBee(beeContainer, 'idle').setHunger(0.01).setPollen(60)
   }
   */
-    
-  setGameSpeedText()
 })
 
