@@ -3,6 +3,8 @@ function createBee(parent, type, startPosition) {
   const bee = Sprite.fromImage('images/bee/bee-drone-body.png')
   bee.opacity = 1
   
+  animateSprite(bee, 'bee', 43)
+
   const shadow = Sprite.fromImage('images/bee/shadow.png')
   bee.addChild(shadow)
   
