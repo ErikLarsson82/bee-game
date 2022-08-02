@@ -31,7 +31,7 @@ function createSeasonTracker() {
     const maxWidth = 65
     const dayFraction = (day-1-summerDayOffset) / storedCycles
     const hourFraction = hour / (storedCycles * 24)
-    summerProgress.width = 65 - (65 * (dayFraction + hourFraction))
+    summerProgress.width = maxWidth - (maxWidth * (dayFraction + hourFraction))
     const seasonLabel = isSummer ? 'Summer' : 'Winter'
     seasonTrackerLabel.text = `${seasonLabel} - ${singularOrPluralDay(cycles[0])}` 
     summerProgress.texture = isSummer
