@@ -277,7 +277,7 @@ function setup() {
   })
   dimmer.addChild(nightDimmer)
 
-  const jobsPanel = Sprite.fromImage('ui-jobs-panel.png')
+  const jobsPanel = Sprite.fromImage('images/ui/ui-jobs-panel.png')
   jobsPanel.position.x = 140
   jobsPanel.position.y = 95
   background.addChild(jobsPanel)
