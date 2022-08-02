@@ -127,7 +127,7 @@ function setupSplash() {
   welcomeBee.position.y = Math.round(HEIGHT / 2 / 2) - 0
   splashscreen.addChild(welcomeBee)
 
-  const welcomeHoney = Sprite.fromImage('cell-honey-full.png')
+  const welcomeHoney = Sprite.fromImage('images/hex/honey/cell-honey-full.png')
   welcomeHoney.scale.x = 2
   welcomeHoney.scale.y = 2
   welcomeHoney.position.x = Math.round(WIDTH / 2 / 2) + 5
@@ -562,7 +562,7 @@ function createFlowers() {
 
     const flipped = Math.random() < 0.5
 
-    const flowerExclamation = Sprite.fromImage('exclamation-warning-mild.png')
+    const flowerExclamation = Sprite.fromImage('images/exclamations/exclamation-warning-mild.png')
     flowerExclamation.position.x = flipped ? -10 : 10
     flowerExclamation.position.y = -20
     flowerExclamation.visible = false
@@ -651,7 +651,7 @@ function addJobsButtons(jobsPanel) {
   for (var i = 0; i < 3; i++) {
     for (var j = 0; j < 2; j++) {
       {
-        const button = Sprite.fromImage(j === 0 ? 'minus.png' : 'plus.png')
+        const button = Sprite.fromImage(j === 0 ? 'images/ui/minus.png' : 'images/ui/plus.png')
         button.position.x = 54 + (j * 12)
         button.position.y = 41 + (i * 38)
         button.interactive = true
@@ -945,7 +945,7 @@ function makeSelectable(sprite, label) {
 }
 
 function makeOccupiable(parent) {
-  const spotClaimed = PIXI.Sprite.fromImage('spot-claimed.png')
+  const spotClaimed = PIXI.Sprite.fromImage('images/ui/spot-claimed.png')
   spotClaimed.visible = false
   parent.addChild(spotClaimed)
 
@@ -1253,7 +1253,7 @@ function makeParticleCreator(bee) {
       transferRate = (Math.random() * 1) + 0.8
       bee.particleDelay = 1
 
-      const pollenPixel = Sprite.fromImage('pollen-pixel.png')
+      const pollenPixel = Sprite.fromImage('images/drops/pollen-pixel.png')
       pollenPixel.position.x = bee.position.x + 2 + (Math.random() * 4)
       pollenPixel.position.y = bee.position.y + 4 + (Math.random() * 3) - 1.5
       let lifetime = 0
@@ -1423,19 +1423,19 @@ function createBee(parent, type, startPosition) {
   beeAddon.position.y = -1
   beeAddon.opacity = 1
   bee.addChild(beeAddon)
-  const honeyDrop = Sprite.fromImage('drop-honey.png')
+  const honeyDrop = Sprite.fromImage('images/drops/drop-honey.png')
   honeyDrop.position.x = 2
   honeyDrop.position.y = 6
   bee.addChild(honeyDrop)
-  const nectarDrop = Sprite.fromImage('drop-nectar.png')
+  const nectarDrop = Sprite.fromImage('images/drops/drop-nectar.png')
   nectarDrop.position.x = 0
   nectarDrop.position.y = 5
   bee.addChild(nectarDrop)
-  const waxDrop = Sprite.fromImage('drop-wax.png')
+  const waxDrop = Sprite.fromImage('images/drops/drop-wax.png')
   waxDrop.position.x = -2
   waxDrop.position.y = 5
   bee.addChild(waxDrop)
-  const beeExclamation = Sprite.fromImage('exclamation-warning-severe.png')
+  const beeExclamation = Sprite.fromImage('images/exclamations/exclamation-warning-severe.png')
   beeExclamation.position.x = 12
   beeExclamation.position.y = -2
   beeExclamation.visible = false
@@ -1552,7 +1552,7 @@ function createBee(parent, type, startPosition) {
     content.position.y = -37
     container.addChild(content)
 
-    const beeExclamationLabel = Sprite.fromImage('exclamation-warning-severe.png')
+    const beeExclamationLabel = Sprite.fromImage('images/exclamations/exclamation-warning-severe.png')
     beeExclamationLabel.position.x = 84
     beeExclamationLabel.position.y = 29
     beeExclamationLabel.visible = false
@@ -2004,7 +2004,7 @@ function createBee(parent, type, startPosition) {
 
 function cellDisabled(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
-  const disabledSprite = Sprite.fromImage('cell-disabled.png')
+  const disabledSprite = Sprite.fromImage('images/hex/states/cell-disabled.png')
   disabledSprite.position.x = pixelCoordinate.x
   disabledSprite.position.y = pixelCoordinate.y
   disabledSprite.isDisabled = () => true
@@ -2016,7 +2016,7 @@ function cellDisabled(x, y, parent) {
 
 function cellEmpty(x, y, parent, parent2) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
-  const emptySprite = Sprite.fromImage('cell-empty.png')
+  const emptySprite = Sprite.fromImage('images/hex/states/cell-empty.png')
   makeSelectable(emptySprite, 'cell')
   emptySprite.position.x = pixelCoordinate.x
   emptySprite.position.y = pixelCoordinate.y
@@ -2050,7 +2050,7 @@ function cellEmpty(x, y, parent, parent2) {
   
   parent.addChild(emptySprite)
 
-  const backgroundSprite = Sprite.fromImage('cell-background.png')
+  const backgroundSprite = Sprite.fromImage('images/hex/states/cell-background.png')
   backgroundSprite.position.x = pixelCoordinate.x - 10
   backgroundSprite.position.y = pixelCoordinate.y - 10
   parent2.addChild(backgroundSprite)
@@ -2060,9 +2060,9 @@ function cellEmpty(x, y, parent, parent2) {
 
 function cellPrepared(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
-  const preparedCellSprite = Sprite.fromImage('cell-prepared-partial1.png')
+  const preparedCellSprite = Sprite.fromImage('images/hex/prepared/cell-prepared-partial1.png')
 
-  const spriteExclamation = Sprite.fromImage('exclamation-warning-severe.png')
+  const spriteExclamation = Sprite.fromImage('images/exclamations/exclamation-warning-severe.png')
   spriteExclamation.position.x = 14
   spriteExclamation.position.y = -6
   spriteExclamation.visible = false
@@ -2141,14 +2141,14 @@ function cellPrepared(x, y, parent) {
   })
   addTicker('game-stuff', time => {
     if (preparedCellSprite.completeness >= 100) {
-      preparedCellSprite.texture = Texture.fromImage('cell-prepared-complete.png')
+      preparedCellSprite.texture = Texture.fromImage('images/hex/prepared/cell-prepared-complete.png')
       if (selected === preparedCellSprite && !preparedCellSprite.done) setSelected(null)
       preparedCellSprite.done = true
       return
     }
 
     const partialNumber = Math.ceil(preparedCellSprite.completeness / 100 * 7) + 1
-    preparedCellSprite.texture = Texture.fromImage(`cell-prepared-partial${partialNumber}.png`)       
+    preparedCellSprite.texture = Texture.fromImage(`images/hex/prepared/cell-prepared-partial${partialNumber}.png`)       
   })
   
   parent.addChild(preparedCellSprite)
@@ -2396,9 +2396,9 @@ function cellConverter(x, y, parent) {
 
 function cellBrood(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
-  const broodSprite = Sprite.fromImage('cell-brood-empty.png')
+  const broodSprite = Sprite.fromImage('images/hex/brood/cell-brood-empty.png')
 
-  const broodExclamation = Sprite.fromImage('exclamation-warning-severe.png')
+  const broodExclamation = Sprite.fromImage('images/exclamations/exclamation-warning-severe.png')
   broodExclamation.position.x = 14
   broodExclamation.position.y = -6
   broodExclamation.visible = false
@@ -2442,15 +2442,15 @@ function cellBrood(x, y, parent) {
   const setTexture = () => {
     const item = broodSprite.content
     if (item === 'empty') {
-      broodSprite.texture = Texture.fromImage('cell-brood-empty.png')      
+      broodSprite.texture = Texture.fromImage('images/hex/brood/cell-brood-empty.png')      
     } else if (item === 'egg') {
-      broodSprite.texture = Texture.fromImage('cell-brood-egg.png')
+      broodSprite.texture = Texture.fromImage('images/hex/brood/cell-brood-egg.png')
     } else if (item === 'larvae') {      
-      broodSprite.texture = Texture.fromImage('cell-brood-larvae.png')      
+      broodSprite.texture = Texture.fromImage('images/hex/brood/cell-brood-larvae.png')      
     } else if (item === 'puppa') {
-      broodSprite.texture = Texture.fromImage('cell-brood-puppa.png')      
+      broodSprite.texture = Texture.fromImage('images/hex/brood/cell-brood-puppa.png')      
     } else if (item === 'dead') {
-      broodSprite.texture = Texture.fromImage('cell-brood-dead.png')   
+      broodSprite.texture = Texture.fromImage('images/hex/brood/cell-brood-dead.png')   
     }
   }
 
