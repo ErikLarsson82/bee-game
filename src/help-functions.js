@@ -15,8 +15,8 @@ function setGameSpeedText() {
 }
 
 function singularOrPluralDay(amount) {
-  if (amount === 1) return `${amount} day`
-  return `${amount} days`
+  if (amount === 1) return `last day`
+  return `${amount} days left`
 } 
 
 function isDayBeforeWinter() {
