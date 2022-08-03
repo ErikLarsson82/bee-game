@@ -138,11 +138,11 @@ function createBee(parent, type, startPosition) {
     
     const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
     whiteLine.position.x = -3
-    whiteLine.position.y = -37
+    whiteLine.position.y = -38
     container.addChild(whiteLine)
 
     const contentOffsetX = 66
-    const contentOffsetY = -36
+    const contentOffsetY = -37
 
     const content = Sprite.fromImage('images/ui/content-boilerplate.png')
     content.position.x = contentOffsetX
@@ -150,13 +150,13 @@ function createBee(parent, type, startPosition) {
     container.addChild(content)
 
     const beeExclamationLabel = Sprite.fromImage('images/exclamations/exclamation-warning-severe.png')
-    beeExclamationLabel.position.x = 84
-    beeExclamationLabel.position.y = 29
+    beeExclamationLabel.position.x = contentOffsetX + 10
+    beeExclamationLabel.position.y = contentOffsetY + 58
     beeExclamationLabel.visible = false
     container.addChild(beeExclamationLabel)
 
     const bs = -22
-    const p = [bs, bs + (1 * 9), bs + (2 * 9), bs + (3 * 9), bs + (4 * 9), bs + (5 * 9)]
+    const p = [bs, bs + (1 * 7), bs + (2 * 7), bs + (3 * 7), bs + (4 * 7), bs + (5 * 7)]
     container.addChild(ProgressBar(106, p[0], 'hunger', () => bee.hunger, bee.HUNGER_CAPACITY))
     container.addChild(ProgressBar(106, p[1], 'honey', () => bee.honeySack, bee.HONEY_SACK_CAPACITY))
     container.addChild(ProgressBar(106, p[2], 'nectar', () => bee.nectarSack, bee.NECTAR_SACK_CAPACITY))
@@ -173,17 +173,17 @@ function createBee(parent, type, startPosition) {
     const texts = ['HUNGER', 'HONEY', 'NECTAR', 'WAX', 'POLLEN', 'AGE']
 
     texts.forEach((text, idx) => {
-      const textDescription = new PIXI.Text(text, { ...picoFontConfig, fill: '#96a5bc' })
+      const textDescription = new PIXI.Text(text, { ...picoFontConfig, fill: '#8b9bb4' })
       textDescription.scale.set(0.15, 0.15)
       textDescription.position.x = contentOffsetX + 10
-      textDescription.position.y = contentOffsetY + 13 + (idx * 9)
+      textDescription.position.y = contentOffsetY + 13 + (idx * 7)
       container.addChild(textDescription)
     })
 
     const helper = new PIXI.Text('Loading...', { ...picoFontConfig, lineHeight: 44 })
     helper.scale.set(0.15, 0.15)
     helper.position.x = contentOffsetX + 10
-    helper.position.y = contentOffsetY + 74
+    helper.position.y = contentOffsetY + 58
     container.addChild(helper)
 
     addTicker('ui', () => {

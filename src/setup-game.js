@@ -184,8 +184,8 @@ function setupGame() {
     if (selected) {
       if (selected.label === 'bee') {
         selectedSpriteSub.texture = Texture.fromImage('images/ui/selection-circle.png')
-        selectedSprite.position.x = selected.position.x + 2
-        selectedSprite.position.y = selected.position.y + 1
+        selectedSprite.position.x = selected.position.x + 1
+        selectedSprite.position.y = selected.position.y - 1
       } else {
         selectedSpriteSub.texture = Texture.fromImage('images/ui/selection-cell.png')
         selectedSprite.position.x = selected.position.x
