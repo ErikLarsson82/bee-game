@@ -443,23 +443,8 @@ function cellBrood(x, y, parent) {
     disabledSprite.visible = broodSprite.paused
   }
 
-  const setTexture = () => {
-    const item = broodSprite.content
-    if (item === 'empty') {
-      broodSprite.texture = Texture.fromImage('images/hex/brood/cell-brood-empty.png')      
-    } else if (item === 'egg') {
-      broodSprite.texture = Texture.fromImage('images/hex/brood/cell-brood-egg.png')
-    } else if (item === 'larvae') {      
-      broodSprite.texture = Texture.fromImage('images/hex/brood/cell-brood-larvae.png')      
-    } else if (item === 'puppa') {
-      broodSprite.texture = Texture.fromImage('images/hex/brood/cell-brood-puppa.png')      
-    } else if (item === 'dead') {
-      broodSprite.texture = Texture.fromImage('images/hex/brood/cell-brood-dead.png')   
-    }
-  }
-
   addTicker('game-stuff', time => {
-    setTexture()
+    broodSprite.texture = Texture.fromImage(`images/hex/brood/cell-brood-${broodSprite.content}.png`)
     broodExclamation.visible = broodSprite.content === 'larvae' && broodSprite.nutrition < 20
     if (!broodSprite.content) return
     if (broodSprite.content === 'empty') return
