@@ -394,6 +394,10 @@ function cellConverter(x, y, parent) {
 function cellBrood(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const broodSprite = Sprite.fromImage('images/hex/brood/cell-brood-empty.png')
+  const disabledSprite = Sprite.fromImage('images/hex/brood/cell-brood-disabled.png')
+  disabledSprite.visible = false
+
+  broodSprite.addChild(disabledSprite)
 
   const broodExclamation = Sprite.fromImage('images/exclamations/exclamation-warning-severe.png')
   broodExclamation.position.x = 14
@@ -434,7 +438,10 @@ function cellBrood(x, y, parent) {
   }
   broodSprite.isWellFed = () => broodSprite.nutrition >= broodSprite.NUTRITION_CAPACITY - 10
   broodSprite.isDead = () => broodSprite.content === 'dead'
-  broodSprite.togglePause = () => broodSprite.paused = !broodSprite.paused
+  broodSprite.togglePause = () => {
+    broodSprite.paused = !broodSprite.paused
+    disabledSprite.visible = broodSprite.paused
+  }
 
   const setTexture = () => {
     const item = broodSprite.content
