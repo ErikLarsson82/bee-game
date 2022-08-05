@@ -6,7 +6,7 @@ function createSeasonTracker() {
 
   const seasonTracker = Sprite.fromImage('images/ui/season-tracker/background.png')
   seasonTracker.position.x = 384
-  seasonTracker.position.y = 3
+  seasonTracker.position.y = 2
   uiTopBar.addChild(seasonTracker)
 
   const seasonTrackerLabel = new PIXI.Text('Loading', { ...picoFontConfig, fontSize: 4 })
@@ -18,7 +18,7 @@ function createSeasonTracker() {
   const summerTexture = Texture.fromImage('images/ui/season-tracker/bar-summer.png')
   const winterTexture = Texture.fromImage('images/ui/season-tracker/bar-winter.png')
   summerProgress.position.x = 1
-  summerProgress.position.y = 1
+  summerProgress.position.y = 2
   seasonTracker.addChild(summerProgress)
   
   addTicker('ui', time => {
