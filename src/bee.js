@@ -1,12 +1,14 @@
 
 function createBee(parent, type, startPosition) {
-  const bee = Sprite.fromImage('images/bee/bee-drone-body.png')
-  bee.opacity = 1
-  
+  const bee = new Container()
+
+  const droneBody = Sprite.fromImage('images/bee/bee-drone-body.png')
+  bee.addChild(droneBody)
+
   const shadow = Sprite.fromImage('images/bee/shadow.png')
   bee.addChild(shadow)
   
-  const animationSprite = Sprite.fromImage('images/hex/nectar/cell-conversion-animation-a.png')
+  const animationSprite = Sprite.fromImage('images/bee/cell-conversion-animation-a.png')
   animationSprite.position.y = -2
   animationSprite.visible = true
   animationSprite.delay = 0
@@ -64,13 +66,12 @@ function createBee(parent, type, startPosition) {
   bee.setWax = amount => { bee.waxSack = cap(0, bee.WAX_SACK_CAPACITY)(amount); return bee }
   bee.type = type || 'unassigned'
   bee.setType = type => { bee.type = type; bee.idle = getIdlePosition(type) }
-  bee.determineIfVisible = () => bee.isAtType('converter') ? bee.hideBee() : bee.showBee()
   bee.showBee = () => {
-    bee.opacity = 1
+    droneBody.visible = true
     beeAddon.visible = true
   }
   bee.hideBee = () => {
-    bee.opacity = 0
+    droneBody.visible = false
     beeAddon.visible = false
   }
 
@@ -400,7 +401,6 @@ function createBee(parent, type, startPosition) {
   }
 
   function worker() {
-    bee.determineIfVisible()
     if (ageBee()) return
     if (season === 'summer') {
       if (depositHoney()) return
@@ -523,11 +523,13 @@ function createBee(parent, type, startPosition) {
       animationSprite.delay = animationSprite.delay < 12 ? animationSprite.delay : 0
       const isConverting = bee.isAtType('converter') && bee.type === 'worker'
       if (isConverting) {
+        bee.hideBee()
         animationSprite.visible = true
         animationSprite.texture = animationSprite.delay > 6
-          ? Texture.fromImage('images/hex/nectar/cell-conversion-animation-a.png')
-          : Texture.fromImage('images/hex/nectar/cell-conversion-animation-b.png')
+          ? Texture.fromImage('images/bee/cell-conversion-animation-a.png')
+          : Texture.fromImage('images/bee/cell-conversion-animation-b.png')
       } else {
+        bee.showBee()
         animationSprite.visible = false
       }
     }
