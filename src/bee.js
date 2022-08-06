@@ -2,11 +2,11 @@
 function createBee(parent, type, startPosition) {
   const bee = new Container()
 
-  const droneBody = Sprite.fromImage('images/bee/bee-drone-body.png')
-  bee.addChild(droneBody)
-
   const shadow = Sprite.fromImage('images/bee/shadow.png')
   bee.addChild(shadow)
+
+  const droneBody = Sprite.fromImage('images/bee/bee-drone-body.png')
+  bee.addChild(droneBody)
   
   const animationSprite = Sprite.fromImage('images/bee/cell-conversion-animation-a.png')
   animationSprite.position.y = -2
