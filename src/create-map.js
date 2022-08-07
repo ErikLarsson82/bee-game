@@ -18,11 +18,22 @@ function createMap(m) {
     replaceHex([0, 8], 'prepared', 'activate').instantlyPrepare()
     replaceHex([8, 0], 'prepared', 'activate').instantlyPrepare()
     replaceHex([8, 8], 'prepared', 'activate').instantlyPrepare()
-
+    
     replaceHex([4, 4], 'wax', 'activate')
     replaceHex([4, 5], 'wax', 'activate')
     replaceHex([5, 4], 'honey', 'activate').setHoney(30)
     replaceHex([3, 4], 'honey', 'activate').setHoney(30)
+  }
+
+  if (m === 'all') {
+    seeds = 2
+    createBee(beeContainer, 'idle').setHunger(40).setAge(80)
+    
+    for (let i = 0; i < hexGrid.length; i++) {
+      for (let j = 0; j < hexGrid[0].length; j++) {
+        replaceHex([i, j], 'prepared', 'activate').instantlyPrepare()
+      }
+    }
   }
 
   if (m === 'die') {

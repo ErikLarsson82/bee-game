@@ -45,40 +45,42 @@ function setupGame() {
 
   {
     uiTopBar = new Graphics()
-    uiTopBar.beginFill(0x000000)
-    uiTopBar.drawRect(0, 0, 1024, 20)
+    uiTopBar.beginFill(0x181425)
+    uiTopBar.drawRect(0, 0, 1024, 22)
+
+    const topBarContentOffsetY = 5
     
     const colonyLabel = new PIXI.Text('Colony population', { ...picoFontConfig, ...largeFont, fill: 'gray' })
-    colonyLabel.position.x = 5
-    colonyLabel.position.y = 4
+    colonyLabel.position.x = 6
+    colonyLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(colonyLabel)
 
     populationText = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
     populationText.position.x = 156
-    populationText.position.y = 4
+    populationText.position.y = topBarContentOffsetY
     uiTopBar.addChild(populationText)
 
     const timelineText = new PIXI.Text('Year   Day   Hour', { ...picoFontConfig, ...largeFont, fill: 'gray' })
     timelineText.position.x = 210
-    timelineText.position.y = 4
+    timelineText.position.y = topBarContentOffsetY
     uiTopBar.addChild(timelineText)
     
     const yearLabel = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
     yearLabel.anchor.set(1, 0)
     yearLabel.position.x = 260
-    yearLabel.position.y = 4
+    yearLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(yearLabel)
 
     const dayLabel = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
     dayLabel.anchor.set(1, 0)
     dayLabel.position.x = 308
-    dayLabel.position.y = 4
+    dayLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(dayLabel)
 
     const hourLabel = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
     hourLabel.anchor.set(1, 0)
     hourLabel.position.x = 364
-    hourLabel.position.y = 4
+    hourLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(hourLabel)
 
     addTicker('ui', time => {
@@ -89,15 +91,15 @@ function setupGame() {
 
     pausedText = new PIXI.Text('Playing', { ...picoFontConfig, ...largeFont })
     pausedText.position.x = 470
-    pausedText.position.y = 4
+    pausedText.position.y = topBarContentOffsetY
     uiTopBar.addChild(pausedText)
 
+    ui.addChild(uiTopBar)
+
     pauseFrame = new Graphics()
-    pauseFrame.lineStyle(10, 0x000000);
+    pauseFrame.lineStyle(10, 0xf77622);
     pauseFrame.drawRect(0, 0, WIDTH / 2, HEIGHT / 2)
     ui.addChild(pauseFrame)
-
-    ui.addChild(uiTopBar)
   }
 
   backgroundScene = Sprite.fromImage('images/scene/background-summer.png')
@@ -184,8 +186,8 @@ function setupGame() {
     if (selected) {
       if (selected.label === 'bee') {
         selectedSpriteSub.texture = Texture.fromImage('images/ui/selection-circle.png')
-        selectedSprite.position.x = selected.position.x + 2
-        selectedSprite.position.y = selected.position.y + 1
+        selectedSprite.position.x = selected.position.x + 1
+        selectedSprite.position.y = selected.position.y - 1
       } else {
         selectedSpriteSub.texture = Texture.fromImage('images/ui/selection-cell.png')
         selectedSprite.position.x = selected.position.x

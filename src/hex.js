@@ -5,7 +5,7 @@ const VERTICAL_SIZE = 6
 const HORIZONTAL_SIZE = 9
 
 const WIDTH_FLAT = 2 * HORIZONTAL_SIZE
-const HEIGHT_FLAT = Math.sqrt(3) * VERTICAL_SIZE
+const HEIGHT_FLAT = Math.round(Math.sqrt(3) * VERTICAL_SIZE)
 
 const WIDTH_POINTY = Math.sqrt(3) * HORIZONTAL_SIZE
 const HEIGHT_POINTY = 2 * VERTICAL_SIZE
@@ -16,8 +16,8 @@ function toLocalCoordinateFlat(index) {
   const odd = x % 2
 
   return {
-    x: (x * WIDTH_FLAT * (3/4)) + OFFSET_X,
-    y: (y * HEIGHT_FLAT) + OFFSET_Y + (odd ? HEIGHT_FLAT/2 : 0)
+    x: ((x * WIDTH_FLAT * (3/4)) + OFFSET_X),
+    y: ((y * HEIGHT_FLAT) + OFFSET_Y + (odd ? HEIGHT_FLAT/2 : 0))
   } 
 }
 
@@ -27,8 +27,8 @@ function toLocalCoordinatePointy(index) {
   const odd = y % 2
 
   return {
-    x: (x * WIDTH_POINTY) + OFFSET_X + (odd ? WIDTH_POINTY/2 : 0),
-    y: (y * HEIGHT_POINTY * (3/4)) + OFFSET_Y
+    x: ((x * WIDTH_POINTY) + OFFSET_X + (odd ? WIDTH_POINTY/2 : 0)),
+    y: ((y * HEIGHT_POINTY * (3/4)) + OFFSET_Y)
   }
 }
 
@@ -37,8 +37,8 @@ function hexCornerFlat(center, size, i) {
   const angle_rad = Math.PI / 180 * angle_deg
   
   return { 
-    x: center.x + size * Math.cos(angle_rad),
-    y: center.y + size * Math.sin(angle_rad)
+    x: (center.x + size * Math.cos(angle_rad)),
+    y: (center.y + size * Math.sin(angle_rad))
   }
 }
 
@@ -47,8 +47,8 @@ function hexCornerPointy(center, size, i) {
   var angle_rad = Math.PI / 180 * angle_deg
   
   return {
-    x: center.x + size * Math.cos(angle_rad),
-    y: center.y + size * Math.sin(angle_rad)
+    x: (center.x + size * Math.cos(angle_rad)),
+    y: (center.y + size * Math.sin(angle_rad))
   }
 }
     

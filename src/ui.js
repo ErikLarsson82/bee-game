@@ -1,13 +1,17 @@
 
 function ProgressBar(x, y, type, tickerData, max) {
+  const container = new Container()
+  container.position.x = x
+  container.position.y = y
+  const progressBarBgSprite = Sprite.fromImage('images/ui/progress-bar/progress-bg.png')
   const progressSprite = Sprite.fromImage('images/ui/progress-bar/progress-' + type + '.png')
-  progressSprite.position.x = x
-  progressSprite.position.y = y
   addTicker('ui', time => {
     const _max = max === undefined ? 100 : max
-    progressSprite.width = cap(0, _max)((tickerData() / max) * 20)
+    progressSprite.width = cap(0, _max)(tickerData()) / max * 20
   })
-  return progressSprite
+  container.addChild(progressBarBgSprite)
+  container.addChild(progressSprite)
+  return container
 }
 
 function Button(x, y, content, callback, hoverover, hoverout, _size) {

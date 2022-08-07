@@ -1,14 +1,16 @@
 
 function createBee(parent, type, startPosition) {
-  const bee = Sprite.fromImage('images/bee/bee-drone-body.png')
-  bee.opacity = 1
+  const bee = new Container()
   
   animateSprite(bee, 'bee', 43)
 
   const shadow = Sprite.fromImage('images/bee/shadow.png')
   bee.addChild(shadow)
+
+  const droneBody = Sprite.fromImage('images/bee/bee-drone-body.png')
+  bee.addChild(droneBody)
   
-  const animationSprite = Sprite.fromImage('images/hex/nectar/cell-conversion-animation-a.png')
+  const animationSprite = Sprite.fromImage('images/bee/cell-conversion-animation-a.png')
   animationSprite.position.y = -2
   animationSprite.visible = true
   animationSprite.delay = 0
@@ -66,13 +68,12 @@ function createBee(parent, type, startPosition) {
   bee.setWax = amount => { bee.waxSack = cap(0, bee.WAX_SACK_CAPACITY)(amount); return bee }
   bee.type = type || 'unassigned'
   bee.setType = type => { bee.type = type; bee.idle = getIdlePosition(type) }
-  bee.determineIfVisible = () => bee.isAtType('converter') ? bee.hideBee() : bee.showBee()
   bee.showBee = () => {
-    bee.opacity = 1
+    droneBody.visible = true
     beeAddon.visible = true
   }
   bee.hideBee = () => {
-    bee.opacity = 0
+    droneBody.visible = false
     beeAddon.visible = false
   }
 
@@ -143,46 +144,49 @@ function createBee(parent, type, startPosition) {
     whiteLine.position.y = -38
     container.addChild(whiteLine)
 
+    const contentOffsetX = 66
+    const contentOffsetY = -37
+
     const content = Sprite.fromImage('images/ui/content-boilerplate.png')
-    content.position.x = 72
-    content.position.y = -37
+    content.position.x = contentOffsetX
+    content.position.y = contentOffsetY
     container.addChild(content)
 
     const beeExclamationLabel = Sprite.fromImage('images/exclamations/exclamation-warning-severe.png')
-    beeExclamationLabel.position.x = 84
-    beeExclamationLabel.position.y = 29
+    beeExclamationLabel.position.x = contentOffsetX + 10
+    beeExclamationLabel.position.y = contentOffsetY + 58
     beeExclamationLabel.visible = false
     container.addChild(beeExclamationLabel)
 
-    const bs = -23
-    const p = [bs, bs + (1 * 9), bs + (2 * 9), bs + (3 * 9), bs + (4 * 9), bs + (5 * 9)]
-    container.addChild(ProgressBar(112, p[0], 'hunger', () => bee.hunger, bee.HUNGER_CAPACITY))
-    container.addChild(ProgressBar(112, p[1], 'honey', () => bee.honeySack, bee.HONEY_SACK_CAPACITY))
-    container.addChild(ProgressBar(112, p[2], 'nectar', () => bee.nectarSack, bee.NECTAR_SACK_CAPACITY))
-    container.addChild(ProgressBar(112, p[3], 'wax', () => bee.waxSack, bee.WAX_SACK_CAPACITY))
-    container.addChild(ProgressBar(112, p[4], 'pollen', () => bee.pollenSack, bee.POLLEN_SACK_CAPACITY))
-    container.addChild(ProgressBar(112, p[5], 'age', () => bee.age, 100))
+    const bs = -22
+    const p = [bs, bs + (1 * 7), bs + (2 * 7), bs + (3 * 7), bs + (4 * 7), bs + (5 * 7)]
+    container.addChild(ProgressBar(106, p[0], 'hunger', () => bee.hunger, bee.HUNGER_CAPACITY))
+    container.addChild(ProgressBar(106, p[1], 'honey', () => bee.honeySack, bee.HONEY_SACK_CAPACITY))
+    container.addChild(ProgressBar(106, p[2], 'nectar', () => bee.nectarSack, bee.NECTAR_SACK_CAPACITY))
+    container.addChild(ProgressBar(106, p[3], 'wax', () => bee.waxSack, bee.WAX_SACK_CAPACITY))
+    container.addChild(ProgressBar(106, p[4], 'pollen', () => bee.pollenSack, bee.POLLEN_SACK_CAPACITY))
+    container.addChild(ProgressBar(106, p[5], 'age', () => bee.age, 100))
     
     const textHeading = new PIXI.Text('BEE', { ...picoFontConfig })
     textHeading.scale.set(0.15, 0.15)
-    textHeading.position.x = 100
-    textHeading.position.y = -34
+    textHeading.position.x = contentOffsetX + 30
+    textHeading.position.y = contentOffsetY + 3
     container.addChild(textHeading)
 
     const texts = ['HUNGER', 'HONEY', 'NECTAR', 'WAX', 'POLLEN', 'AGE']
 
     texts.forEach((text, idx) => {
-      const textDescription = new PIXI.Text(text, { ...picoFontConfig, fill: '#96a5bc' })
+      const textDescription = new PIXI.Text(text, { ...picoFontConfig, fill: '#8b9bb4' })
       textDescription.scale.set(0.15, 0.15)
-      textDescription.position.x = 82
-      textDescription.position.y = -24 + (idx * 9)
+      textDescription.position.x = contentOffsetX + 10
+      textDescription.position.y = contentOffsetY + 13 + (idx * 7)
       container.addChild(textDescription)
     })
 
     const helper = new PIXI.Text('Loading...', { ...picoFontConfig, lineHeight: 44 })
     helper.scale.set(0.15, 0.15)
-    helper.position.x = 82
-    helper.position.y = 31
+    helper.position.x = contentOffsetX + 10
+    helper.position.y = contentOffsetY + 58
     container.addChild(helper)
 
     addTicker('ui', () => {
@@ -399,7 +403,6 @@ function createBee(parent, type, startPosition) {
   }
 
   function worker() {
-    bee.determineIfVisible()
     if (ageBee()) return
     if (season === 'summer') {
       if (depositHoney()) return
@@ -522,11 +525,13 @@ function createBee(parent, type, startPosition) {
       animationSprite.delay = animationSprite.delay < 12 ? animationSprite.delay : 0
       const isConverting = bee.isAtType('converter') && bee.type === 'worker'
       if (isConverting) {
+        bee.hideBee()
         animationSprite.visible = true
         animationSprite.texture = animationSprite.delay > 6
-          ? Texture.fromImage('images/hex/nectar/cell-conversion-animation-a.png')
-          : Texture.fromImage('images/hex/nectar/cell-conversion-animation-b.png')
+          ? Texture.fromImage('images/bee/cell-conversion-animation-a.png')
+          : Texture.fromImage('images/bee/cell-conversion-animation-b.png')
       } else {
+        bee.showBee()
         animationSprite.visible = false
       }
     }

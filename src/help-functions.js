@@ -1,7 +1,9 @@
 
 function setGameSpeedText() {
+  pausedText.style.fill = 0xffffff
   if (paused) {
     pausedText.text = 'Paused'
+    pausedText.style.fill = 0xf77622
   } else if (gameSpeed === 1) {
     pausedText.text = '>'
   } else if (gameSpeed === 4) {
