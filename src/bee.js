@@ -2,7 +2,8 @@
 function createBee(parent, type, startPosition) {
   const bee = new Container()
   
-  animateSprite(bee, 'bee', 43)
+  const { sprite } = animateSprite(bee, 'bee', 43)
+  const workingSprite = sprite
 
   const shadow = Sprite.fromImage('images/bee/shadow.png')
   bee.addChild(shadow)
@@ -369,14 +370,14 @@ function createBee(parent, type, startPosition) {
   }
 
   function idle() {
-    bee.showBee()
+    // bee.showBee()
     if (ageBee()) return
     if (bee.feedBee()) return
     bee.flyTo(null)
   }
 
   function forager() {
-    bee.showBee()
+    // bee.showBee()
     if (ageBee()) return
     if (bee.feedBee()) return
     if (pollinateFlower()) return
@@ -388,7 +389,7 @@ function createBee(parent, type, startPosition) {
   }
 
   function nurser() {
-    bee.showBee()
+    // bee.showBee()
     if (ageBee()) return
     if (bee.feedBee()) return
     if (refillPollen()) return
@@ -517,10 +518,9 @@ function createBee(parent, type, startPosition) {
   })
 
   bee.removeTicker = () => bee.ticker.remove = true
-
-  bee.ticker = addTicker('game-stuff', time => {
-    bee.setShadowPosition()
+  bee.handleAnimations = () => {
     {
+      // Specifically conversion animation only
       animationSprite.delay++
       animationSprite.delay = animationSprite.delay < 12 ? animationSprite.delay : 0
       const isConverting = bee.isAtType('converter') && bee.type === 'worker'
@@ -530,11 +530,23 @@ function createBee(parent, type, startPosition) {
         animationSprite.texture = animationSprite.delay > 6
           ? Texture.fromImage('images/bee/cell-conversion-animation-a.png')
           : Texture.fromImage('images/bee/cell-conversion-animation-b.png')
+        return
       } else {
-        bee.showBee()
         animationSprite.visible = false
       }
     }
+    // Generic working animation
+    const isWorking = bee.isAtType('brood') || bee.isAtType('pollen') || bee.isAtType('prepared') || bee.isAtType('honey') || bee.isAtType('wax') || bee.isAtType('converter') || bee.isAtType('flower')
+    workingSprite.visible = isWorking
+    isWorking
+      ? bee.hideBee()
+      : bee.showBee()
+  }
+
+  bee.ticker = addTicker('game-stuff', time => {
+    bee.setShadowPosition()
+    
+    bee.handleAnimations()
 
     const deadPosition = 32
     if (bee.position.y === deadPosition) return

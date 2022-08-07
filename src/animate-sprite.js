@@ -1,8 +1,7 @@
 
 function animateSprite(sprite, name, amount) {
 	const frame = Sprite.fromImage(`images/animation-test/${name}/1.png`)
-	frame.position.x = 20
-
+	
 	let delay = 0
     let pause = false
 	const frameDurationModifier = 0.1
