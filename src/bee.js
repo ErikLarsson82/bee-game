@@ -370,14 +370,12 @@ function createBee(parent, type, startPosition) {
   }
 
   function idle() {
-    // bee.showBee()
     if (ageBee()) return
     if (bee.feedBee()) return
     bee.flyTo(null)
   }
 
   function forager() {
-    // bee.showBee()
     if (ageBee()) return
     if (bee.feedBee()) return
     if (pollinateFlower()) return
@@ -389,7 +387,6 @@ function createBee(parent, type, startPosition) {
   }
 
   function nurser() {
-    // bee.showBee()
     if (ageBee()) return
     if (bee.feedBee()) return
     if (refillPollen()) return
