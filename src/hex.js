@@ -96,3 +96,31 @@ const filterHexagon = (hexGrid, f) => {
   hexGrid.forEach(row => row.forEach(hex => f(hex) && result.push(hex)))
   return result
 }
+
+const dist = (x1, y1, x2, y2) => Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
+
+const getClosestHex = (hexes, bee) => {
+  if (hexes.length === 0) {
+    throw 'hexes array must have length above 0'
+  }
+  let closestHex = null
+  let closestDistance = 9999
+  let i = 0
+
+  do {
+    const d = dist(
+      hexes[i].worldTransform.tx,
+      hexes[i].worldTransform.ty,
+      bee.worldTransform.tx,
+      bee.worldTransform.ty)
+
+    if (d < closestDistance) {
+      closestDistance = d
+      closestHex = hexes[i]
+    }
+
+    i++
+  } while (i < hexes.length)
+
+  return closestHex
+}
