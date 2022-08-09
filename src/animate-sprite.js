@@ -1,7 +1,16 @@
 
-function animateSprite(sprite, name, amount, _loop, callback) {
-	const frame = Sprite.fromImage(`images/animation-test/${name}/1.png`)
-	
+function animateSprite(sprite, res, amount, w, h, _loop, callback) {
+	const frame = new Sprite()
+
+    const spritesheet = new PIXI.BaseTexture.from(resources[res].url)
+	const frames = []
+
+    for (let i = 0; i < amount; i++) {
+        frames.push(
+            new PIXI.Texture(spritesheet, new PIXI.Rectangle(i * w, 0, w, h))
+        )
+    }
+
 	let delay = 0
     let pause = false
     const loop = _loop === undefined ? true : _loop
@@ -36,8 +45,8 @@ function animateSprite(sprite, name, amount, _loop, callback) {
                 callback && callback()
             }
         }
-    	const currentFrame = Math.min(Math.max(1, Math.ceil(delay / MOD)), amount)
-        frame.texture = Texture.fromImage(`images/animation-test/${name}/${currentFrame}.png`)
+    	const currentFrame = Math.min(Math.max(0, Math.floor(delay / MOD)), amount)
+        frame.texture = frames[currentFrame]
     })
 
     sprite.addChild(frame)

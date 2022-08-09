@@ -2,7 +2,7 @@
 function createBee(parent, type, startPosition) {
   const bee = new Container()
   
-  const { sprite } = animateSprite(bee, 'bee', 43)
+  const { sprite } = animateSprite(bee, 'bee-working-animation', 43, 13, 8)
   const workingSprite = sprite
 
   const shadow = Sprite.fromImage('images/bee/shadow.png')

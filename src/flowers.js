@@ -16,7 +16,7 @@ function createFlowers() {
     makeSelectable(flower, 'flower')
 
     flower.POLLINATION_REQUIREMENT = 100
-    flower.pollinationLevel = 98
+    flower.pollinationLevel = 0
     flower.isPollinated = () => flower.pollinationLevel >= flower.POLLINATION_REQUIREMENT
     
     flower.scale.x = flipped ? -1 : 1
@@ -70,7 +70,7 @@ function createFlowers() {
             delete flower.pollinationAnimationSprite  
             flower.pollinationAnimationSprite = 'no not animate again'
           }
-          const { sprite } = animateSprite(flower, 'flower-is-pollinated', 7, false, doneCallback)
+          const { sprite } = animateSprite(flower, 'flower-is-pollinated', 7, 46, 50, false, doneCallback)
           sprite.anchor.set(flipped ? 0.6 : 0.2, 0.2)
           flower.pollinationAnimationSprite = sprite
         }
