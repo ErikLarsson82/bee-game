@@ -323,9 +323,8 @@ function createBee(parent, type, startPosition) {
     ).sort((a, b) => a.nutrition > b.nutrition ? 1 : -1)
 
     if (larvaeHex.length === 0 || isPollenSackEmpty()) return false
-    const closest = getClosestHex(larvaeHex, bee)
-    closest.claimSlot(bee)
-    bee.flyTo(closest)
+    larvaeHex[0].claimSlot(bee)
+    bee.flyTo(larvaeHex[0])
     return true
   }
 
