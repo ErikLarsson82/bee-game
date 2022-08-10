@@ -13,6 +13,12 @@ function cellDisabled(x, y, parent) {
 
 function cellEmpty(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
+
+  const backgroundSprite = Sprite.fromImage('images/hex/states/cell-empty-background.png')
+  backgroundSprite.position.x = pixelCoordinate.x
+  backgroundSprite.position.y = pixelCoordinate.y
+  hexBackground.addChild(backgroundSprite)
+
   const emptySprite = Sprite.fromImage('images/hex/states/cell-empty.png')
   makeSelectable(emptySprite, 'cell')
   emptySprite.position.x = pixelCoordinate.x
