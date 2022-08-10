@@ -21,6 +21,16 @@ function Button(x, y, content, callback, hoverover, hoverout, _size) {
   buttonSprite.position.x = x
   buttonSprite.position.y = y
   buttonSprite.interactive = true
+  if (size === 'large') {
+    buttonSprite.hitArea = new PIXI.Polygon([
+      new PIXI.Point(10, 0),
+      new PIXI.Point(28, 0),
+      new PIXI.Point(38, 10),
+      new PIXI.Point(28, 20),
+      new PIXI.Point(10, 20),
+      new PIXI.Point(0, 10),
+    ])
+  }
   buttonSprite.buttonMode = true
   buttonSprite.mouseover = () => {
     hoverover && hoverover()
