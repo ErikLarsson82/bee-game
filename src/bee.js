@@ -2,8 +2,11 @@
 function createBee(parent, type, startPosition) {
   const bee = new Container()
   
-  const { sprite } = animateSprite(bee, 'bee-working-animation', 43, 13, 8)
-  const workingSprite = sprite
+  const workingAnimation = animateSprite(bee, 'bee-working-animation', 43, 13, 8)
+  const workingSprite = workingAnimation.sprite
+
+  const unloadingAnimation = animateSprite(bee, 'bee-unloading-animation', 43, 13, 8)
+  const unloadingSprite = unloadingAnimation.sprite
 
   const shadow = Sprite.fromImage('images/bee/shadow.png')
   bee.addChild(shadow)
@@ -523,28 +526,45 @@ function createBee(parent, type, startPosition) {
 
   bee.removeTicker = () => bee.ticker.remove = true
   bee.handleAnimations = () => {
+    // Reset all
+    bee.hideBee()
+    workingSprite.visible = false
+    unloadingSprite.visible = false
+    animationSprite.visible = false
+
     {
       // Specifically conversion animation only
       animationSprite.delay++
       animationSprite.delay = animationSprite.delay < 12 ? animationSprite.delay : 0
       const isConverting = bee.isAtType('converter') && bee.type === 'worker'
       if (isConverting) {
-        bee.hideBee()
         animationSprite.visible = true
         animationSprite.texture = animationSprite.delay > 6
           ? Texture.fromImage('images/bee/cell-conversion-animation-a.png')
           : Texture.fromImage('images/bee/cell-conversion-animation-b.png')
         return
-      } else {
-        animationSprite.visible = false
       }
     }
+    // Unloading animation
+    const isUnloading =
+      (bee.isAtType('pollen') && bee.type === 'forager') ||
+      (bee.isAtType('converter') && bee.type === 'forager') ||
+      (bee.isAtType('honey') && bee.type === 'worker' && season === 'summer')
+
+    if (isUnloading) {
+      unloadingSprite.visible = true
+      return
+    }
+
     // Generic working animation
     const isWorking = bee.isAtType('brood') || bee.isAtType('pollen') || bee.isAtType('prepared') || bee.isAtType('honey') || bee.isAtType('wax') || bee.isAtType('converter') || bee.isAtType('flower')
-    workingSprite.visible = isWorking
-    isWorking
-      ? bee.hideBee()
-      : bee.showBee()
+    
+    if (isWorking) {
+      workingSprite.visible = true  
+      return
+    }
+    
+    bee.showBee()
   }
 
   bee.ticker = addTicker('game-stuff', time => {

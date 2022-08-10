@@ -82,6 +82,7 @@ const bees = []
 
 loader.add('pico8-mono.ttf')
 loader.add('bee-working-animation', 'images/animation-test/bee/animation-spritesheet-bee.png')
+loader.add('bee-unloading-animation', 'images/animation-test/bee/animation-spritesheet-bee-unloading.png')
 loader.add('flower-is-pollinated', 'images/animation-test/flower-is-pollinated/animation-spritesheet-flower.png')
 loader.load(setupSplash)
 
