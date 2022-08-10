@@ -1,3 +1,12 @@
+const generateHitArea = () => 
+  new PIXI.Polygon([
+      new PIXI.Point(5, 0),
+      new PIXI.Point(13, 0),
+      new PIXI.Point(18, 5),
+      new PIXI.Point(13, 10),
+      new PIXI.Point(5, 10),
+      new PIXI.Point(0, 5),
+  ])
 
 function cellDisabled(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
@@ -21,6 +30,7 @@ function cellEmpty(x, y, parent) {
 
   const emptySprite = Sprite.fromImage('images/hex/states/cell-empty.png')
   makeSelectable(emptySprite, 'cell')
+  emptySprite.hitArea = generateHitArea()
   emptySprite.position.x = pixelCoordinate.x
   emptySprite.position.y = pixelCoordinate.y
 
@@ -72,8 +82,9 @@ function cellPrepared(x, y, parent) {
   spriteExclamation.visible = false
   preparedCellSprite.addChild(spriteExclamation)
 
-  makeSelectable(preparedCellSprite, 'prepared')
   makeOccupiable(preparedCellSprite)
+  makeSelectable(preparedCellSprite, 'prepared')
+  preparedCellSprite.hitArea = generateHitArea()
   preparedCellSprite.position.x = pixelCoordinate.x
   preparedCellSprite.position.y = pixelCoordinate.y
   preparedCellSprite.completeness = 0
@@ -163,8 +174,9 @@ function cellPrepared(x, y, parent) {
 function cellHoney(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const honeySprite = Sprite.fromImage('images/hex/honey/cell-honey-full.png')
-  makeSelectable(honeySprite, 'honey')
   makeOccupiable(honeySprite)
+  makeSelectable(honeySprite, 'honey')
+  honeySprite.hitArea = generateHitArea()
   honeySprite.position.x = pixelCoordinate.x
   honeySprite.position.y = pixelCoordinate.y
 
@@ -250,8 +262,9 @@ function cellHoney(x, y, parent) {
 function cellWax(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const waxSprite = Sprite.fromImage('images/hex/wax/cell-wax-full.png')
-  makeSelectable(waxSprite, 'wax')
   makeOccupiable(waxSprite)
+  makeSelectable(waxSprite, 'wax')
+  waxSprite.hitArea = generateHitArea()
   waxSprite.position.x = pixelCoordinate.x
   waxSprite.position.y = pixelCoordinate.y
 
@@ -330,9 +343,10 @@ function cellConverter(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const converterSprite = Sprite.fromImage('images/hex/nectar/cell-nectar-empty.png')
   
-  makeSelectable(converterSprite, 'converter')
-  makeOccupiable(converterSprite)
   makeHexDetectable(converterSprite)
+  makeOccupiable(converterSprite)
+  makeSelectable(converterSprite, 'converter')
+  converterSprite.hitArea = generateHitArea()
   converterSprite.position.x = pixelCoordinate.x
   converterSprite.position.y = pixelCoordinate.y
   converterSprite.NECTAR_CAPACITY = 15
@@ -413,8 +427,9 @@ function cellBrood(x, y, parent) {
   broodExclamation.visible = false
   broodSprite.addChild(broodExclamation)
 
-  makeSelectable(broodSprite, 'brood')
   makeOccupiable(broodSprite)
+  makeSelectable(broodSprite, 'brood')
+  broodSprite.hitArea = generateHitArea()
   broodSprite.position.x = pixelCoordinate.x
   broodSprite.position.y = pixelCoordinate.y
 
@@ -603,8 +618,9 @@ function cellBrood(x, y, parent) {
 function cellPollen(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const pollenSprite = Sprite.fromImage('images/hex/pollen/cell-pollen-empty.png')
-  makeSelectable(pollenSprite, 'pollen')
   makeOccupiable(pollenSprite)
+  makeSelectable(pollenSprite, 'pollen')
+  pollenSprite.hitArea = generateHitArea()
   pollenSprite.position.x = pixelCoordinate.x
   pollenSprite.position.y = pixelCoordinate.y
 

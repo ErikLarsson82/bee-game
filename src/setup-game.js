@@ -27,7 +27,7 @@ function setupGame() {
 
   foreground = new Container()
   container.addChild(foreground)
-  
+
   ui = new Container()
   container.addChild(ui)
 
