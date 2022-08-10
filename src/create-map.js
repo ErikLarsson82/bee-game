@@ -4,13 +4,22 @@ const MAP_CONFIGURATIONS = [
     name: 'Default',
     id: 'default',
     cycles: [5, 1, 5, 2, 5, 2, 4, 3, 4, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30],
-    seeds: 2
+    seeds: 2,
+    winterHungerMultiplier: 1
+  },
+  {
+    name: 'Hunger winter',
+    id: 'default',
+    cycles: [3, 1, 3, 1, 3, 1, 3, 1, 3, 2, 3, 2, 3, 3, 3, 3, 3, 4, 3, 4, 3, 5, 3, 6, 3, 7, 3, 8, 3, 9, 3, 10, 3, 11],
+    seeds: 2,
+    winterHungerMultiplier: 5
   },
   {
     name: 'Fast winter',
     id: 'fast winter',
     cycles: [1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1],
-    seeds: 1
+    seeds: 1,
+    winterHungerMultiplier: 1
   }
 ]
 
@@ -35,6 +44,34 @@ function createMap(m) {
     replaceHex([4, 5], 'wax', 'activate')
     replaceHex([5, 4], 'honey', 'activate').setHoney(30)
     replaceHex([3, 4], 'honey', 'activate').setHoney(30)
+  }
+
+  if (m === 'plenty honey') {
+    createBee(beeContainer, 'idle').setHunger(40).setAge(80)
+    createBee(beeContainer, 'idle').setHunger(42).setAge(60)
+    createBee(beeContainer, 'idle').setHunger(50).setAge(20)
+    createBee(beeContainer, 'idle').setHunger(80).setAge(10)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(6)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(5)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
+
+    replaceHex([0, 0], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([0, 8], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([8, 0], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([8, 8], 'prepared', 'activate').instantlyPrepare()
+    
+    replaceHex([4, 4], 'wax', 'activate')
+    replaceHex([4, 5], 'wax', 'activate')
+    replaceHex([5, 4], 'honey', 'activate').setHoney(30)
+    replaceHex([3, 4], 'honey', 'activate').setHoney(30)
+    replaceHex([5, 5], 'honey', 'activate').setHoney(30)
+    replaceHex([3, 5], 'honey', 'activate').setHoney(30)
+    replaceHex([5, 6], 'honey', 'activate').setHoney(30)
+    replaceHex([3, 6], 'honey', 'activate').setHoney(30)
+    replaceHex([5, 7], 'honey', 'activate').setHoney(30)
+    replaceHex([3, 7], 'honey', 'activate').setHoney(30)
+    replaceHex([5, 8], 'honey', 'activate').setHoney(30)
+    replaceHex([3, 8], 'honey', 'activate').setHoney(30)
   }
 
   if (m === 'fast winter') {

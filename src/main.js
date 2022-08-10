@@ -55,6 +55,7 @@ let day = 1
 let year = 1
 let seeds = 1
 let season = 'summer'
+let winterHungerMultiplier = null
 
 let scene = null
 let selected = null

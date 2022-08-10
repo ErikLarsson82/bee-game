@@ -114,10 +114,17 @@ function makeHungry(bee) {
   bee.setHunger = amount => { bee.hunger = cap(0, bee.HUNGER_CAPACITY)(amount); return bee }
 
   bee.consumeEnergy = () => {
-    // A bee will survive approx 15 minuter at speed 1 with a full belly, which is 15 min * 60 sec = 900 sec
+    // A bee will survive approx 15 minutes at speed 1 with a full belly, which is 15 min * 60 sec = 900 sec
     // 900 sec * 144 FPS = 129600 game ticks
     // 100 hunger value points / 129600 gameticks = 0.00077160 reduction in hunger each tick
-    bee.hunger -= transferTo(bee.HUNGER_CAPACITY).inSeconds(900)
+    // Above is calculated during summer
+
+    if (season === 'summer') {
+      bee.hunger -= transferTo(bee.HUNGER_CAPACITY).inSeconds(900)
+    } else {
+      bee.hunger -= transferTo(bee.HUNGER_CAPACITY).inSeconds(900 / winterHungerMultiplier)
+    }
+    
     bee.hunger = cap(0, bee.HUNGER_CAPACITY)(bee.hunger)
 
     if (bee.hunger <= 0) {
@@ -126,7 +133,7 @@ function makeHungry(bee) {
   }
 
   bee.eat = () => {
-    bee.hunger += transferTo(bee.HUNGER_CAPACITY).inSeconds(20)      
+    bee.hunger += transferTo(bee.HUNGER_CAPACITY).inSeconds(20)
     bee.hunger = cap(0, bee.HUNGER_CAPACITY)(bee.hunger)
   }
 

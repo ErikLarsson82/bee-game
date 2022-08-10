@@ -23,6 +23,7 @@ function setupMenu() {
       cycles = map.cycles
       MAP_SELECTION = map.id
       seeds = map.seeds
+      winterHungerMultiplier = map.winterHungerMultiplier
       app.stage.removeChild(container)
       setupGame()
     }
