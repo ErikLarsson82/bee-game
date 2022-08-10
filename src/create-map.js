@@ -1,6 +1,7 @@
 
 const MAP_CONFIGURATIONS = [
   {
+    // The one we've been playing for all this time
     name: 'Default',
     id: 'default',
     cycles: [5, 1, 5, 2, 5, 2, 4, 3, 4, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30],
@@ -8,6 +9,15 @@ const MAP_CONFIGURATIONS = [
     winterHungerMultiplier: 1
   },
   {
+    // Give players lots of resources at the start, but have winters be pretty punishing
+    name: 'Generous start',
+    id: 'generous start',
+    cycles: [4, 2, 4, 2, 4, 2, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3],
+    seeds: 4,
+    winterHungerMultiplier: 4
+  },
+  {
+    // Bees are VERY hungry during winter, albeit they are short - this one could be considered a very hard map, especially to get far
     name: 'Hunger winter',
     id: 'default',
     cycles: [3, 1, 3, 1, 3, 1, 3, 1, 3, 2, 3, 2, 3, 3, 3, 3, 3, 4, 3, 4, 3, 5, 3, 6, 3, 7, 3, 8, 3, 9, 3, 10, 3, 11],
@@ -15,6 +25,7 @@ const MAP_CONFIGURATIONS = [
     winterHungerMultiplier: 5
   },
   {
+    // Not much to start with and winter coming fast
     name: 'Fast winter',
     id: 'fast winter',
     cycles: [1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1],
@@ -44,6 +55,37 @@ function createMap(m) {
     replaceHex([4, 5], 'wax', 'activate')
     replaceHex([5, 4], 'honey', 'activate').setHoney(30)
     replaceHex([3, 4], 'honey', 'activate').setHoney(30)
+  }
+
+  if (m === 'generous start') {
+    createBee(beeContainer, 'idle').setHunger(40).setAge(80)
+    createBee(beeContainer, 'idle').setHunger(42).setAge(60)
+    createBee(beeContainer, 'idle').setHunger(50).setAge(20)
+    createBee(beeContainer, 'idle').setHunger(80).setAge(10)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(6)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(5)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
+
+    replaceHex([2, 3], 'pollen', 'activate').setPollen(60)
+    replaceHex([2, 2], 'pollen', 'activate').setPollen(60)
+    
+    replaceHex([6, 6], 'converter', 'activate')
+    replaceHex([6, 7], 'converter', 'activate')
+
+    replaceHex([4, 4], 'wax', 'activate')
+    replaceHex([4, 5], 'wax', 'activate')
+    
+    replaceHex([5, 4], 'honey', 'activate').setHoney(30)
+    replaceHex([3, 4], 'honey', 'activate').setHoney(30)
+
+    replaceHex([8, 8], 'honey', 'activate').setHoney(30)
+    replaceHex([8, 9], 'honey', 'activate').setHoney(30)
+    replaceHex([7, 8], 'honey', 'activate').setHoney(30)
+    replaceHex([7, 9], 'honey', 'activate').setHoney(30)
   }
 
   if (m === 'plenty honey') {

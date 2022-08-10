@@ -524,13 +524,17 @@ function createBee(parent, type, startPosition) {
     bee.setShadowPosition()
   })
 
+  bee.hideAllAnimations = () => {
+    workingSprite.visible = false
+    unloadingSprite.visible = false
+    animationSprite.visible = false
+  }
+
   bee.removeTicker = () => bee.ticker.remove = true
   bee.handleAnimations = () => {
     // Reset all
     bee.hideBee()
-    workingSprite.visible = false
-    unloadingSprite.visible = false
-    animationSprite.visible = false
+    bee.hideAllAnimations()
 
     {
       // Specifically conversion animation only
@@ -582,6 +586,7 @@ function createBee(parent, type, startPosition) {
       waxDrop.visible = false
       beeAddon.visible = false
       beeExclamation.visible = false
+      bee.hideAllAnimations()
       bee.disableParticle()
       if (bee.position.y !== deadPosition) {
         bee.position.x = 65 + (Math.random() * 100)
