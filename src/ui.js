@@ -7,7 +7,7 @@ function ProgressBar(x, y, type, tickerData, max) {
   const progressSprite = Sprite.fromImage('images/ui/progress-bar/progress-' + type + '.png')
   addTicker('ui', time => {
     const _max = max === undefined ? 100 : max
-    progressSprite.width = cap(0, _max)(tickerData()) / max * 20
+    progressSprite.width = cap(0, _max)(tickerData()) / max * 21
   })
   container.addChild(progressBarBgSprite)
   container.addChild(progressSprite)
