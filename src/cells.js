@@ -11,8 +11,14 @@ function cellDisabled(x, y, parent) {
   return disabledSprite
 }
 
-function cellEmpty(x, y, parent, parent2) {
+function cellEmpty(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
+
+  const backgroundSprite = Sprite.fromImage('images/hex/states/cell-empty-background.png')
+  backgroundSprite.position.x = pixelCoordinate.x
+  backgroundSprite.position.y = pixelCoordinate.y
+  hexBackground.addChild(backgroundSprite)
+
   const emptySprite = Sprite.fromImage('images/hex/states/cell-empty.png')
   makeSelectable(emptySprite, 'cell')
   emptySprite.position.x = pixelCoordinate.x
@@ -47,16 +53,17 @@ function cellEmpty(x, y, parent, parent2) {
   
   parent.addChild(emptySprite)
 
-  const backgroundSprite = Sprite.fromImage('images/hex/states/cell-background.png')
-  backgroundSprite.position.x = pixelCoordinate.x - 10
-  backgroundSprite.position.y = pixelCoordinate.y - 10
-  parent2.addChild(backgroundSprite)
-
   return emptySprite
 }
 
 function cellPrepared(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
+
+  const backgroundSprite = Sprite.fromImage('images/hex/states/cell-background.png')
+  backgroundSprite.position.x = pixelCoordinate.x - 10
+  backgroundSprite.position.y = pixelCoordinate.y - 10
+  hexBackground.addChild(backgroundSprite)
+
   const preparedCellSprite = Sprite.fromImage('images/hex/prepared/cell-prepared-partial1.png')
 
   const spriteExclamation = Sprite.fromImage('images/exclamations/exclamation-warning-severe.png')
@@ -149,6 +156,7 @@ function cellPrepared(x, y, parent) {
   })
   
   parent.addChild(preparedCellSprite)
+
   return preparedCellSprite
 }
 
