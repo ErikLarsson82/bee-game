@@ -1,6 +1,7 @@
 
 function setupSplash() {
   scene = 'splash'
+  document.body.style['background-color'] = '#ffd601'
   
   const container = new Container()
   container.scale.x = 2
@@ -39,9 +40,8 @@ function setupSplash() {
   splashscreen.addChild(welcomeHoney)
 
   const callback = () => {
-    document.body.style['background-color'] = '#fff4bc'
     app.stage.removeChild(container)
-    setupGame()
+    setupMenu()
   }
   const scaler = new Container()
   scaler.scale.x = 2

@@ -1,6 +1,7 @@
 
 function setupGame() {
   scene = 'game'
+  document.body.style['background-color'] = '#fff4bc'
 
   const container = new Container()
   container.scale.x = 2
