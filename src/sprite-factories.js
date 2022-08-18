@@ -9,6 +9,12 @@ function makeSelectable(sprite, label) {
   sprite.mousedown = () => setSelected(sprite)
 }
 
+function makeHexagon(sprite, x, y, type) {
+  sprite.type = type
+  sprite.index = { x, y }
+  sprite.bonuses = []
+}
+
 function makeOccupiable(parent) {
   const spotClaimed = PIXI.Sprite.fromImage('images/ui/spot-claimed.png')
   spotClaimed.visible = false

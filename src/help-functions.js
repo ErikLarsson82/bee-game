@@ -70,16 +70,64 @@ function killBroodlings() {
   })
 }
 
+function something(x) {
+  return x !== undefined
+}
 
-function activateAdjacent(_x, _y) {
+function notMe(_x, _y) {
+  return hex => {
+    const { x, y } = hex.index
+    return !(_x === x && _y === y)
+  }
+}
+
+
+function adjacent(_x, _y) {
+  const ad = []
   const instructions = _x % 2 === 0 ? DIRECTIONS_FLAT_EVEN : DIRECTIONS_FLAT_ODD
   for (direction in instructions) {
     const modifier = instructions[direction]
     const target = hexGrid[_x + modifier.x] && hexGrid[_x + modifier.x][_y + modifier.y]
-    if (target && target.isDisabled && target.isDisabled()) {
-      hexGrid[_x + modifier.x][_y + modifier.y] = cellEmpty(_x + modifier.x, _y + modifier.y, hexForeground, hexBackground)
-    }
+    ad.push(target)
   }
+  return ad.filter(something)
+    .filter(notMe(_x, _y))
+}
+
+function isHoney(hex) {
+  return hex.type === 'honey'
+}
+
+function isHoneyBuff(hex) {
+  return hex.bonusType === 'honey-buff'
+}
+
+function calculateAdjacency() {
+  forEachHexagon(hexGrid, hex => {
+    // Recaulculate all from scratch
+    hex.bonuses = []
+    const { x, y } = hex.index
+    const adjacentHexagons = adjacent(x, y)
+
+    const targets = adjacentHexagons.filter(isHoney)
+    
+    if (hex.type === 'honey' && targets.length > 0) {
+      hex.bonuses.push({
+        bonusType: 'honey-buff',
+        modifier: 1 + (targets.length * 0.1)
+      })
+    }
+  })
+}
+
+function activateAdjacent(_x, _y) {
+  const adjacentHexagons = adjacent(_x, _y)
+
+  adjacentHexagons.filter(hex => hex.isDisabled && hex.isDisabled())
+    .forEach(hex => {
+      const { x, y } = hex.index
+      hexGrid[x][y] = cellEmpty(x, y, hexForeground, hexBackground)
+    })
 }
 
 function setSelected(item) {

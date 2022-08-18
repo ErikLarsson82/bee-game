@@ -47,14 +47,18 @@ function createMap(m) {
     createBee(beeContainer, 'idle').setHunger(100).setAge(0)
 
     replaceHex([0, 0], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([1, 0], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([0, 1], 'prepared', 'activate').instantlyPrepare()
     replaceHex([0, 8], 'prepared', 'activate').instantlyPrepare()
     replaceHex([8, 0], 'prepared', 'activate').instantlyPrepare()
     replaceHex([8, 8], 'prepared', 'activate').instantlyPrepare()
     
-    replaceHex([4, 4], 'wax', 'activate')
-    replaceHex([4, 5], 'wax', 'activate')
     replaceHex([5, 4], 'honey', 'activate').setHoney(30)
     replaceHex([3, 4], 'honey', 'activate').setHoney(30)
+    replaceHex([4, 4], 'honey', 'activate')
+    replaceHex([4, 5], 'wax', 'activate')
+
+    calculateAdjacency() // This needs to be implemented all over
   }
 
   if (m === 'generous start') {
