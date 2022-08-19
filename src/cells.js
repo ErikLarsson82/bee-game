@@ -117,7 +117,7 @@ function cellPrepared(x, y, parent) {
     const contentNectar = Sprite.fromImage('images/ui/button-large/button-large-content-nectar.png')
     
     if (preparedCellSprite.done) {
-      container.addChild(Button(70, -34, contentHoney, () => { replaceSelectedHex('honey'); calculateAdjacency() }, null, null, 'large'))
+      container.addChild(Button(70, -34, contentHoney, () => replaceSelectedHex('honey'), null, null, 'large'))
       container.addChild(Button(100, -23, contentBrood, () => replaceSelectedHex('brood'), null, null, 'large'))
       container.addChild(Button(70, -12, contentPollen, () => replaceSelectedHex('pollen'), null, null, 'large'))
       container.addChild(Button(100, -1, contentNectar, () => replaceSelectedHex('converter'), null, null, 'large'))
@@ -240,7 +240,7 @@ function cellHoney(x, y, parent) {
 
     addTicker('ui', () => {
       const buff = honeySprite.bonuses.find(isHoneyBuff)
-      textBonus.text = buff ? 'Adjacency bonus: ' + buff.modifier : 'No bonuses'
+      textBonus.text = buff ? `Adjacency bonus: +${((buff.modifier - 1) * 100).toFixed(0)}%` : 'No bonuses'
     })
 
     const textDescription = new PIXI.Text('HONEY', { ...picoFontConfig, fill: '#96a5bc' })

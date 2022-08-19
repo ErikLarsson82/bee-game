@@ -57,8 +57,6 @@ function createMap(m) {
     replaceHex([3, 4], 'honey', 'activate').setHoney(30)
     replaceHex([4, 4], 'honey', 'activate')
     replaceHex([4, 5], 'wax', 'activate')
-
-    calculateAdjacency() // This needs to be implemented all over
   }
 
   if (m === 'generous start') {

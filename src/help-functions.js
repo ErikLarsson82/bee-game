@@ -102,20 +102,28 @@ function isHoneyBuff(hex) {
   return hex.bonusType === 'honey-buff'
 }
 
-function calculateAdjacency() {
+function calculateAdjacencyBonuses() {
   forEachHexagon(hexGrid, hex => {
     // Recaulculate all from scratch
-    hex.bonuses = []
+    hex.bonuses = []    
+
     const { x, y } = hex.index
     const adjacentHexagons = adjacent(x, y)
 
     const targets = adjacentHexagons.filter(isHoney)
     
-    if (hex.type === 'honey' && targets.length > 0) {
-      hex.bonuses.push({
-        bonusType: 'honey-buff',
-        modifier: 1 + (targets.length * 0.1)
-      })
+    // Honey bonus
+    if (hex.type === 'honey') {
+      if (targets.length > 0) {
+        const modifier = 1 + (targets.length * 0.1)
+        hex.bonuses.push({
+          bonusType: 'honey-buff',
+          modifier
+        })
+        hex.HONEY_HEX_CAPACITY = 30 * modifier
+      } else {
+        hex.HONEY_HEX_CAPACITY = 30
+      }
     }
   })
 }
@@ -230,6 +238,7 @@ function replaceHex(coordinate, type, activate) {
   const newHex = nameToFunction(type)(x, y, hexForeground)
   hexGrid[x][y] = newHex
 
+  calculateAdjacencyBonuses()
 
   return newHex
 }
@@ -250,6 +259,9 @@ function replaceSelectedHex(type) {
       setSelected(newHex)
     }
   }))
+
+  calculateAdjacencyBonuses()
+
   return returnHex;
 }
 
