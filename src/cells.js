@@ -476,6 +476,7 @@ function cellBrood(x, y, parent) {
     broodSprite.setContents('dead')
   }
   broodSprite.isWellFed = () => broodSprite.nutrition >= broodSprite.NUTRITION_CAPACITY - 10
+  broodSprite.isStarving = () => broodSprite.content === 'larvae' && broodSprite.nutrition < 20
   broodSprite.isDead = () => broodSprite.content === 'dead'
   broodSprite.togglePause = () => {
     broodSprite.paused = !broodSprite.paused
@@ -483,8 +484,19 @@ function cellBrood(x, y, parent) {
   }
 
   addTicker('game-stuff', time => {
-    broodSprite.texture = Texture.fromImage(`images/hex/brood/cell-brood-${broodSprite.content}.png`)
-    broodExclamation.visible = broodSprite.content === 'larvae' && broodSprite.nutrition < 20
+    if (broodSprite.content === 'larvae') {
+      if (broodSprite.nutrition > broodSprite.NUTRITION_CAPACITY - 30) {
+        broodSprite.texture = Texture.fromImage(`images/hex/brood/cell-brood-${broodSprite.content}-fat.png`)
+      } else if (broodSprite.nutrition > broodSprite.NUTRITION_CAPACITY - 60) {
+        broodSprite.texture = Texture.fromImage(`images/hex/brood/cell-brood-${broodSprite.content}-medium.png`)
+      } else {
+        broodSprite.texture = Texture.fromImage(`images/hex/brood/cell-brood-${broodSprite.content}-starving.png`)
+      }
+    } else {
+      broodSprite.texture = Texture.fromImage(`images/hex/brood/cell-brood-${broodSprite.content}.png`)
+    }
+    
+    broodExclamation.visible = broodSprite.isStarving()
     if (!broodSprite.content) return
     if (broodSprite.content === 'empty') return
     if (broodSprite.content === 'dead') {

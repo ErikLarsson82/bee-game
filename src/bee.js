@@ -346,7 +346,15 @@ function createBee(parent, type, startPosition) {
   }
 
   function nurseBroodling() {
+    const isAnyLarvaeStarving = filterHexagon(hexGrid, hex => hex.type === 'brood' && hex.isStarving() && hex.isUnclaimed(bee))
+    const isAtWellFedLarvae = filterHexagon(hexGrid, hex => hex.type === 'brood' && hex.isWellFed() && isAt(hex))
     const isAtAnyLarvae = filterHexagon(hexGrid, hex => hex.type === 'brood' && hex.content === 'larvae' && hex.isUnclaimed(bee) && isAt(hex))
+    
+    if (isAnyLarvaeStarving.length > 0 && isAtWellFedLarvae.length > 0) {
+      // Take off, another larvae needs me
+      bee.position.y = isAtWellFedLarvae[0].position.y - 5
+    }
+
     if (isAtAnyLarvae.length === 0 || isPollenSackEmpty()) return false
     
     isAtAnyLarvae[0].claimSlot(bee)
