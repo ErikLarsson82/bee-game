@@ -174,7 +174,7 @@ function cellPrepared(x, y, parent) {
 
 function cellHoney(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
-  const honeySprite = Sprite.fromImage('images/hex/honey/cell-honey-full.png')
+  const honeySprite = Sprite.fromImage('images/hex/honey/cell-honey-empty.png')
   makeHexagon(honeySprite, x, y, 'honey')
   makeOccupiable(honeySprite)
   makeSelectable(honeySprite, 'honey')
