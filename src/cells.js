@@ -92,7 +92,6 @@ function cellPrepared(x, y, parent) {
   preparedCellSprite.position.y = pixelCoordinate.y
   preparedCellSprite.completeness = 0
   preparedCellSprite.done = false
-  preparedCellSprite.type = 'prepared'
 
   preparedCellSprite.instantlyPrepare = () => {
     preparedCellSprite.completeness = 100
@@ -183,7 +182,6 @@ function cellHoney(x, y, parent) {
   honeySprite.position.x = pixelCoordinate.x
   honeySprite.position.y = pixelCoordinate.y
 
-  honeySprite.type = 'honey'
   honeySprite.HONEY_HEX_CAPACITY = 30
   honeySprite.honey = 0
   honeySprite.setHoney = amount => { honeySprite.honey = cap(0, honeySprite.HONEY_HEX_CAPACITY)(amount); return honeySprite }
@@ -283,7 +281,6 @@ function cellWax(x, y, parent) {
   waxSprite.position.x = pixelCoordinate.x
   waxSprite.position.y = pixelCoordinate.y
 
-  waxSprite.type = 'wax'
   waxSprite.WAX_HEX_CAPACITY = 130
   waxSprite.wax = 130
   waxSprite.setWax = amount => { waxSprite.wax = cap(0, waxSprite.WAX_HEX_CAPACITY)(amount); return waxSprite }
@@ -420,8 +417,6 @@ function cellConverter(x, y, parent) {
       converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-empty.png')
     }
   })
-
-  converterSprite.type = 'converter'
   
   parent.addChild(converterSprite)
   return converterSprite
@@ -449,7 +444,6 @@ function cellBrood(x, y, parent) {
   broodSprite.position.x = pixelCoordinate.x
   broodSprite.position.y = pixelCoordinate.y
 
-  broodSprite.type = 'brood'
   broodSprite.paused = false
   
   // Stored in seconds for easy transitions
@@ -653,7 +647,6 @@ function cellPollen(x, y, parent) {
   pollenSprite.position.x = pixelCoordinate.x
   pollenSprite.position.y = pixelCoordinate.y
 
-  pollenSprite.type = 'pollen'
   pollenSprite.POLLEN_HEX_CAPACITY = 120
   pollenSprite.pollen = 0
   pollenSprite.setPollen = (pollen) => pollenSprite.pollen = pollen

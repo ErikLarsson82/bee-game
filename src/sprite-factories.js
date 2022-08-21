@@ -144,21 +144,17 @@ function makeHungry(bee) {
   }
 
   bee.feedBee = () => {
-    const honeyHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.honey > 0 && hex.isUnclaimed(bee))
-    
     const honeyTarget = bee.isAtType('honey')
     if (honeyTarget && !bee.isWellFed() && honeyTarget.honey > 0) {
       honeyTarget.claimSlot(bee)
       bee.eat()
       honeyTarget.honey -= transferTo(honeyTarget.HONEY_HEX_CAPACITY).inSeconds(40)
-      if (bee.isWellFed()) {
-        bee.position.y = honeyTarget.position.y - 5
-      }
       return true
     } else {
       bee.consumeEnergy()
     }
 
+    const honeyHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.honey > 0 && hex.isUnclaimed(bee))
     if (honeyHex.length > 0 && bee.isHungry()) {
       honeyHex[0].claimSlot(bee)
       bee.flyTo(honeyHex[0])

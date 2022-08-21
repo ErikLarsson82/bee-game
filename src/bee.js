@@ -201,30 +201,6 @@ function createBee(parent, type, startPosition) {
     return container
   }
 
-  function flyToAndDepositNectar() {
-    
-    const targetHex = bee.isAtType('converter')
-    if (targetHex && !isNectarSackEmpty()) {
-      targetHex.claimSlot(bee)
-      bee.nectarSack -= transferTo(bee.NECTAR_SACK_CAPACITY).inSeconds(5)
-      bee.nectarSack = cap(0, bee.NECTAR_SACK_CAPACITY)(bee.nectarSack)
-      targetHex.nectar += transferTo(targetHex.NECTAR_CAPACITY).inSeconds(5)
-      targetHex.nectar = cap(0, targetHex.NECTAR_CAPACITY)(targetHex.nectar)
-      return true
-    }
-
-    if (!isNectarSackFull()) return false
-
-    const converterNeedsNectar = filterHexagon(hexGrid, hex => hex.type === 'converter' && !hex.isNectarFull() && hex.isUnclaimed(bee))
-    
-    if (converterNeedsNectar.length === 0) return false
-    const closest = getClosestHex(converterNeedsNectar, bee)
-    closest.claimSlot(bee)
-    bee.flyTo(closest)
-    
-    return true
-  }
-
   function pollinateFlower() {
     const flower = bee.isAtType('flower')
     const needsResource = !(isPollenSackFull() && isNectarSackFull())
@@ -298,6 +274,55 @@ function createBee(parent, type, startPosition) {
     return true
   }
 
+  function depositHoney() {
+    const targetHex = bee.isAtType('honey')
+    if (!targetHex) return false
+    const valid = !isHoneySackEmpty() && !targetHex.isHoneyFull()
+    if (!valid) return false
+
+    targetHex.claimSlot(bee)
+
+    targetHex.honey += transferTo(targetHex.HONEY_HEX_CAPACITY / 3).inSeconds(5)
+    targetHex.honey = cap(0, targetHex.HONEY_HEX_CAPACITY)(targetHex.honey)
+
+    bee.honeySack -= transferTo(bee.HONEY_SACK_CAPACITY).inSeconds(5)
+    bee.honeySack = cap(0, bee.HONEY_SACK_CAPACITY)(bee.honeySack)
+
+    return true
+  }
+
+  function depositNectar() {
+    const targetHex = bee.isAtType('converter')
+    if (!targetHex) return false
+    const valid = !isNectarSackEmpty() && !targetHex.isNectarFull()
+    if (!valid) return false
+    targetHex.claimSlot(bee)
+    bee.nectarSack -= transferTo(bee.NECTAR_SACK_CAPACITY).inSeconds(5)
+    bee.nectarSack = cap(0, bee.NECTAR_SACK_CAPACITY)(bee.nectarSack)
+    targetHex.nectar += transferTo(targetHex.NECTAR_CAPACITY).inSeconds(5)
+    targetHex.nectar = cap(0, targetHex.NECTAR_CAPACITY)(targetHex.nectar)
+    return true
+  }
+
+  function flyToHoneyToDeposit() {
+    const honeyHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.isUnclaimed(bee) && !hex.isHoneyFull())
+    if (honeyHex.length === 0 || isHoneySackEmpty()) return false
+    const closest = getClosestHex(honeyHex, bee)
+    closest.claimSlot(bee)
+    bee.flyTo(closest)      
+    return true
+  }
+
+  function flyToNectarToDeposit() {
+    const converterHex = filterHexagon(hexGrid, hex => hex.type === 'converter' && hex.isUnclaimed(bee) && !hex.isNectarFull())
+    
+    if (converterHex.length === 0 || isNectarSackEmpty()) return false
+    const closest = getClosestHex(converterHex, bee)
+    closest.claimSlot(bee)
+    bee.flyTo(closest)
+    
+    return true
+  }
 
   function flyToPollenToDeposit() {
     const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && hex.isUnclaimed(bee) && !hex.isPollenFull())
@@ -386,6 +411,12 @@ function createBee(parent, type, startPosition) {
   function idle() {
     if (ageBee()) return
     if (bee.feedBee()) return
+    if (depositPollen()) return
+    if (depositNectar()) return 
+    if (depositHoney()) return
+    if (flyToHoneyToDeposit()) return
+    if (flyToNectarToDeposit()) return
+    if (flyToPollenToDeposit()) return    
     bee.flyTo(null)
   }
 
@@ -393,8 +424,9 @@ function createBee(parent, type, startPosition) {
     if (ageBee()) return
     if (bee.feedBee()) return
     if (pollinateFlower()) return
-    if (depositPollen()) return    
-    if (flyToAndDepositNectar()) return
+    if (depositPollen()) return
+    if (depositNectar()) return
+    if (flyToNectarToDeposit()) return
     if (flyToPollenToDeposit()) return    
     if (flyToFlower()) return    
     bee.flyTo(null)
@@ -416,9 +448,10 @@ function createBee(parent, type, startPosition) {
 
   function worker() {
     if (ageBee()) return
+    if (convertNectar()) return
+    if (depositHoney()) return
+    if (flyToHoneyToDeposit()) return
     if (season === 'summer') {
-      if (depositHoney()) return
-      if (flyToHoney()) return
       bee.consumeEnergy()
     } else {
       if (bee.feedBee()) return
@@ -427,8 +460,7 @@ function createBee(parent, type, startPosition) {
     if (prepareCell()) return
     if (flyToPrepareCell()) return
     if (flyToWax()) return
-    if (convertNectar()) return
-    if (flyToConverter()) return
+    if (flyToConverterToConvert()) return
     bee.flyTo(null)
   }
 
@@ -447,36 +479,10 @@ function createBee(parent, type, startPosition) {
     return true
   }
 
-  function flyToConverter() {
+  function flyToConverterToConvert() {
     const converterHex = filterHexagon(hexGrid, hex => hex.type === 'converter' && hex.isUnclaimed(bee) && !hex.isNectarEmpty())
     if (converterHex.length === 0 || isHoneySackFull()) return false
     const closest = getClosestHex(converterHex, bee)
-    closest.claimSlot(bee)
-    bee.flyTo(closest)      
-    return true
-  }
-
-  function depositHoney() {
-    const hex = bee.isAtType('honey')
-    if (!hex) return false
-    hex.claimSlot(bee)
-
-    hex.honey += transferTo(hex.HONEY_HEX_CAPACITY / 3).inSeconds(5)
-    hex.honey = cap(0, hex.HONEY_HEX_CAPACITY)(hex.honey)
-
-    bee.honeySack -= transferTo(bee.HONEY_SACK_CAPACITY).inSeconds(5)
-    bee.honeySack = cap(0, bee.HONEY_SACK_CAPACITY)(bee.honeySack)
-
-    if (isHoneySackEmpty() || hex.isHoneyFull()) {
-      bee.position.y = hex.position.y - 5
-    }
-    return true
-  }
-
-  function flyToHoney() {
-    const honeyHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.isUnclaimed(bee) && !hex.isHoneyFull())
-    if (honeyHex.length === 0 || !isHoneySackFull()) return false
-    const closest = getClosestHex(honeyHex, bee)
     closest.claimSlot(bee)
     bee.flyTo(closest)      
     return true

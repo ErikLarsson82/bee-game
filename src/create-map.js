@@ -37,6 +37,14 @@ const MAP_CONFIGURATIONS = [
 function createMap(m) {
   createQueen(beeContainer)
    
+  if (m === 'default1') {
+    createBee(beeContainer, 'idle').setHunger(20).setAge(80).setNectar(60).setPollen(30).setHoney(30)
+    
+    replaceHex([4, 5], 'converter', 'activate')
+    replaceHex([4, 6], 'pollen', 'activate')
+    replaceHex([4, 7], 'honey', 'activate')
+  }
+
   if (m === 'default') {
     createBee(beeContainer, 'idle').setHunger(40).setAge(80)
     createBee(beeContainer, 'idle').setHunger(42).setAge(60)
