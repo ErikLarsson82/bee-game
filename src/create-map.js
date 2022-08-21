@@ -10,11 +10,19 @@ const MAP_CONFIGURATIONS = [
   },
   {
     // Give players lots of resources at the start, but have winters be pretty punishing
-    name: 'Generous start',
+    name: 'Generous start - punishing',
     id: 'generous start',
     cycles: [4, 2, 4, 2, 4, 2, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3],
     seeds: 4,
     winterHungerMultiplier: 4
+  },
+  {
+    // Give players lots of resources at the start, but have winters be pretty punishing
+    name: 'Generous start - easy',
+    id: 'generous start',
+    cycles: [4, 2, 4, 2, 4, 2, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3],
+    seeds: 4,
+    winterHungerMultiplier: 1
   },
   {
     // Bees are VERY hungry during winter, albeit they are short - this one could be considered a very hard map, especially to get far
