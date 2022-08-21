@@ -19,7 +19,7 @@ const MAP_CONFIGURATIONS = [
   {
     // Bees are VERY hungry during winter, albeit they are short - this one could be considered a very hard map, especially to get far
     name: 'Hunger winter',
-    id: 'default',
+    id: 'corner start',
     cycles: [3, 1, 3, 1, 3, 1, 3, 1, 3, 2, 3, 2, 3, 3, 3, 3, 3, 4, 3, 4, 3, 5, 3, 6, 3, 7, 3, 8, 3, 9, 3, 10, 3, 11],
     seeds: 2,
     winterHungerMultiplier: 5
@@ -55,6 +55,21 @@ function createMap(m) {
     replaceHex([3, 4], 'honey', 'activate').setHoney(30)
     replaceHex([4, 4], 'wax', 'activate')
     replaceHex([4, 5], 'wax', 'activate')
+  }
+
+  if (m === 'corner start') {
+    createBee(beeContainer, 'idle').setHunger(40).setAge(80)
+    createBee(beeContainer, 'idle').setHunger(42).setAge(60)
+    createBee(beeContainer, 'idle').setHunger(50).setAge(20)
+    createBee(beeContainer, 'idle').setHunger(80).setAge(10)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(6)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(5)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
+
+    replaceHex([0, 8], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([0, 9], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([1, 8], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([1, 9], 'prepared', 'activate').instantlyPrepare()
   }
 
   if (m === 'generous start') {
