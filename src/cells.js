@@ -501,7 +501,12 @@ function cellBrood(x, y, parent) {
       return
     }
     
-    broodSprite.lifecycle += transferTo(225).inSeconds(225)
+    if (season === 'winter' && broodSprite.content === 'puppa') {
+      // Make sure all puppas will hatch on the first day of summer by speeding up the process in the winter
+      broodSprite.lifecycle += transferTo(225).inSeconds(10)
+    } else {
+      broodSprite.lifecycle += transferTo(225).inSeconds(225)
+    }
 
     // Transitions
     if (broodSprite.lifecycle > eggDuration && broodSprite.content === 'egg') {
