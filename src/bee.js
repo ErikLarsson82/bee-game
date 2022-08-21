@@ -315,12 +315,10 @@ function createBee(parent, type, startPosition) {
 
   function flyToNectarToDeposit() {
     const converterHex = filterHexagon(hexGrid, hex => hex.type === 'converter' && hex.isUnclaimed(bee) && !hex.isNectarFull())
-    
     if (converterHex.length === 0 || isNectarSackEmpty()) return false
     const closest = getClosestHex(converterHex, bee)
     closest.claimSlot(bee)
     bee.flyTo(closest)
-    
     return true
   }
 
@@ -468,19 +466,26 @@ function createBee(parent, type, startPosition) {
     const hex = bee.isAtType('converter')
     if (!hex || isHoneySackFull()) return false
     hex.claimSlot(bee)
+    if (!isNectarSackEmpty()) {
+      hex.nectar += transferTo(hex.NECTAR_CAPACITY).inSeconds(30)
+      hex.nectar = cap(0, hex.NECTAR_CAPACITY)(hex.nectar)
+      bee.nectarSack -= transferTo(bee.NECTAR_SACK_CAPACITY).inSeconds(30)
+      bee.nectarSack = cap(0, bee.NECTAR_SACK_CAPACITY)(bee.nectarSack)      
+    }
     hex.nectar -= transferTo(hex.NECTAR_CAPACITY).inSeconds(30)
     hex.nectar = cap(0, hex.NECTAR_CAPACITY)(hex.nectar)
     bee.honeySack += transferTo(bee.HONEY_SACK_CAPACITY).inSeconds(30)
     bee.honeySack = cap(0, bee.HONEY_SACK_CAPACITY)(bee.honeySack)
+
     bee.eat()
-    if (isHoneySackFull() || hex.isNectarEmpty()) {
+    if (isHoneySackFull() || (hex.isNectarEmpty() && isNectarSackEmpty())) {
       bee.position.y = hex.position.y - 5
     }
     return true
   }
 
   function flyToConverterToConvert() {
-    const converterHex = filterHexagon(hexGrid, hex => hex.type === 'converter' && hex.isUnclaimed(bee) && !hex.isNectarEmpty())
+    const converterHex = filterHexagon(hexGrid, hex => hex.type === 'converter' && hex.isUnclaimed(bee) && (!hex.isNectarEmpty() || !isNectarSackEmpty()))
     if (converterHex.length === 0 || isHoneySackFull()) return false
     const closest = getClosestHex(converterHex, bee)
     closest.claimSlot(bee)
