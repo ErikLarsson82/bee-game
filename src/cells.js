@@ -250,11 +250,17 @@ function cellHoney(x, y, parent) {
     const notEnoughWarning = new PIXI.Text('NOT ENOUGH HONEY', { ...picoFontConfig, fill: 'white' })
     notEnoughWarning.scale.set(0.15, 0.15)
     notEnoughWarning.position.x = 76
-    notEnoughWarning.position.y = 10
+    notEnoughWarning.position.y = 26
     notEnoughWarning.visible = false
     container.addChild(notEnoughWarning)
 
-    const button = Button(84, -6, 'Make Wax', () => {
+    const buttonDelete = Button(84, -6, 'Delete', () => {
+      replaceHex([x, y], 'prepared').instantlyPrepare()
+      setSelected(null) 
+    })
+    container.addChild(buttonDelete)
+
+    const button = Button(84, 8, 'Make Wax', () => {
       if (honeySprite.honey >= (honeySprite.HONEY_HEX_CAPACITY * 0.9)) {
         replaceHex([x, y], 'wax')
         setSelected(null) 
@@ -263,6 +269,7 @@ function cellHoney(x, y, parent) {
       }
     })
     container.addChild(button)
+
 
     return container
   }
@@ -343,6 +350,12 @@ function cellWax(x, y, parent) {
     textDescription.position.y = -16
     container.addChild(textDescription)
 
+    const buttonDelete = Button(84, -6, 'Delete', () => {
+      replaceHex([x, y], 'prepared').instantlyPrepare()
+      setSelected(null) 
+    })
+    container.addChild(buttonDelete)
+
     return container
   }
 
@@ -396,6 +409,12 @@ function cellConverter(x, y, parent) {
     textDescription.position.x = 86
     textDescription.position.y = -16
     container.addChild(textDescription)
+
+    const buttonDelete = Button(84, -6, 'Delete', () => {
+      replaceHex([x, y], 'prepared').instantlyPrepare()
+      setSelected(null) 
+    })
+    container.addChild(buttonDelete)
 
     return container
   }
@@ -592,6 +611,12 @@ function cellBrood(x, y, parent) {
     helper.position.y = 35
     container.addChild(helper)
 
+    const buttonDelete = Button(84, 80, 'Delete', () => {
+      replaceHex([x, y], 'prepared').instantlyPrepare()
+      setSelected(null) 
+    })
+    container.addChild(buttonDelete)
+
     const helperText = () => {
       if (broodSprite.content === 'dead') {
         return 'Larvae needs\npollen from\nnurser bees\nto survive'
@@ -705,6 +730,12 @@ function cellPollen(x, y, parent) {
     textDescription.position.x = 86
     textDescription.position.y = -16
     container.addChild(textDescription)
+
+    const buttonDelete = Button(84, -6, 'Delete', () => {
+      replaceHex([x, y], 'prepared').instantlyPrepare()
+      setSelected(null) 
+    })
+    container.addChild(buttonDelete)
 
     return container
   }
