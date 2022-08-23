@@ -15,6 +15,12 @@ function makeHexagon(sprite, x, y, type) {
   sprite.bonuses = []
 }
 
+function makeUpgradeable(sprite) {
+  sprite.upgrades = []
+  sprite.hasUpgrade = type => sprite.upgrades.includes(type)
+  sprite.addUpgrade = type => sprite.upgrades.push(type)
+}
+
 function makeOccupiable(parent) {
   const spotClaimed = PIXI.Sprite.fromImage('images/ui/spot-claimed.png')
   spotClaimed.visible = false

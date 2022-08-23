@@ -135,11 +135,19 @@ function cellPrepared(x, y, parent) {
 
       container.addChild(ProgressBar(113, -15, 'build', () => preparedCellSprite.completeness, 100))
 
+      const buttonDelete = Button(84, 54, 'Delete', () => {
+        replaceHex([x, y], 'empty')
+        setSelected(null) 
+      })
+      container.addChild(buttonDelete)
+
       addTicker('ui', time => {
         if (needsHelp()) {
+          buttonDelete.position.y = 54
           helperText.visible = true
           content.texture = Texture.fromImage('images/ui/content-prepared-help.png')
         } else {
+          buttonDelete.position.y = -4
           helperText.visible = false
           content.texture = Texture.fromImage('images/ui/content-prepared.png')
         }
@@ -367,6 +375,7 @@ function cellWax(x, y, parent) {
 function cellConverter(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const converterSprite = Sprite.fromImage('images/hex/nectar/cell-nectar-empty.png')
+  makeUpgradeable(converterSprite)
   makeHexagon(converterSprite, x, y, 'converter')
   makeHexDetectable(converterSprite)
   makeOccupiable(converterSprite)
@@ -415,6 +424,24 @@ function cellConverter(x, y, parent) {
       setSelected(null) 
     })
     container.addChild(buttonDelete)
+
+    const buttonUpgrade = Button(84, 20, 'Upgrade A', () => converterSprite.addUpgrade('converter-adjacent-feed'))
+    container.addChild(buttonUpgrade)
+
+    const upgradesText = new PIXI.Text('-', { ...picoFontConfig })
+    upgradesText.scale.set(0.15, 0.15)
+    upgradesText.position.x = 90
+    upgradesText.position.y = 40
+    container.addChild(upgradesText)
+
+    addTicker('ui', () => {
+      upgradesText.text = ''
+      buttonUpgrade.visible = true
+      if (converterSprite.hasUpgrade('converter-adjacent-feed')) {
+        upgradesText.text = 'Upgrade A: Adds bonus\nhoney to adjacent\nhoney hexagons\nwhen converting'
+        buttonUpgrade.visible = false
+      }
+    })
 
     return container
   }

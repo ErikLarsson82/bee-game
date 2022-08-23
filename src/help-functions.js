@@ -219,7 +219,8 @@ const nameToFunction = (input) => {
 	  pollen: cellPollen,
 	  honey: cellHoney,
 	  wax: cellWax,
-	  prepared: cellPrepared
+	  prepared: cellPrepared,
+    empty: cellEmpty
 	}[input] 
 }
 

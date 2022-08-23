@@ -477,6 +477,18 @@ function createBee(parent, type, startPosition) {
     bee.honeySack += transferTo(bee.HONEY_SACK_CAPACITY).inSeconds(30)
     bee.honeySack = cap(0, bee.HONEY_SACK_CAPACITY)(bee.honeySack)
 
+    if (hex.hasUpgrade('converter-adjacent-feed')) {
+      const ad = adjacent(hex.index.x, hex.index.y)
+        .filter(({ type }) => type === 'honey')
+        .filter(hex => !hex.isHoneyFull())
+
+      if (ad.length > 0) {
+        const target = ad[0]
+        target.honey += transferTo(target.HONEY_HEX_CAPACITY / 6).inSeconds(5)
+        target.honey = cap(0, target.HONEY_HEX_CAPACITY)(target.honey)        
+      }
+    }
+
     bee.eat()
     if (isHoneySackFull() || (hex.isNectarEmpty() && isNectarSackEmpty())) {
       bee.position.y = hex.position.y - 5
