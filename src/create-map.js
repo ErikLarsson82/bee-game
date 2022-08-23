@@ -73,6 +73,14 @@ function createMap(m) {
     replaceHex([4, 7], 'honey', 'activate')
   }
 
+  if (m === 'brood single test') {
+    createBee(beeContainer, 'nurser').setHunger(100)
+    
+    replaceHex([5, 4], 'honey', 'activate').setHoney(30)
+    replaceHex([3, 4], 'brood', 'activate')
+    replaceHex([4, 4], 'pollen', 'activate').setPollen(100)
+  }
+
   if (m === 'corner start') {
     createBee(beeContainer, 'idle').setHunger(40).setAge(80)
     createBee(beeContainer, 'idle').setHunger(42).setAge(60)

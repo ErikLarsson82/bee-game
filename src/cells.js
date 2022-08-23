@@ -496,7 +496,7 @@ function cellBrood(x, y, parent) {
   broodSprite.lifecycle = 0
   const eggDuration = 30
   const larvaeDuration = 300
-  const puppaDuration = 500    
+  const puppaDuration = 540    
   
   broodSprite.content = 'empty'
   broodSprite.NUTRITION_CAPACITY = 100
