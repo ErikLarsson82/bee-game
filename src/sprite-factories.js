@@ -57,18 +57,9 @@ function makeFlyable(sprite) {
   sprite.vx = 0
   sprite.vy = 0
   sprite.flyTo = targetSprite => {
-    if (!targetSprite) {
-      targetSprite = {
-        position: {
-          x: sprite.idle.x,
-          y: sprite.idle.y
-        }
-      }
-    }
     const x = targetSprite.position.x - sprite.position.x
     const y = targetSprite.position.y - sprite.position.y
 
-    sprite.setShadowPosition()
     if (x === 0 && y === 0) return
     const direction = new PIXI.Point(x, y).normalize()
 
@@ -95,8 +86,6 @@ function makeFlyable(sprite) {
     sprite.position.x += sprite.vx
     sprite.position.y += sprite.vy
     snapTo(sprite, targetSprite)
-
-    sprite.setShadowPosition()
   }
   sprite.isMoving = () => {
     return sprite.vx !== 0 || sprite.vy !== 0
@@ -144,30 +133,30 @@ function makeHungry(bee) {
     }
   }
 
-  bee.eat = () => {
-    bee.hunger += transferTo(bee.HUNGER_CAPACITY).inSeconds(20)
-    bee.hunger = cap(0, bee.HUNGER_CAPACITY)(bee.hunger)
-  }
+  // bee.eat = () => {
+  //   bee.hunger += transferTo(bee.HUNGER_CAPACITY).inSeconds(20)
+  //   bee.hunger = cap(0, bee.HUNGER_CAPACITY)(bee.hunger)
+  // }
 
-  bee.feedBee = () => {
-    const honeyTarget = bee.isAtType('honey')
-    if (honeyTarget && !bee.isWellFed() && honeyTarget.honey > 0) {
-      honeyTarget.claimSlot(bee)
-      bee.eat()
-      honeyTarget.honey -= transferTo(honeyTarget.HONEY_HEX_CAPACITY).inSeconds(40)
-      return true
-    } else {
-      bee.consumeEnergy()
-    }
+//   bee.feedBee = () => {
+//     const honeyTarget = bee.isAtType('honey')
+//     if (honeyTarget && !bee.isWellFed() && honeyTarget.honey > 0) {
+//       honeyTarget.claimSlot(bee)
+//       bee.eat()
+//       honeyTarget.honey -= transferTo(honeyTarget.HONEY_HEX_CAPACITY).inSeconds(40)
+//       return true
+//     } else {
+//       bee.consumeEnergy()
+//     }
 
-    const honeyHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.honey > 0 && hex.isUnclaimed(bee))
-    if (honeyHex.length > 0 && bee.isHungry()) {
-      honeyHex[0].claimSlot(bee)
-      bee.flyTo(honeyHex[0])
-      return true
-    }
-    return false
-  }
+//     const honeyHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.honey > 0 && hex.isUnclaimed(bee))
+//     if (honeyHex.length > 0 && bee.isHungry()) {
+//       honeyHex[0].claimSlot(bee)
+//       bee.flyTo(honeyHex[0])
+//       return true
+//     }
+//     return false
+//   }
 }
 
 function makeParticleCreator(bee) {
@@ -199,7 +188,6 @@ function makeParticleCreator(bee) {
         if (!bee.particleActive) {
           removeParticle()
           foreground.removeChild(pollenPixel)
-          delete pollenPixel
           return
         }
         pollenPixel.position.y += 0.0003 * FPS * gameSpeed
@@ -207,7 +195,6 @@ function makeParticleCreator(bee) {
         if (lifetime > 1) {
           removeParticle()
           foreground.removeChild(pollenPixel)
-          delete pollenPixel
         }
       })
       foreground.addChild(pollenPixel)

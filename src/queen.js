@@ -23,8 +23,6 @@ function createQueen(parent) {
   makeFlyable(queenSprite)
   makeHexDetectable(queenSprite)
 
-  queenSprite.setShadowPosition = () => {}
-
   const helperText = () => {
     if (season === 'winter') return 'Does not\nlay eggs\nin winter'
     if (queenSprite.isAtType('brood')) return 'Laying egg'
@@ -66,28 +64,28 @@ function createQueen(parent) {
   }
 
   addTicker('game-stuff', time => {
-    queenSprite.animationTicker += speeds[gameSpeed]
+    // queenSprite.animationTicker += speeds[gameSpeed]
     
-    const targetBrood = queenSprite.isAtType('brood')
+    // const targetBrood = queenSprite.isAtType('brood')
     
-    queenWingAddon.visible = (queenSprite.vx !== 0 || queenSprite.vy !== 0) && Math.sin(queenSprite.animationTicker) > 0
-    queenLegAddon.visible = (queenSprite.vx === 0 && queenSprite.vy === 0 && targetBrood) && Math.sin(queenSprite.animationTicker) > 0
+    // queenWingAddon.visible = (queenSprite.vx !== 0 || queenSprite.vy !== 0) && Math.sin(queenSprite.animationTicker) > 0
+    // queenLegAddon.visible = (queenSprite.vx === 0 && queenSprite.vy === 0 && targetBrood) && Math.sin(queenSprite.animationTicker) > 0
 
-    if (targetBrood && season === 'summer') {
-      queenSprite.delay += transferTo(1).inSeconds(30)
-      if (queenSprite.delay < 1) return true
-      queenSprite.delay = 0
-      targetBrood.setContents('egg')
-      queenSprite.position.y = queenSprite.position.y - 5
-      return true
-    }
+    // if (targetBrood && season === 'summer') {
+    //   queenSprite.delay += transferTo(1).inSeconds(30)
+    //   if (queenSprite.delay < 1) return true
+    //   queenSprite.delay = 0
+    //   targetBrood.setContents('egg')
+    //   queenSprite.position.y = queenSprite.position.y - 5
+    //   return true
+    // }
 
-    const emptyBroodCells = filterHexagon(hexGrid, hex => hex.type === 'brood' && !hex.isOccupiedWithOffspring() && hex.paused === false)
-    if (emptyBroodCells.length > 0 && season === 'summer') {
-      queenSprite.flyTo(emptyBroodCells[0])
-      return true
-    }
-    queenSprite.flyTo(null)
+    // const emptyBroodCells = filterHexagon(hexGrid, hex => hex.type === 'brood' && !hex.isOccupiedWithOffspring() && hex.paused === false)
+    // if (emptyBroodCells.length > 0 && season === 'summer') {
+    //   queenSprite.flyTo(emptyBroodCells[0])
+    //   return true
+    // }
+    // queenSprite.flyTo(null)
     return false
   })
 

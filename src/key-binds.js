@@ -8,33 +8,33 @@ window.addEventListener('keydown', e => {
   }
 
   //T, for gameTick
-  if (e.keyCode === 84) {
-    gameloop(16.66, true)
-  }
+  // if (e.keyCode === 84) {
+  //   gameloop(16.66, true)
+  // }
 
-  // 1
-  if (e.keyCode === 49) {
-    gameSpeed = 1
-    paused = false
-  }
+  // // 1
+  // if (e.keyCode === 49) {
+  //   gameSpeed = 1
+  //   paused = false
+  // }
 
-  // 2
-  if (e.keyCode === 50) {
-    gameSpeed = 4
-    paused = false
-  }
+  // // 2
+  // if (e.keyCode === 50) {
+  //   gameSpeed = 4
+  //   paused = false
+  // }
 
-  // 2
-  if (e.keyCode === 51) {
-    gameSpeed = 8
-    paused = false
-  }
+  // // 2
+  // if (e.keyCode === 51) {
+  //   gameSpeed = 8
+  //   paused = false
+  // }
 
-  // 3
-  if (e.keyCode === 52) {
-    gameSpeed = 64
-    paused = false
-  }
+  // // 3
+  // if (e.keyCode === 52) {
+  //   gameSpeed = 64
+  //   paused = false
+  // }
 
   /*
   // enter

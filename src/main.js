@@ -48,7 +48,7 @@ app.renderer.view.style.display = 'block'
 
 let cycles = null
 
-let gameSpeed = 1
+let gameSpeed = 4
 let paused = false
 let hour = 0
 let day = 1
@@ -82,9 +82,29 @@ let tickers = []
 const bees = []
 
 loader.add('pico8-mono.ttf')
-loader.add('bee-working-animation', 'images/animation-test/bee/animation-spritesheet-bee.png')
-loader.add('bee-unloading-animation', 'images/animation-test/bee/animation-spritesheet-bee-unloading.png')
-loader.add('flower-is-pollinated', 'images/animation-test/flower-is-pollinated/animation-spritesheet-flower.png')
-loader.load(setupSplash)
 
-// loader.load(setupGame)
+loader.add('bee-working-animation-worker', 'images/animation-test/bee/animation-spritesheet-bee-worker.png')
+loader.add('bee-unloading-animation-worker', 'images/animation-test/bee/animation-spritesheet-bee-unloading-worker.png')
+loader.add('bee-working-animation-nurser', 'images/animation-test/bee/animation-spritesheet-bee-nurser.png')
+loader.add('bee-unloading-animation-nurser', 'images/animation-test/bee/animation-spritesheet-bee-unloading-nurser.png')
+loader.add('bee-working-animation-forager', 'images/animation-test/bee/animation-spritesheet-bee-forager.png')
+loader.add('bee-unloading-animation-forager', 'images/animation-test/bee/animation-spritesheet-bee-unloading-forager.png')
+
+loader.add('flower-is-pollinated', 'images/animation-test/flower-is-pollinated/animation-spritesheet-flower.png')
+// loader.load(setupSplash)
+
+const map = {
+  // The one we've been playing for all this time
+  name: 'Default',
+  id: 'default',
+  cycles: [5, 1, 5, 2, 5, 2, 4, 3, 4, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30],
+  seeds: 5,
+  winterHungerMultiplier: 1
+}
+
+cycles = map.cycles
+MAP_SELECTION = map.id
+seeds = map.seeds
+winterHungerMultiplier = map.winterHungerMultiplier
+
+loader.load(setupGame)

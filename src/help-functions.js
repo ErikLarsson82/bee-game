@@ -102,31 +102,31 @@ function isHoneyBuff(hex) {
   return hex.bonusType === 'honey-buff'
 }
 
-function calculateAdjacencyBonuses() {
-  forEachHexagon(hexGrid, hex => {
-    // Recaulculate all from scratch
-    hex.bonuses = []    
+// function calculateAdjacencyBonuses() {
+//   forEachHexagon(hexGrid, hex => {
+//     // Recaulculate all from scratch
+//     hex.bonuses = []    
 
-    const { x, y } = hex.index
-    const adjacentHexagons = adjacent(x, y)
+//     const { x, y } = hex.index
+//     const adjacentHexagons = adjacent(x, y)
 
-    const targets = adjacentHexagons.filter(isHoney)
+//     const targets = adjacentHexagons.filter(isHoney)
     
-    // Honey bonus
-    if (hex.type === 'honey') {
-      if (targets.length > 0) {
-        const modifier = 1 + (targets.length * 0.1)
-        hex.bonuses.push({
-          bonusType: 'honey-buff',
-          modifier
-        })
-        hex.HONEY_HEX_CAPACITY = 30 * modifier
-      } else {
-        hex.HONEY_HEX_CAPACITY = 30
-      }
-    }
-  })
-}
+//     // Honey bonus
+//     if (hex.type === 'honey') {
+//       if (targets.length > 0) {
+//         const modifier = 1 + (targets.length * 0.1)
+//         hex.bonuses.push({
+//           bonusType: 'honey-buff',
+//           modifier
+//         })
+//         hex.HONEY_HEX_CAPACITY = 30 * modifier
+//       } else {
+//         hex.HONEY_HEX_CAPACITY = 30
+//       }
+//     }
+//   })
+// }
 
 function activateAdjacent(_x, _y) {
   const adjacentHexagons = adjacent(_x, _y)
@@ -134,7 +134,7 @@ function activateAdjacent(_x, _y) {
   adjacentHexagons.filter(hex => hex.isDisabled && hex.isDisabled())
     .forEach(hex => {
       const { x, y } = hex.index
-      hexGrid[x][y] = cellEmpty(x, y, hexForeground, hexBackground)
+      hexGrid[x][y] = cellEmpty(x, y, hexForeground)
     })
 }
 
@@ -215,7 +215,9 @@ function snapTo(a, b) {
 const nameToFunction = (input) => {
 	return {
 	  converter: cellConverter,
-	  brood: cellBrood,
+	  ['brood-worker']: (x, y, parent) => cellBrood(x, y, parent, 'worker'),
+	  ['brood-nurser']: (x, y, parent) => cellBrood(x, y, parent, 'nurser'),
+	  ['brood-forager']: (x, y, parent) => cellBrood(x, y, parent, 'forager'),
 	  pollen: cellPollen,
 	  honey: cellHoney,
 	  wax: cellWax,
@@ -231,7 +233,7 @@ function replaceHex(coordinate, type, activate) {
   if (activate === 'activate') activateAdjacent(x, y)
 
   hexForeground.removeChild(hexGrid[x][y])
-  delete hexGrid[x][y]
+  // delete hexGrid[x][y]
   
   if (!nameToFunction(type)) {
     console.error('No type!')
@@ -239,7 +241,7 @@ function replaceHex(coordinate, type, activate) {
   const newHex = nameToFunction(type)(x, y, hexForeground)
   hexGrid[x][y] = newHex
 
-  calculateAdjacencyBonuses()
+  // calculateAdjacencyBonuses()
 
   return newHex
 }
@@ -261,7 +263,7 @@ function replaceSelectedHex(type) {
     }
   }))
 
-  calculateAdjacencyBonuses()
+  // calculateAdjacencyBonuses()
 
   return returnHex;
 }

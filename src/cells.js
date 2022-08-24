@@ -12,6 +12,7 @@ function cellDisabled(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const disabledSprite = Sprite.fromImage('images/hex/states/cell-disabled.png')
   makeHexagon(disabledSprite, x, y, 'disabled')
+
   disabledSprite.position.x = pixelCoordinate.x
   disabledSprite.position.y = pixelCoordinate.y
   disabledSprite.isDisabled = () => true
@@ -29,8 +30,10 @@ function cellEmpty(x, y, parent) {
   hexBackground.addChild(backgroundSprite)
 
   const emptySprite = Sprite.fromImage('images/hex/states/cell-empty.png')
-  makeSelectable(emptySprite, 'cell')
+  makeSelectable(emptySprite, 'empty')
   makeHexagon(emptySprite, x, y, 'empty')
+  makeOccupiable(emptySprite)
+
   emptySprite.hitArea = generateHitArea()
   emptySprite.position.x = pixelCoordinate.x
   emptySprite.position.y = pixelCoordinate.y
@@ -94,10 +97,10 @@ function cellPrepared(x, y, parent) {
   preparedCellSprite.done = false
 
   preparedCellSprite.instantlyPrepare = () => {
-    preparedCellSprite.completeness = 100
+    preparedCellSprite.completeness = 9
   }
 
-  const needsHelp = () => preparedCellSprite.completeness <= 100 && bees.filter(({ type }) => type === 'worker').length === 0
+  const needsHelp = () => preparedCellSprite.completeness <= 9 && bees.filter(({ type }) => type === 'worker').length === 0
   
   preparedCellSprite.panelLabel = () => false
   preparedCellSprite.panelPosition = () => ({ x: pixelCoordinate.x + 8, y: pixelCoordinate.y + 5 })
@@ -111,15 +114,20 @@ function cellPrepared(x, y, parent) {
     container.addChild(whiteLine)
 
     const contentHoney = Sprite.fromImage('images/ui/button-large/button-large-content-honey.png')
-    const contentBrood = Sprite.fromImage('images/ui/button-large/button-large-content-brood.png')
     const contentPollen = Sprite.fromImage('images/ui/button-large/button-large-content-pollen.png')
     const contentNectar = Sprite.fromImage('images/ui/button-large/button-large-content-nectar.png')
+
+    const contentLayNurserEgg = Sprite.fromImage('images/ui/button-large/button-large-content-brood-nurser.png')
+    const contentLayWorkerEgg = Sprite.fromImage('images/ui/button-large/button-large-content-brood-worker.png')
+    const contentLayForagerEgg = Sprite.fromImage('images/ui/button-large/button-large-content-brood-forager.png')
     
     if (preparedCellSprite.done) {
       container.addChild(Button(70, -34, contentHoney, () => replaceSelectedHex('honey'), null, null, 'large'))
-      container.addChild(Button(100, -23, contentBrood, () => replaceSelectedHex('brood'), null, null, 'large'))
+      container.addChild(Button(100, -23, contentNectar, () => replaceSelectedHex('converter'), null, null, 'large'))
       container.addChild(Button(70, -12, contentPollen, () => replaceSelectedHex('pollen'), null, null, 'large'))
-      container.addChild(Button(100, -1, contentNectar, () => replaceSelectedHex('converter'), null, null, 'large'))
+      container.addChild(Button(100, 2, contentLayNurserEgg, () => replaceSelectedHex('brood-nurser'), null, null, 'large'))
+      container.addChild(Button(100, 24, contentLayWorkerEgg, () => replaceSelectedHex('brood-worker'), null, null, 'large'))
+      container.addChild(Button(100, 46, contentLayForagerEgg, () => replaceSelectedHex('brood-forager'), null, null, 'large'))
     } else {
       const content = Sprite.fromImage('images/ui/content-prepared.png')
       content.position.x = 72
@@ -133,13 +141,13 @@ function cellPrepared(x, y, parent) {
       helperText.position.y = -6
       container.addChild(helperText)
 
-      container.addChild(ProgressBar(113, -15, 'build', () => preparedCellSprite.completeness, 100))
+      container.addChild(ProgressBar(113, -15, 'build', () => preparedCellSprite.completeness, 9))
 
       const buttonDelete = Button(84, 54, 'Delete', () => {
         replaceHex([x, y], 'empty')
         setSelected(null) 
       })
-      container.addChild(buttonDelete)
+      // container.addChild(buttonDelete)
 
       addTicker('ui', time => {
         if (needsHelp()) {
@@ -164,15 +172,15 @@ function cellPrepared(x, y, parent) {
     spriteExclamation.visible = needsHelp()
   })
   addTicker('game-stuff', time => {
-    if (preparedCellSprite.completeness >= 100) {
+    if (preparedCellSprite.completeness >= 9) {
       preparedCellSprite.texture = Texture.fromImage('images/hex/prepared/cell-prepared-complete.png')
       if (selected === preparedCellSprite && !preparedCellSprite.done) setSelected(null)
       preparedCellSprite.done = true
+      activateAdjacent(x, y)
       return
     }
 
-    const partialNumber = Math.ceil(preparedCellSprite.completeness / 100 * 7) + 1
-    preparedCellSprite.texture = Texture.fromImage(`images/hex/prepared/cell-prepared-partial${partialNumber}.png`)       
+    preparedCellSprite.texture = Texture.fromImage(`images/hex/prepared/cell-prepared-partial${cap(1, 8)(Math.floor(preparedCellSprite.completeness))}.png`)       
   })
   
   parent.addChild(preparedCellSprite)
@@ -190,24 +198,24 @@ function cellHoney(x, y, parent) {
   honeySprite.position.x = pixelCoordinate.x
   honeySprite.position.y = pixelCoordinate.y
 
-  honeySprite.HONEY_HEX_CAPACITY = 30
+  honeySprite.HONEY_HEX_CAPACITY = 6
   honeySprite.honey = 0
   honeySprite.setHoney = amount => { honeySprite.honey = cap(0, honeySprite.HONEY_HEX_CAPACITY)(amount); return honeySprite }
   honeySprite.isHoneyFull = () => honeySprite.honey >= honeySprite.HONEY_HEX_CAPACITY
   honeySprite.isHoneyEmpty = () => honeySprite.honey <= 0
   
   addTicker('game-stuff', time => {
-    if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.95) {
+    if (honeySprite.honey >= honeySprite.HONEY_HEX_CAPACITY) {
       honeySprite.texture = Texture.fromImage('images/hex/honey/cell-honey-full.png')
-    } else if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.85) {
+    } else if (honeySprite.honey >= 5) {
       honeySprite.texture = Texture.fromImage('images/hex/honey/cell-honey-a.png')
-    } else if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.6) {
+    } else if (honeySprite.honey >= 4) {
       honeySprite.texture = Texture.fromImage('images/hex/honey/cell-honey-b.png')
-    } else if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.5) {
+    } else if (honeySprite.honey >= 3) {
       honeySprite.texture = Texture.fromImage('images/hex/honey/cell-honey-c.png')
-    } else if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.35) {
+    } else if (honeySprite.honey >= 2) {
       honeySprite.texture = Texture.fromImage('images/hex/honey/cell-honey-d.png')
-    } else if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.1) {
+    } else if (honeySprite.honey >= 1) {
       honeySprite.texture = Texture.fromImage('images/hex/honey/cell-honey-e.png')
     } else {
       honeySprite.texture = Texture.fromImage('images/hex/honey/cell-honey-empty.png')
@@ -266,7 +274,7 @@ function cellHoney(x, y, parent) {
       replaceHex([x, y], 'prepared').instantlyPrepare()
       setSelected(null) 
     })
-    container.addChild(buttonDelete)
+    // container.addChild(buttonDelete)
 
     const button = Button(84, 8, 'Make Wax', () => {
       if (honeySprite.honey >= (honeySprite.HONEY_HEX_CAPACITY * 0.9)) {
@@ -296,8 +304,8 @@ function cellWax(x, y, parent) {
   waxSprite.position.x = pixelCoordinate.x
   waxSprite.position.y = pixelCoordinate.y
 
-  waxSprite.WAX_HEX_CAPACITY = 130
-  waxSprite.wax = 130
+  waxSprite.WAX_HEX_CAPACITY = 7
+  waxSprite.wax = 7
   waxSprite.setWax = amount => { waxSprite.wax = cap(0, waxSprite.WAX_HEX_CAPACITY)(amount); return waxSprite }
   waxSprite.isWaxFull = () => waxSprite.wax >= waxSprite.WAX_HEX_CAPACITY
   waxSprite.isWaxEmpty = () => waxSprite.wax <= 0
@@ -309,19 +317,19 @@ function cellWax(x, y, parent) {
       replaceHex([x, y], 'prepared').instantlyPrepare()
     }
 
-    if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.96) {
+    if (waxSprite.wax >= waxSprite.WAX_HEX_CAPACITY) {
       waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-full.png')
-    } else if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.72) {
+    } else if (waxSprite.wax >= 6) {
       waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-a.png')
-    } else if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.66 ) {
+    } else if (waxSprite.wax >= 5) {
       waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-b.png')
-    } else if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.5) {
+    } else if (waxSprite.wax >= 4) {
       waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-c.png')
-    } else if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.4) {
+    } else if (waxSprite.wax >= 3) {
       waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-d.png')
-    } else if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.3) {
+    } else if (waxSprite.wax >= 2) {
       waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-e.png')
-    } else if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.1) {
+    } else if (waxSprite.wax >= 1) {
       waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-f.png')
     } else {
       waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-empty.png')
@@ -362,7 +370,7 @@ function cellWax(x, y, parent) {
       replaceHex([x, y], 'prepared').instantlyPrepare()
       setSelected(null) 
     })
-    container.addChild(buttonDelete)
+    // container.addChild(buttonDelete)
 
     return container
   }
@@ -383,7 +391,7 @@ function cellConverter(x, y, parent) {
   converterSprite.hitArea = generateHitArea()
   converterSprite.position.x = pixelCoordinate.x
   converterSprite.position.y = pixelCoordinate.y
-  converterSprite.NECTAR_CAPACITY = 15
+  converterSprite.NECTAR_CAPACITY = 6
   converterSprite.nectar = 0
   converterSprite.setNectar = amount => { converterSprite.nectar = cap(0, converterSprite.NECTAR_CAPACITY)(amount); return converterSprite }
   converterSprite.isNectarFull = () => converterSprite.nectar >= converterSprite.NECTAR_CAPACITY
@@ -423,7 +431,7 @@ function cellConverter(x, y, parent) {
       replaceHex([x, y], 'prepared').instantlyPrepare()
       setSelected(null) 
     })
-    container.addChild(buttonDelete)
+    // container.addChild(buttonDelete)
 
     const buttonUpgrade = Button(84, 20, 'Upgrade A', () => converterSprite.addUpgrade('converter-adjacent-feed'))
     container.addChild(buttonUpgrade)
@@ -447,17 +455,17 @@ function cellConverter(x, y, parent) {
   }
 
   addTicker('game-stuff', time => {
-    if (converterSprite.nectar > converterSprite.NECTAR_CAPACITY * 0.9) {
+    if (converterSprite.nectar >= converterSprite.NECTAR_CAPACITY) {
       converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-full.png')
-    } else if (converterSprite.nectar > converterSprite.NECTAR_CAPACITY * 0.72) {
+    } else if (converterSprite.nectar >= 5) {
       converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-a.png')
-    } else if (converterSprite.nectar > converterSprite.NECTAR_CAPACITY * 0.66 ) {
+    } else if (converterSprite.nectar >= 4) {
       converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-b.png')
-    } else if (converterSprite.nectar > converterSprite.NECTAR_CAPACITY * 0.5) {
+    } else if (converterSprite.nectar >= 3) {
       converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-c.png')
-    } else if (converterSprite.nectar > converterSprite.NECTAR_CAPACITY * 0.25) {
+    } else if (converterSprite.nectar >= 2) {
       converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-d.png')
-    } else if (converterSprite.nectar > converterSprite.NECTAR_CAPACITY * 0.05) {
+    } else if (converterSprite.nectar >= 1) {
       converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-e.png')
     } else {
       converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-empty.png')
@@ -469,14 +477,10 @@ function cellConverter(x, y, parent) {
 }
 
 
-function cellBrood(x, y, parent) {
+function cellBrood(x, y, parent, type) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const broodSprite = Sprite.fromImage('images/hex/brood/cell-brood-empty.png')
   makeHexagon(broodSprite, x, y, 'brood')
-  const disabledSprite = Sprite.fromImage('images/hex/brood/cell-brood-disabled.png')
-  disabledSprite.visible = false
-
-  broodSprite.addChild(disabledSprite)
 
   const broodExclamation = Sprite.fromImage('images/exclamations/exclamation-warning-severe.png')
   broodExclamation.position.x = 14
@@ -485,7 +489,7 @@ function cellBrood(x, y, parent) {
   broodSprite.addChild(broodExclamation)
 
   makeOccupiable(broodSprite)
-  makeSelectable(broodSprite, 'brood')
+  makeSelectable(broodSprite, 'brood-' + type)
   broodSprite.hitArea = generateHitArea()
   broodSprite.position.x = pixelCoordinate.x
   broodSprite.position.y = pixelCoordinate.y
@@ -494,44 +498,38 @@ function cellBrood(x, y, parent) {
   
   // Stored in seconds for easy transitions
   broodSprite.lifecycle = 0
-  const eggDuration = 30
-  const larvaeDuration = 300
-  const puppaDuration = 540    
+  const eggDuration = 10
+  const larvaeDuration = 60
+  const puppaDuration = 20
   
-  broodSprite.content = 'empty'
-  broodSprite.NUTRITION_CAPACITY = 100
-  broodSprite.nutrition = null
+  broodSprite.content = 'egg'
+  broodSprite.NUTRITION_CAPACITY = 10
+  broodSprite.nutrition = broodSprite.NUTRITION_CAPACITY
   broodSprite.CORPSE_DELAY = 60
   broodSprite.corpseCleaned = broodSprite.CORPSE_DELAY
   broodSprite.isOccupiedWithOffspring = () => broodSprite.content !== 'empty'
   broodSprite.setContents = item => {
     // empty -> egg -> (larvae -> puppa) || dead
     broodSprite.content = item
-    if (item === 'egg') {
-      broodSprite.lifecycle = 0
-      broodSprite.nutrition = 50
-    }
   }
   broodSprite.kill = () => {
     broodSprite.setContents('dead')
   }
-  broodSprite.isWellFed = () => broodSprite.nutrition >= broodSprite.NUTRITION_CAPACITY - 10
-  broodSprite.isStarving = () => broodSprite.content === 'larvae' && broodSprite.nutrition < 20
+  broodSprite.isWellFed = () => broodSprite.nutrition >= 8
+  broodSprite.isStarving = () => broodSprite.content === 'larvae' && broodSprite.nutrition < 4
   broodSprite.isDead = () => broodSprite.content === 'dead'
-  broodSprite.togglePause = () => {
-    broodSprite.paused = !broodSprite.paused
-    disabledSprite.visible = broodSprite.paused
-  }
 
-  addTicker('game-stuff', time => {
+  addTicker('game-stuff', frameTime => {
     if (broodSprite.content === 'larvae') {
-      if (broodSprite.nutrition > broodSprite.NUTRITION_CAPACITY - 30) {
-        broodSprite.texture = Texture.fromImage(`images/hex/brood/cell-brood-${broodSprite.content}-fat.png`)
-      } else if (broodSprite.nutrition > broodSprite.NUTRITION_CAPACITY - 60) {
-        broodSprite.texture = Texture.fromImage(`images/hex/brood/cell-brood-${broodSprite.content}-medium.png`)
+      if (broodSprite.nutrition >= 8) {
+        broodSprite.texture = Texture.fromImage(`images/hex/brood/cell-brood-larvae-fat-${type}.png`)
+      } else if (broodSprite.nutrition > 4) {
+        broodSprite.texture = Texture.fromImage(`images/hex/brood/cell-brood-larvae-medium-${type}.png`)
       } else {
-        broodSprite.texture = Texture.fromImage(`images/hex/brood/cell-brood-${broodSprite.content}-starving.png`)
+        broodSprite.texture = Texture.fromImage(`images/hex/brood/cell-brood-larvae-starving-${type}.png`)
       }
+    } else if (broodSprite.content === 'puppa') {
+      broodSprite.texture = Texture.fromImage(`images/hex/brood/cell-brood-puppa-${type}.png`)
     } else {
       broodSprite.texture = Texture.fromImage(`images/hex/brood/cell-brood-${broodSprite.content}.png`)
     }
@@ -561,12 +559,13 @@ function cellBrood(x, y, parent) {
       broodSprite.setContents('puppa')
     } else if (broodSprite.lifecycle > eggDuration + larvaeDuration + puppaDuration && broodSprite.content === 'puppa' && season === 'summer') {
       broodSprite.setContents('empty')
-      createBee(beeContainer, 'idle', { x: broodSprite.position.x, y: broodSprite.position.y - 5 })
+      replaceHex([x, y], 'prepared').instantlyPrepare()
+      createBee(beeContainer, type, { x: broodSprite.position.x, y: broodSprite.position.y - 5 })
     }
 
     // States
     if (broodSprite.content === 'larvae') {
-      broodSprite.nutrition -= transferTo(broodSprite.NUTRITION_CAPACITY).inSeconds(90)
+      broodSprite.nutrition -= (frameTime / 1000)
       if (broodSprite.nutrition <= 0) {
         broodSprite.setContents('dead')
       }
@@ -589,7 +588,7 @@ function cellBrood(x, y, parent) {
     content.position.y = -29
     container.addChild(content)
 
-    const textHeading = new PIXI.Text('BROOD HEX', { ...picoFontConfig })
+    const textHeading = new PIXI.Text(type.toUpperCase() + ' EGG', { ...picoFontConfig })
     textHeading.scale.set(0.15, 0.15)
     textHeading.position.x = 90
     textHeading.position.y = -26
@@ -642,7 +641,7 @@ function cellBrood(x, y, parent) {
       replaceHex([x, y], 'prepared').instantlyPrepare()
       setSelected(null) 
     })
-    container.addChild(buttonDelete)
+    // container.addChild(buttonDelete)
 
     const helperText = () => {
       if (broodSprite.content === 'dead') {
@@ -681,10 +680,6 @@ function cellBrood(x, y, parent) {
 
       helper.text = helperText()
     })
-
-
-    const button = Button(83, 60, 'Disable', () => broodSprite.togglePause())
-    container.addChild(button)
     
     return container
   }
@@ -704,24 +699,24 @@ function cellPollen(x, y, parent) {
   pollenSprite.position.x = pixelCoordinate.x
   pollenSprite.position.y = pixelCoordinate.y
 
-  pollenSprite.POLLEN_HEX_CAPACITY = 120
+  pollenSprite.POLLEN_HEX_CAPACITY = 6
   pollenSprite.pollen = 0
   pollenSprite.setPollen = (pollen) => pollenSprite.pollen = pollen
   pollenSprite.isPollenFull = () => pollenSprite.pollen >= pollenSprite.POLLEN_HEX_CAPACITY
   pollenSprite.isPollenEmpty = () => pollenSprite.pollen <= 0
   
   addTicker('game-stuff', time => {
-    if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.95) {
+    if (pollenSprite.pollen >= pollenSprite.POLLEN_HEX_CAPACITY) {
       pollenSprite.texture = Texture.fromImage('images/hex/pollen/cell-pollen-full.png')
-    } else if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.8) {
+    } else if (pollenSprite.pollen >= 5) {
       pollenSprite.texture = Texture.fromImage('images/hex/pollen/cell-pollen-a.png')
-    } else if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.6) {
+    } else if (pollenSprite.pollen >= 4) {
       pollenSprite.texture = Texture.fromImage('images/hex/pollen/cell-pollen-b.png')
-    } else if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.5) {
+    } else if (pollenSprite.pollen >= 3) {
       pollenSprite.texture = Texture.fromImage('images/hex/pollen/cell-pollen-c.png')
-    } else if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.3) {
+    } else if (pollenSprite.pollen >= 2) {
       pollenSprite.texture = Texture.fromImage('images/hex/pollen/cell-pollen-d.png')
-    } else if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.1) {
+    } else if (pollenSprite.pollen >= 1) {
       pollenSprite.texture = Texture.fromImage('images/hex/pollen/cell-pollen-e.png')
     } else {
       pollenSprite.texture = Texture.fromImage('images/hex/pollen/cell-pollen-empty.png')
@@ -762,7 +757,7 @@ function cellPollen(x, y, parent) {
       replaceHex([x, y], 'prepared').instantlyPrepare()
       setSelected(null) 
     })
-    container.addChild(buttonDelete)
+    // container.addChild(buttonDelete)
 
     return container
   }

@@ -61,39 +61,10 @@ function setupGame() {
     populationText.position.y = topBarContentOffsetY
     uiTopBar.addChild(populationText)
 
-    const timelineText = new PIXI.Text('Year   Day   Hour', { ...picoFontConfig, ...largeFont, fill: 'gray' })
-    timelineText.position.x = 210
-    timelineText.position.y = topBarContentOffsetY
-    uiTopBar.addChild(timelineText)
-    
-    const yearLabel = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
-    yearLabel.anchor.set(1, 0)
-    yearLabel.position.x = 260
-    yearLabel.position.y = topBarContentOffsetY
-    uiTopBar.addChild(yearLabel)
-
-    const dayLabel = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
-    dayLabel.anchor.set(1, 0)
-    dayLabel.position.x = 308
-    dayLabel.position.y = topBarContentOffsetY
-    uiTopBar.addChild(dayLabel)
-
-    const hourLabel = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
-    hourLabel.anchor.set(1, 0)
-    hourLabel.position.x = 364
-    hourLabel.position.y = topBarContentOffsetY
-    uiTopBar.addChild(hourLabel)
-
-    addTicker('ui', time => {
-      yearLabel.text = year
-      dayLabel.text = day
-      hourLabel.text = Math.round(hour)
-    })
-
     pausedText = new PIXI.Text('Playing', { ...picoFontConfig, ...largeFont })
     pausedText.position.x = 470
     pausedText.position.y = topBarContentOffsetY
-    uiTopBar.addChild(pausedText)
+    // uiTopBar.addChild(pausedText)
 
     ui.addChild(uiTopBar)
 
@@ -108,33 +79,14 @@ function setupGame() {
   backgroundScene.mouseup = () => setSelected(null)
   background.addChild(backgroundScene)
 
-  nightDimmer = new Graphics()
-  nightDimmer.beginFill(0x000000)
-  nightDimmer.drawRect(0, 0, WIDTH / 2, HEIGHT / 2)
-  nightDimmer.alpha = 0
-  nightDimmer.visible = true
-
   addTicker('ui', time => {
     setGameSpeedText()
   })
 
-  addTicker('game-stuff', time => {
-    const isNight = hour > 21
-    const isDay = !isNight
-    if (nightDimmer.alpha < 0.4 && isNight) {
-      nightDimmer.alpha += transferTo(0.4).inSeconds(2)
-    }
-    if (nightDimmer.alpha > 0 && isDay) {
-      nightDimmer.alpha -= transferTo(0.4).inSeconds(2)
-    } 
-    nightDimmer.alpha = cap(0, 0.4)(nightDimmer.alpha)
-  })
-  dimmer.addChild(nightDimmer)
-
   const jobsPanel = Sprite.fromImage('images/ui/ui-jobs-panel.png')
   jobsPanel.position.x = 140
   jobsPanel.position.y = 95
-  background.addChild(jobsPanel)
+  // background.addChild(jobsPanel)
 
   const unassignedText = new PIXI.Text('-', { ...picoFontConfig, ...smallFont })
   unassignedText.anchor.set(1, 0)
@@ -213,7 +165,7 @@ function setupGame() {
   createMap(MAP_SELECTION)
   createFlowers()
 
-  app.ticker.add((delta) => gameloop(delta))
+  app.ticker.add(() => gameloop(app.ticker.elapsedMS))
 
   function handleVisibilityChange() {
     if (document.visibilityState === 'hidden') {

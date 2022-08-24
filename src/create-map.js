@@ -46,23 +46,19 @@ function createMap(m) {
   createQueen(beeContainer)
    
   if (m === 'default') {
-    createBee(beeContainer, 'idle').setHunger(40).setAge(80)
-    createBee(beeContainer, 'idle').setHunger(42).setAge(60)
-    createBee(beeContainer, 'idle').setHunger(50).setAge(20)
-    createBee(beeContainer, 'idle').setHunger(80).setAge(10)
-    createBee(beeContainer, 'idle').setHunger(100).setAge(6)
-    createBee(beeContainer, 'idle').setHunger(100).setAge(5)
-    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
-
-    replaceHex([0, 0], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([0, 8], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([8, 0], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([8, 8], 'prepared', 'activate').instantlyPrepare()
+    createBee(beeContainer, 'nurser', {x: 300, y: 200}).setHunger(100).setAge(0)
+    createBee(beeContainer, 'worker', {x: 300, y: 200}).setHunger(100).setAge(0)
+    createBee(beeContainer, 'forager', {x: 300, y: 200}).setHunger(100).setAge(0)
     
-    replaceHex([5, 4], 'honey', 'activate').setHoney(30)
-    replaceHex([3, 4], 'honey', 'activate').setHoney(30)
-    replaceHex([4, 4], 'wax', 'activate')
-    replaceHex([4, 5], 'wax', 'activate')
+    replaceHex([5, 8], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([5, 9], 'prepared', 'activate').instantlyPrepare()
+    
+    replaceHex([6, 7], 'wax', 'activate')
+    replaceHex([6, 8], 'wax', 'activate')
+    replaceHex([6, 9], 'wax', 'activate')
+
+    replaceHex([7, 8], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([7, 9], 'prepared', 'activate').instantlyPrepare()
   }
 
   if (m === 'mini') {
@@ -228,8 +224,8 @@ function createMap(m) {
       for (let y = 0; y < 5; y++) {
         const type = ['pollen', 'honey', 'wax', 'brood', 'converter'][Math.floor(Math.random()*5)]
         replaceHex([x, y], type, 'activate')
-        // replaceSelectedHex(type)
-        //activateAdjacent(x, y)  
+        replaceSelectedHex(type)
+        activateAdjacent(x, y)  
       }
     }
   }

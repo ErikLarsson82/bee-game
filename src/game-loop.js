@@ -1,14 +1,8 @@
 
-function gameloop(delta, manualTick) {
-  const newTickers = tickers.filter(ticker => ticker.remove === false)
-  if (tickers.length > newTickers.length) {
-    newTickers.filter(ticker => ticker.remove).forEach(ticker => {
-      delete ticker
-    })
-    tickers = tickers.filter(ticker => ticker.remove === false)
-  }
+function gameloop(frameTime, manualTick) {
+  tickers = tickers.filter(ticker => ticker.remove === false)
 
-  tickers.filter(isUI).forEach(ticker => ticker.func());
+  tickers.filter(isUI).forEach(ticker => ticker.func(frameTime));
 
   if (selected && selected.panelContent) {
     const { x, y } = selected.panelPosition && selected.panelPosition() || { x: 350, y: 100 }
@@ -18,7 +12,7 @@ function gameloop(delta, manualTick) {
 
   if (paused && !manualTick) return
   
-  tickers.filter(isGameStuff).forEach(ticker => ticker.func());
+  tickers.filter(isGameStuff).forEach(ticker => ticker.func(frameTime));
 
   {
     // Time management
