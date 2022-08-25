@@ -53,8 +53,6 @@ function createMap(m) {
     replaceHex([5, 8], 'prepared', 'activate').instantlyPrepare()
     replaceHex([5, 9], 'prepared', 'activate').instantlyPrepare()
     
-    replaceHex([6, 7], 'wax', 'activate')
-    replaceHex([6, 8], 'wax', 'activate')
     replaceHex([6, 9], 'wax', 'activate')
 
     replaceHex([7, 8], 'prepared', 'activate').instantlyPrepare()

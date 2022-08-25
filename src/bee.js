@@ -38,7 +38,7 @@ function createBee(parent, type, startPosition) {
   beeExclamation.position.x = 12
   beeExclamation.position.y = -2
   beeExclamation.visible = false
-  bee.addChild(beeExclamation)
+  // bee.addChild(beeExclamation)
   // makeSelectable(bee, 'bee')
   makeHungry(bee)
   makeParticleCreator(bee)
@@ -266,6 +266,20 @@ function createBee(parent, type, startPosition) {
     return true
   }
 
+  function depositWax() {
+    const targetHex = bee.isAtType('wax')
+    if (!targetHex) return false
+    const valid = !isWaxSackEmpty() && targetHex.wax < 9
+    if (!valid) return false
+
+    targetHex.claimSlot(bee)
+
+    targetHex.setWax(targetHex.wax + 1)
+    bee.waxSack = cap(0, bee.WAX_SACK_CAPACITY)(bee.waxSack - 1)
+
+    return true
+  }
+
   function depositNectar() {
     const targetHex = bee.isAtType('converter')
     if (!targetHex) return false
@@ -430,7 +444,7 @@ function createBee(parent, type, startPosition) {
     // if (season !== 'summer') {
       if (cleanBrood()) return
       if (flyToCleanBrood()) return
-    // }  
+    // }
     flyToEmptyToChill()
   }
 
@@ -439,11 +453,11 @@ function createBee(parent, type, startPosition) {
     if (convertNectar()) return
     if (depositHoney()) return
     if (flyToHoneyToDeposit()) return
-    if (season === 'summer') {
-      bee.consumeEnergy()
+    // if (season === 'summer') {
+    //   bee.consumeEnergy()
     // } else {
     //   if (bee.feedBee()) return
-    }
+    // }
     if (refillWax()) return
     if (prepareCell()) return
     if (flyToPrepareCell()) return
@@ -464,12 +478,41 @@ function createBee(parent, type, startPosition) {
     return true
   }
 
+  function convertHoneyToWax() {
+    const hex = bee.isAtType('honey')
+    if (!hex || isWaxSackFull()) return false
+    hex.claimSlot(bee)
+
+    hex.setHoney(hex.honey - 1)
+    bee.waxSack = cap(0, bee.WAX_SACK_CAPACITY)(bee.waxSack + 1)
+
+    return true
+  }
+
+  function flyToHoneyToMakeWax() {
+    const targetHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.isUnclaimed(bee) && hex.honey > 0)
+    if (targetHex.length === 0 || isWaxSackFull()) return false
+    const closest = getClosestHex(targetHex, bee)
+    closest.claimSlot(bee)
+    bee.flyTo(closest)
+    return true
+  }
+
   function flyToConverterToConvert() {
     const converterHex = filterHexagon(hexGrid, hex => hex.type === 'converter' && hex.isUnclaimed(bee) && (!hex.isNectarEmpty() || !isNectarSackEmpty()))
     if (converterHex.length === 0 || isHoneySackFull()) return false
     const closest = getClosestHex(converterHex, bee)
     closest.claimSlot(bee)
     bee.flyTo(closest)      
+    return true
+  }
+
+  function flyToWaxToDeposit() {
+    const waxHex = filterHexagon(hexGrid, hex => hex.type === 'wax' && hex.isUnclaimed(bee) && hex.wax < 7)
+    if (waxHex.length === 0 || isWaxSackEmpty()) return false
+    const closest = getClosestHex(waxHex, bee)
+    closest.claimSlot(bee)
+    bee.flyTo(closest)
     return true
   }
 

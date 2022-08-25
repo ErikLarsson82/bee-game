@@ -278,7 +278,7 @@ function cellHoney(x, y, parent) {
 
     const button = Button(84, 8, 'Make Wax', () => {
       if (honeySprite.honey >= (honeySprite.HONEY_HEX_CAPACITY * 0.9)) {
-        replaceHex([x, y], 'wax')
+        replaceHex([x, y], 'wax').honey = 0
         setSelected(null) 
       } else {
         notEnoughWarning.visible = true
@@ -313,8 +313,8 @@ function cellWax(x, y, parent) {
   addTicker('game-stuff', time => {
     
     if (waxSprite.wax <= 0) {
-      waxSprite.wax = 1 // this is dirty
-      replaceHex([x, y], 'prepared').instantlyPrepare()
+      waxSprite.wax = 1
+      replaceHex([x, y], 'honey').honey = 0
     }
 
     if (waxSprite.wax >= waxSprite.WAX_HEX_CAPACITY) {
@@ -534,7 +534,7 @@ function cellBrood(x, y, parent, type) {
       broodSprite.texture = Texture.fromImage(`images/hex/brood/cell-brood-${broodSprite.content}.png`)
     }
     
-    broodExclamation.visible = broodSprite.isStarving()
+    // broodExclamation.visible = broodSprite.isStarving()
     if (!broodSprite.content) return
     if (broodSprite.content === 'empty') return
     if (broodSprite.content === 'dead') {
