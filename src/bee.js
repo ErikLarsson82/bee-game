@@ -55,7 +55,7 @@ function createBee(parent, type, startPosition) {
   makeFlyable(bee)
   makeHexDetectable(bee)
   bee.animationTicker = Math.random() * 100
-  bee.NECTAR_SACK_CAPACITY = 20
+  bee.NECTAR_SACK_CAPACITY = 15
   bee.POLLEN_SACK_CAPACITY = 20
   bee.HONEY_SACK_CAPACITY = 10
   bee.WAX_SACK_CAPACITY = 10
@@ -208,10 +208,12 @@ function createBee(parent, type, startPosition) {
       flower.claimSlot(bee)
       flower.pollinationLevel += transferTo(flower.POLLINATION_REQUIREMENT).inSeconds(200)
       flower.pollinationLevel = cap(0, flower.POLLINATION_REQUIREMENT)(flower.pollinationLevel)
+
       bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(40)
       bee.nectarSack += transferTo(bee.NECTAR_SACK_CAPACITY).inSeconds(40)
       bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
       bee.nectarSack = cap(0, bee.NECTAR_SACK_CAPACITY)(bee.nectarSack)
+
       if (isPollenSackFull() && isNectarSackFull()) {
         bee.position.y = flower.position.y - 5
       }
@@ -235,11 +237,14 @@ function createBee(parent, type, startPosition) {
   function depositPollen() {
     const hex = bee.isAtType('pollen')
     if (!hex) return false
-    hex.claimSlot(bee)  
-    bee.pollenSack -= transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(30)
+    hex.claimSlot(bee)
+
+    const rate = bee.POLLEN_SACK_CAPACITY
+    bee.pollenSack -= transferTo(rate).inSeconds(30)
     bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
-    hex.pollen += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(30)
+    hex.pollen += transferTo(rate).inSeconds(30)
     hex.pollen = cap(0, hex.POLLEN_HEX_CAPACITY)(hex.pollen)
+
     if (isPollenSackEmpty() || hex.isPollenFull()) {
       bee.position.y = hex.position.y - 5
     }
@@ -249,11 +254,14 @@ function createBee(parent, type, startPosition) {
   function refillPollen() {
     const hex = bee.isAtType('pollen')
     if (!hex) return false
-    hex.claimSlot(bee)  
-    bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(30)
+    hex.claimSlot(bee)
+
+    const rate = bee.POLLEN_SACK_CAPACITY
+    bee.pollenSack += transferTo(rate).inSeconds(30)
     bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
-    hex.pollen -= transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(30)
+    hex.pollen -= transferTo(rate).inSeconds(30)
     hex.pollen = cap(0, hex.POLLEN_HEX_CAPACITY)(hex.pollen)
+
     if (isPollenSackFull() || hex.isPollenEmpty()) {
       bee.position.y = hex.position.y - 5
     }
@@ -263,11 +271,14 @@ function createBee(parent, type, startPosition) {
   function refillWax() {
     const hex = bee.isAtType('wax')
     if (!hex) return false
-    hex.claimSlot(bee)  
-    bee.waxSack += transferTo(bee.WAX_SACK_CAPACITY).inSeconds(30)
-    bee.wax = cap(0, bee.WAX_SACK_CAPACITY)(bee.waxSack)
-    hex.wax -= transferTo(bee.WAX_SACK_CAPACITY).inSeconds(30)
+    hex.claimSlot(bee)
+    
+    const rate = bee.WAX_SACK_CAPACITY
+    bee.waxSack += transferTo(rate).inSeconds(30)
+    bee.waxSack = cap(0, bee.WAX_SACK_CAPACITY)(bee.waxSack)
+    hex.wax -= transferTo(rate).inSeconds(30)
     hex.wax = cap(0, hex.WAX_HEX_CAPACITY)(hex.wax)
+    
     if (isWaxSackFull() || hex.isWaxEmpty()) {
       bee.position.y = hex.position.y - 5
     }
@@ -282,11 +293,12 @@ function createBee(parent, type, startPosition) {
 
     targetHex.claimSlot(bee)
 
-    targetHex.honey += transferTo(targetHex.HONEY_HEX_CAPACITY / 3).inSeconds(5)
-    targetHex.honey = cap(0, targetHex.HONEY_HEX_CAPACITY)(targetHex.honey)
-
-    bee.honeySack -= transferTo(bee.HONEY_SACK_CAPACITY).inSeconds(5)
+    const rate = bee.HONEY_SACK_CAPACITY / 3
+    bee.honeySack -= transferTo(rate).inSeconds(5)
     bee.honeySack = cap(0, bee.HONEY_SACK_CAPACITY)(bee.honeySack)
+    
+    targetHex.honey += transferTo(rate).inSeconds(5)
+    targetHex.honey = cap(0, targetHex.HONEY_HEX_CAPACITY)(targetHex.honey)
 
     return true
   }
@@ -297,10 +309,13 @@ function createBee(parent, type, startPosition) {
     const valid = !isNectarSackEmpty() && !targetHex.isNectarFull()
     if (!valid) return false
     targetHex.claimSlot(bee)
-    bee.nectarSack -= transferTo(bee.NECTAR_SACK_CAPACITY).inSeconds(5)
+
+    const rate = bee.NECTAR_SACK_CAPACITY
+    bee.nectarSack -= transferTo(rate).inSeconds(5)
     bee.nectarSack = cap(0, bee.NECTAR_SACK_CAPACITY)(bee.nectarSack)
-    targetHex.nectar += transferTo(targetHex.NECTAR_CAPACITY).inSeconds(5)
+    targetHex.nectar += transferTo(rate).inSeconds(5)
     targetHex.nectar = cap(0, targetHex.NECTAR_CAPACITY)(targetHex.nectar)
+
     return true
   }
 
@@ -467,15 +482,19 @@ function createBee(parent, type, startPosition) {
     if (!hex || isHoneySackFull()) return false
     hex.claimSlot(bee)
     if (!isNectarSackEmpty()) {
-      hex.nectar += transferTo(hex.NECTAR_CAPACITY).inSeconds(30)
-      hex.nectar = cap(0, hex.NECTAR_CAPACITY)(hex.nectar)
-      bee.nectarSack -= transferTo(bee.NECTAR_SACK_CAPACITY).inSeconds(30)
+      const rateA = bee.NECTAR_SACK_CAPACITY
+      bee.nectarSack -= transferTo(rateA).inSeconds(30)
       bee.nectarSack = cap(0, bee.NECTAR_SACK_CAPACITY)(bee.nectarSack)      
+      hex.nectar += transferTo(rateA).inSeconds(30)
+      hex.nectar = cap(0, hex.NECTAR_CAPACITY)(hex.nectar)
     }
-    hex.nectar -= transferTo(hex.NECTAR_CAPACITY).inSeconds(30)
-    hex.nectar = cap(0, hex.NECTAR_CAPACITY)(hex.nectar)
-    bee.honeySack += transferTo(bee.HONEY_SACK_CAPACITY).inSeconds(30)
+    const rateB = bee.HONEY_SACK_CAPACITY
+    bee.honeySack += transferTo(rateB).inSeconds(30)
     bee.honeySack = cap(0, bee.HONEY_SACK_CAPACITY)(bee.honeySack)
+
+    const rateC = bee.HONEY_SACK_CAPACITY * 1.5
+    hex.nectar -= transferTo(rateC).inSeconds(30)
+    hex.nectar = cap(0, hex.NECTAR_CAPACITY)(hex.nectar)
 
     if (hex.hasUpgrade('converter-adjacent-feed')) {
       const ad = adjacent(hex.index.x, hex.index.y)

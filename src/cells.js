@@ -190,6 +190,7 @@ function cellHoney(x, y, parent) {
   honeySprite.position.x = pixelCoordinate.x
   honeySprite.position.y = pixelCoordinate.y
 
+  honeySprite.HONEY_HEX_CAPACITY_BASELINE = 30
   honeySprite.HONEY_HEX_CAPACITY = 30
   honeySprite.honey = 0
   honeySprite.setHoney = amount => { honeySprite.honey = cap(0, honeySprite.HONEY_HEX_CAPACITY)(amount); return honeySprite }
@@ -383,6 +384,7 @@ function cellConverter(x, y, parent) {
   converterSprite.hitArea = generateHitArea()
   converterSprite.position.x = pixelCoordinate.x
   converterSprite.position.y = pixelCoordinate.y
+  converterSprite.NECTAR_CAPACITY_BASELINE = 15
   converterSprite.NECTAR_CAPACITY = 15
   converterSprite.nectar = 0
   converterSprite.setNectar = amount => { converterSprite.nectar = cap(0, converterSprite.NECTAR_CAPACITY)(amount); return converterSprite }
@@ -434,7 +436,16 @@ function cellConverter(x, y, parent) {
     upgradesText.position.y = 40
     container.addChild(upgradesText)
 
+    const textBonus = new PIXI.Text('-', { ...picoFontConfig })
+    textBonus.scale.set(0.15, 0.15)
+    textBonus.position.x = 90
+    textBonus.position.y = 100
+    container.addChild(textBonus)
+
     addTicker('ui', () => {
+      const buff = converterSprite.bonuses.find(isNectarBuff)
+      textBonus.text = buff ? `Adjacency bonus: +${((buff.modifier - 1) * 100).toFixed(0)}%` : 'No bonuses'
+
       upgradesText.text = ''
       buttonUpgrade.visible = true
       if (converterSprite.hasUpgrade('converter-adjacent-feed')) {

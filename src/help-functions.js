@@ -98,8 +98,16 @@ function isHoney(hex) {
   return hex.type === 'honey'
 }
 
+function isNectar(hex) {
+  return hex.type === 'converter'
+}
+
 function isHoneyBuff(hex) {
   return hex.bonusType === 'honey-buff'
+}
+
+function isNectarBuff(hex) {
+  return hex.bonusType === 'nectar-buff'
 }
 
 function calculateAdjacencyBonuses() {
@@ -110,19 +118,34 @@ function calculateAdjacencyBonuses() {
     const { x, y } = hex.index
     const adjacentHexagons = adjacent(x, y)
 
-    const targets = adjacentHexagons.filter(isHoney)
+    const honeyTargets = adjacentHexagons.filter(isHoney)
+    const nectarTargets = adjacentHexagons.filter(isNectar)
     
     // Honey bonus
-    if (hex.type === 'honey') {
-      if (targets.length > 0) {
-        const modifier = 1 + (targets.length * 0.1)
+    if (isHoney(hex)) {
+      if (honeyTargets.length > 0) {
+        const modifier = 1 + (honeyTargets.length * 0.1)
         hex.bonuses.push({
           bonusType: 'honey-buff',
           modifier
         })
-        hex.HONEY_HEX_CAPACITY = 30 * modifier
+        hex.HONEY_HEX_CAPACITY = hex.HONEY_HEX_CAPACITY_BASELINE * modifier
       } else {
-        hex.HONEY_HEX_CAPACITY = 30
+        hex.HONEY_HEX_CAPACITY = hex.HONEY_HEX_CAPACITY_BASELINE
+      }
+    }
+
+    // Nectar bonus
+    if (isNectar(hex)) {
+      if (nectarTargets.length > 0) {
+        const modifier = 1 + (nectarTargets.length * 0.1)
+        hex.bonuses.push({
+          bonusType: 'nectar-buff',
+          modifier
+        })
+        hex.NECTAR_CAPACITY = hex.NECTAR_CAPACITY_BASELINE * modifier
+      } else {
+        hex.NECTAR_CAPACITY = hex.NECTAR_CAPACITY_BASELINE
       }
     }
   })
