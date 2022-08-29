@@ -306,8 +306,8 @@ function cellWax(x, y, parent) {
   addTicker('game-stuff', time => {
     
     if (waxSprite.wax <= 0) {
-      waxSprite.wax = 1 // this is dirty
-      replaceHex([x, y], 'prepared').instantlyPrepare()
+      waxSprite.wax = 1
+      replaceHex([x, y], 'honey').honey = 0
     }
 
     if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.96) {
