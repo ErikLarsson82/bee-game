@@ -15,7 +15,6 @@ function animateSprite(sprite, res, amount, w, h, _loop, callback) {
     let pause = false
     const loop = _loop === undefined ? true : _loop
 	const frameDurationModifier = 0.1
-	const FPS = 60 // assume this
 	const MOD = FPS * frameDurationModifier
 
     const handler = {

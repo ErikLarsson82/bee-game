@@ -1,5 +1,9 @@
 
 function setupGame() {
+
+  // Persist framerate detected by PIXI
+  FPS = Math.round(app.ticker.FPS)
+  
   scene = 'game'
   document.body.style['background-color'] = '#fff4bc'
 

@@ -23,7 +23,7 @@ const hugeFont = { fontSize: 50 }
 const l = console.log
 const pretty = number => Math.round(number/1000)
 
-const FPS = 144
+let FPS = 144
 const ticksToSeconds = number => Math.round(number/FPS)
 const secondsToTicks = number => number * FPS
 
