@@ -6,11 +6,19 @@ function createBee(parent, type, startPosition) {
 
   const bee = new Container()
   
-  const workingAnimation = animateSprite(bee, 'bee-working-animation-idle', 43, 13, 8)
-  const workingSprite = workingAnimation.sprite
+  const workingAnimations = {
+    idle: animateSprite(bee, 'bee-working-animation-idle', 43, 13, 8),
+    worker: animateSprite(bee, 'bee-working-animation-worker', 43, 13, 8),
+    nurser: animateSprite(bee, 'bee-working-animation-nurser', 43, 13, 8),
+    forager: animateSprite(bee, 'bee-working-animation-forager', 43, 13, 8),
+  }
 
-  const unloadingAnimation = animateSprite(bee, 'bee-unloading-animation-idle', 43, 13, 8)
-  const unloadingSprite = unloadingAnimation.sprite
+  const unloadingAnimations = {
+    idle: animateSprite(bee, 'bee-unloading-animation-idle', 43, 13, 8),
+    worker: animateSprite(bee, 'bee-unloading-animation-worker', 43, 13, 8),
+    nurser: animateSprite(bee, 'bee-unloading-animation-nurser', 43, 13, 8),
+    forager: animateSprite(bee, 'bee-unloading-animation-forager', 43, 13, 8),
+  }
 
   const shadow = Sprite.fromImage('images/bee/shadow.png')
   bee.addChild(shadow)
@@ -69,31 +77,31 @@ function createBee(parent, type, startPosition) {
     bee.age = amount
     return bee
   }
-  
+
   bee.pollenSack = 0
   bee.setPollen = amount => {
     bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(amount)
     return bee
   }
-  
+
   bee.nectarSack = 0
   bee.setNectar = amount => {
     bee.nectarSack = cap(0, bee.NECTAR_SACK_CAPACITY)(amount)
     return bee
   }
-  
+
   bee.honeySack = 0
   bee.setHoney = amount => {
     bee.honeySack = cap(0, bee.HONEY_SACK_CAPACITY)(amount)
     return bee
   }
-  
+
   bee.waxSack = 0
   bee.setWax = amount => {
     bee.waxSack = cap(0, bee.WAX_SACK_CAPACITY)(amount)
     return bee
   }
-  
+
   bee.type = type
   bee.setType = type => {
     bee.type = type
@@ -605,8 +613,8 @@ function createBee(parent, type, startPosition) {
   })
 
   bee.hideAllAnimations = () => {
-    workingSprite.visible = false
-    unloadingSprite.visible = false
+    Object.values(workingAnimations).forEach((animation) => animation.sprite.visible = false)
+    Object.values(unloadingAnimations).forEach((animation) => animation.sprite.visible = false)
     animationSprite.visible = false
   }
 
@@ -636,7 +644,7 @@ function createBee(parent, type, startPosition) {
       (bee.isAtType('honey') && bee.type === 'worker' && season === 'summer')
 
     if (isUnloading) {
-      unloadingSprite.visible = true
+      unloadingAnimations[bee.type].sprite.visible = true
       return
     }
 
@@ -644,7 +652,7 @@ function createBee(parent, type, startPosition) {
     const isWorking = bee.isAtType('brood') || bee.isAtType('pollen') || bee.isAtType('prepared') || bee.isAtType('honey') || bee.isAtType('wax') || bee.isAtType('converter') || bee.isAtType('flower')
     
     if (isWorking) {
-      workingSprite.visible = true  
+      workingAnimations[bee.type].sprite.visible = true
       return
     }
     
