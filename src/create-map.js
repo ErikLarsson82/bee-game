@@ -385,6 +385,4 @@ function createMap(m) {
     replaceSelectedHex('brood')
     hexGrid[2][1].setContents('egg')
   }  
-
-  setSelected(null)
 }

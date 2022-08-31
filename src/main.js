@@ -66,6 +66,7 @@ let seeds = 1
 let season = 'summer'
 let winterHungerMultiplier = null
 let currentSeasonLength = 0
+let angelBubbleTimer = 0
 
 let scene = null
 let selected = null
@@ -85,11 +86,14 @@ let flowerBed = null
 let pausedText = null
 let pauseFrame = null
 let summerSun = null
+let angelBubble = null
+let angelBubbleText = null
 
 let hexGrid = []
 let flowers = []
 let tickers = []
-const bees = []
+let bees = []
+let angels = []
 
 loader.add('pico8-mono.ttf')
 loader.add('bee-working-animation-worker', 'images/animation-test/bee/animation-spritesheet-bee-worker.png')

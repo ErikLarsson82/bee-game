@@ -153,6 +153,26 @@ function setupGame() {
     }
   })
 
+  angelBubble = Sprite.fromImage('images/scene/sun-bubble.png')
+  angelBubble.position.x = -7
+  angelBubble.position.y = 18
+
+  angelBubbleText = new PIXI.Text('', { ...picoFontConfig, ...smallFont, fill: colors.darkGray })
+  angelBubbleText.position.x = 9
+  angelBubbleText.position.y = 6
+  angelBubble.addChild(angelBubbleText)
+  
+  angelBubbleTimer = FPS * 5
+  
+  addTicker('ui', time => {
+    if (angelBubble.parent) {
+      angelBubbleTimer -= 1
+      if (angelBubbleTimer <= 0) {
+        angelBubble.parent.removeChild(angelBubble)
+      }
+    }
+  })
+
   const jobsPanel = Sprite.fromImage('images/ui/ui-jobs-panel.png')
   jobsPanel.position.x = 20
   jobsPanel.position.y = 25

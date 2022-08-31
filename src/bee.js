@@ -35,7 +35,6 @@ function createBee(parent, type, startPosition) {
   const beeAddon = Sprite.fromImage('images/bee/bee-drone-legs.png')
   beeAddon.position.x = -1
   beeAddon.position.y = -1
-  beeAddon.opacity = 1
   bee.addChild(beeAddon)
   const honeyDrop = Sprite.fromImage('images/drops/drop-honey.png')
   honeyDrop.position.x = 2
@@ -104,8 +103,14 @@ function createBee(parent, type, startPosition) {
 
   bee.type = type
   bee.setType = type => {
-    bee.type = type
-    droneBody.texture = Texture.fromImage('images/bee/bee-drone-body-' + type + '.png')
+    if (type === 'dead') {
+      bees = bees.filter((b) => b !== bee)
+      angels.push(createAngel(bee))
+      bee.destroy()
+    } else {
+      bee.type = type
+      droneBody.texture = Texture.fromImage('images/bee/bee-drone-body-' + type + '.png')
+    }
     bee.idle = getIdlePosition(type)
   }
 
@@ -123,6 +128,7 @@ function createBee(parent, type, startPosition) {
     bee.removeUiTicker()
     bee.removeTicker()
     bee.removeParticleTicker()
+    parent.removeChild(bee)
   }
   
   const isPollenSackFull = () => bee.pollenSack >= bee.POLLEN_SACK_CAPACITY
@@ -138,12 +144,6 @@ function createBee(parent, type, startPosition) {
   const isWaxSackEmpty = () => !(bee.waxSack > 0)
 
   const helperText = () => {
-    if (bee.type === 'dead' && bee.hunger === 0) {
-      return 'Bee died\nof hunger'
-    }
-    if (bee.type === 'dead') {
-      return 'Bee died\nof old age'
-    }
     if (bee.type === 'worker' && bee.isHungry()) {
       return '  Bee is\nhungry\n\nWorkers\neat when\nmaking honey'
     }
@@ -719,4 +719,46 @@ function createBee(parent, type, startPosition) {
   bees.push(bee)
   parent.addChild(bee)
   return bee
+}
+
+function createAngel(bee) {
+  const container = new Container()
+  
+  const angelSprite = Sprite.fromImage('images/bee/angel.png')
+  angelSprite.alpha = 0.6
+  container.addChild(angelSprite)
+
+  container.position.x = bee.position.x
+  container.position.y = bee.position.y
+
+  container.interactive = true
+  container.mouseup = e => {
+    if (angelBubble.parent) {
+      angelBubble.parent.removeChild(angelBubble)
+    }
+    container.addChild(angelBubble)
+    angelBubbleTimer = FPS * 5
+  }
+
+  let obituary = bee.type.toUpperCase()
+  if (bee.hunger <= 0) {
+    obituary += ' WHO DIED OF HUNGER'
+  } else {
+    obituary += ' WHO DIED OF AGE'
+  }
+
+  angelBubbleText.text = obituary
+
+  container.ticker = addTicker('game-stuff', time => {
+    container.position.y -= 0.05 + 0.1 * Math.random()
+
+    if (container.position.y < -30) {
+      angels = angels.filter(a => a !== container)
+      container.ticker.remove = true
+      container.destroy()
+    }
+  })
+
+  bee.parent.addChild(container)
+  return container
 }

@@ -154,9 +154,13 @@ function activateAdjacent(_x, _y) {
 }
 
 function setSelected(item) {
+
   // start with cleanup of panel
   panel.removeChildren()
-  
+
+  angelBubbleTimer = 0
+  sunBubble.visible = false
+
   selected = item || null
 
   if (!item) {
@@ -313,7 +317,6 @@ function typeIdlePos(type, pos) {
   const baseline = 38
   const y = {
     idle: baseline,
-    [null]: baseline,
     forager: baseline + (1 * rowHeight),
     nurser: baseline + (2 * rowHeight),
     worker: baseline + (3 * rowHeight),
