@@ -14,7 +14,7 @@ function singularOrPluralDay(amount) {
 } 
 
 function isDayBeforeWinter() {
-  return cycles[0] === 1 && season === 'summer'
+  return currentCycle === 1 && season === 'summer'
 }
 
 function generateRandomId() {

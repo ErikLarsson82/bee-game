@@ -7,6 +7,8 @@ function setupGame() {
   scene = 'game'
   document.body.style['background-color'] = '#262b44'
 
+  currentCycleIndex = 0
+
   const container = new Container()
   container.scale.x = 2
   container.scale.y = 2
@@ -94,8 +96,7 @@ function setupGame() {
     addTicker('ui', time => {
       yearLabel.text = year
       dayLabel.text = day
-      nextSeasonLength.text = cycles[1]
-      
+      nextSeasonLength.text = cycles[currentCycleIndex + 1]
     })
 
     gameSpeedIcon = Sprite.fromImage('images/ui/gamespeed1.png')
@@ -116,19 +117,38 @@ function setupGame() {
   backgroundScene.mouseup = () => setSelected(null)
   background.addChild(backgroundScene)
 
-  summerSun = Sprite.fromImage('images/scene/summer-sun.png')
-  summerSun.interactive = true
-  summerSun.mouseup = () => {
+  // sun
+  sun = new Container()
+  const summerSunSprite = Sprite.fromImage('images/scene/summer-sun.png')
+  const winterSunSprite = Sprite.fromImage('images/scene/winter-sun.png')
+  
+  sun.winterSun = winterSunSprite
+  sun.summerSun = summerSunSprite
+
+  winterSunSprite.visible = false
+
+  sun.addChild(summerSunSprite)
+  sun.addChild(winterSunSprite)
+
+  const nextSeason = () => season === 'summer' ? 'winter' : 'summer'
+
+  sun.interactive = true
+  sun.mouseup = () => {
     sunBubbleTimer = FPS * 5
     sunBubble.visible = true
-    sunBubbleText.text = 'WINTER WILL BE ' + cycles[1] + ' DAYS LONG'
+    sunBubbleText.text = nextSeason().toUpperCase() + ' WILL BE ' + cycles[currentCycleIndex + 1] + ' DAYS LONG'
   }
-  background.addChild(summerSun)
+  background.addChild(sun)
   
   sunBubble = Sprite.fromImage('images/scene/sun-bubble.png')
   sunBubble.visible = true
 
-  const sunBubbleText = new PIXI.Text('WINTER WILL BE ' + cycles[1] + ' DAYS LONG', { ...picoFontConfig, ...smallFont, fill: colors.darkGray })
+  const sunBubbleText = new PIXI.Text(nextSeason().toUpperCase() + ' WILL BE ' + cycles[currentCycleIndex + 1] + ' DAYS LONG', { 
+    ...picoFontConfig, 
+    ...smallFont,
+    fill: colors.darkGray
+  })
+
   sunBubbleText.position.x = 9
   sunBubbleText.position.y = 6
   sunBubble.addChild(sunBubbleText)
@@ -140,12 +160,19 @@ function setupGame() {
   addTicker('ui', time => {
     setGameSpeedText()
 
-    summerSun.position.x = Math.round(20 + ((380 / (currentSeasonLength * 24)) * ((day - 1) * 24 + hour)))
-    summerSun.position.y = 228
+    let x
+    if (season === 'winter') {
+      x = Math.round(20 + ((380 / (currentSeasonLength * 24)) * (((day - cycles[currentCycleIndex - 1]) - 1) * 24 + hour)))
+    } else if (season === 'summer') {
+      x = Math.round(20 + ((380 / (currentSeasonLength * 24)) * ((day - 1) * 24 + hour)))
+    }
+
+    sun.position.x = x
+    sun.position.y = 228
 
     if (sunBubble.visible) {
-      sunBubble.position.x = summerSun.position.x - 6
-      sunBubble.position.y = summerSun.position.y + 18
+      sunBubble.position.x = sun.position.x - 6
+      sunBubble.position.y = sun.position.y + 18
       sunBubbleTimer -= 1
       if (sunBubbleTimer <= 0) {
         sunBubble.visible = false
@@ -153,6 +180,7 @@ function setupGame() {
     }
   })
 
+  // angel bubble
   angelBubble = Sprite.fromImage('images/scene/sun-bubble.png')
   angelBubble.position.x = -7
   angelBubble.position.y = 18

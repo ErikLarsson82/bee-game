@@ -66,6 +66,8 @@ let seeds = 1
 let season = 'summer'
 let winterHungerMultiplier = null
 let currentSeasonLength = 0
+let currentCycle = 0
+let currentCycleIndex = 0
 let angelBubbleTimer = 0
 
 let scene = null
@@ -85,7 +87,7 @@ let hexForeground = null
 let flowerBed = null
 let pausedText = null
 let pauseFrame = null
-let summerSun = null
+let sun = null
 let angelBubble = null
 let angelBubbleText = null
 

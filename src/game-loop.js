@@ -27,20 +27,25 @@ function gameloop(delta, manualTick) {
     if (hour > 24) {
       hour = 0
       day++
-      cycles[0]--
-      if (cycles[0] === 0) {
-        cycles = cycles.slice(1)
-        currentSeasonLength = cycles[0]
+      currentCycle--
+      if (currentCycle === 0) {
+        currentCycleIndex++
+        currentCycle = cycles[currentCycleIndex]
+        currentSeasonLength = currentCycle
         season = season === 'summer' ? 'winter' : 'summer'
         if (season === 'summer') {
           backgroundScene.texture = Texture.fromImage('images/scene/background-summer.png')        
           year++
           day = 1
           createFlowers()
+          sun.winterSun.visible = false
+          sun.summerSun.visible = true
         } else {
           backgroundScene.texture = Texture.fromImage('images/scene/background-winter.png')
           killFlowers()
           killBroodlings()
+          sun.winterSun.visible = true
+          sun.summerSun.visible = false
         }
       }
     }

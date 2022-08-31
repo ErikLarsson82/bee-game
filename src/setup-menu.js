@@ -20,7 +20,9 @@ function setupMenu() {
 
   MAP_CONFIGURATIONS.forEach((map, idx) => {
     const callback = () => {
-      cycles = map.cycles
+      cycles = Array.from(map.cycles)
+      currentCycleIndex = 0
+      currentCycle = cycles[0]
       currentSeasonLength = cycles[0]
       MAP_SELECTION = map.id
       seeds = map.seeds
