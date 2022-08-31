@@ -312,7 +312,6 @@ function typeIdlePos(type, pos) {
   const beesPerRow = 8
   const baseline = 38
   const y = {
-    unassigned: baseline,
     idle: baseline,
     [null]: baseline,
     forager: baseline + (1 * rowHeight),

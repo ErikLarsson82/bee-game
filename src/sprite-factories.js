@@ -141,6 +141,7 @@ function makeHungry(bee) {
 
     if (bee.hunger <= 0) {
       bee.setType('dead')
+      return true
     }
   }
 
