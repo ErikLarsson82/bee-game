@@ -84,10 +84,17 @@ function setupGame() {
     hourLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(hourLabel)
 
+    const nextSeasonLength = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
+    nextSeasonLength.anchor.set(1, 0)
+    nextSeasonLength.position.x = 520
+    nextSeasonLength.position.y = topBarContentOffsetY
+    uiTopBar.addChild(nextSeasonLength)
+
     addTicker('ui', time => {
       yearLabel.text = year
       dayLabel.text = day
       hourLabel.text = Math.round(hour)
+      nextSeasonLength.text = cycles[1]
     })
 
     pausedText = new PIXI.Text('Playing', { ...picoFontConfig, ...largeFont })

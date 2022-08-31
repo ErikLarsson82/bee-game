@@ -82,8 +82,14 @@ let tickers = []
 const bees = []
 
 loader.add('pico8-mono.ttf')
-loader.add('bee-working-animation', 'images/animation-test/bee/animation-spritesheet-bee.png')
-loader.add('bee-unloading-animation', 'images/animation-test/bee/animation-spritesheet-bee-unloading.png')
+loader.add('bee-working-animation-worker', 'images/animation-test/bee/animation-spritesheet-bee-worker.png')
+loader.add('bee-unloading-animation-worker', 'images/animation-test/bee/animation-spritesheet-bee-unloading-worker.png')
+loader.add('bee-working-animation-nurser', 'images/animation-test/bee/animation-spritesheet-bee-nurser.png')
+loader.add('bee-unloading-animation-nurser', 'images/animation-test/bee/animation-spritesheet-bee-unloading-nurser.png')
+loader.add('bee-working-animation-forager', 'images/animation-test/bee/animation-spritesheet-bee-forager.png')
+loader.add('bee-unloading-animation-forager', 'images/animation-test/bee/animation-spritesheet-bee-unloading-forager.png')
+loader.add('bee-working-animation-idle', 'images/animation-test/bee/animation-spritesheet-bee-idle.png')
+loader.add('bee-unloading-animation-idle', 'images/animation-test/bee/animation-spritesheet-bee-unloading-idle.png')
 loader.add('flower-is-pollinated', 'images/animation-test/flower-is-pollinated/animation-spritesheet-flower.png')
 loader.load(setupSplash)
 

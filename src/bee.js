@@ -1,17 +1,21 @@
 
 function createBee(parent, type, startPosition) {
+  if (!type) {
+    throw 'Error: createBee called without type'
+  }
+
   const bee = new Container()
   
-  const workingAnimation = animateSprite(bee, 'bee-working-animation', 43, 13, 8)
+  const workingAnimation = animateSprite(bee, 'bee-working-animation-idle', 43, 13, 8)
   const workingSprite = workingAnimation.sprite
 
-  const unloadingAnimation = animateSprite(bee, 'bee-unloading-animation', 43, 13, 8)
+  const unloadingAnimation = animateSprite(bee, 'bee-unloading-animation-idle', 43, 13, 8)
   const unloadingSprite = unloadingAnimation.sprite
 
   const shadow = Sprite.fromImage('images/bee/shadow.png')
   bee.addChild(shadow)
 
-  const droneBody = Sprite.fromImage('images/bee/bee-drone-body.png')
+  const droneBody = Sprite.fromImage('images/bee/bee-drone-body-idle.png')
   bee.addChild(droneBody)
   
   const animationSprite = Sprite.fromImage('images/bee/cell-conversion-animation-a.png')
@@ -61,21 +65,47 @@ function createBee(parent, type, startPosition) {
   bee.WAX_SACK_CAPACITY = 10
   
   bee.age = 0
-  bee.setAge = amount => { bee.age = amount; return bee }
+  bee.setAge = amount => {
+    bee.age = amount
+    return bee
+  }
+  
   bee.pollenSack = 0
-  bee.setPollen = amount => { bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(amount); return bee }
+  bee.setPollen = amount => {
+    bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(amount)
+    return bee
+  }
+  
   bee.nectarSack = 0
-  bee.setNectar = amount => { bee.nectarSack = cap(0, bee.NECTAR_SACK_CAPACITY)(amount); return bee }
+  bee.setNectar = amount => {
+    bee.nectarSack = cap(0, bee.NECTAR_SACK_CAPACITY)(amount)
+    return bee
+  }
+  
   bee.honeySack = 0
-  bee.setHoney = amount => { bee.honeySack = cap(0, bee.HONEY_SACK_CAPACITY)(amount); return bee }
+  bee.setHoney = amount => {
+    bee.honeySack = cap(0, bee.HONEY_SACK_CAPACITY)(amount)
+    return bee
+  }
+  
   bee.waxSack = 0
-  bee.setWax = amount => { bee.waxSack = cap(0, bee.WAX_SACK_CAPACITY)(amount); return bee }
-  bee.type = type || 'unassigned'
-  bee.setType = type => { bee.type = type; bee.idle = getIdlePosition(type) }
+  bee.setWax = amount => {
+    bee.waxSack = cap(0, bee.WAX_SACK_CAPACITY)(amount)
+    return bee
+  }
+  
+  bee.type = type
+  bee.setType = type => {
+    bee.type = type
+    droneBody.texture = Texture.fromImage('images/bee/bee-drone-body-' + type + '.png')
+    bee.idle = getIdlePosition(type)
+  }
+
   bee.showBee = () => {
     droneBody.visible = true
     beeAddon.visible = true
   }
+
   bee.hideBee = () => {
     droneBody.visible = false
     beeAddon.visible = false
@@ -668,17 +698,6 @@ function createBee(parent, type, startPosition) {
       } else {
         beeAddon.texture = Texture.fromImage('images/bee/bee-drone-legs-jerk.png')
       }
-    }
-
-    if (bee.type === 'unassigned') {
-      const rand = Math.random()
-      if (rand < 0.3) {
-        bee.type = 'forager'
-      } else if (rand < 0.6) {
-        bee.type = 'nurser'
-      } else {
-        bee.type = 'worker'
-      }      
     }
 
     if (bee.type === 'forager') forager()
