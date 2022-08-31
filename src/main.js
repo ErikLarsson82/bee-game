@@ -101,14 +101,14 @@ loader.add('bee-unloading-animation-forager', 'images/animation-test/bee/animati
 loader.add('bee-working-animation-idle', 'images/animation-test/bee/animation-spritesheet-bee-idle.png')
 loader.add('bee-unloading-animation-idle', 'images/animation-test/bee/animation-spritesheet-bee-unloading-idle.png')
 loader.add('flower-is-pollinated', 'images/animation-test/flower-is-pollinated/animation-spritesheet-flower.png')
-// loader.load(setupSplash)
+loader.load(setupSplash)
 
 
-map = MAP_CONFIGURATIONS[0]
-cycles = map.cycles
-currentSeasonLength = cycles[0]
-MAP_SELECTION = map.id
-seeds = map.seeds
-winterHungerMultiplier = map.winterHungerMultiplier
+// map = MAP_CONFIGURATIONS[0]
+// cycles = map.cycles
+// currentSeasonLength = cycles[0]
+// MAP_SELECTION = map.id
+// seeds = map.seeds
+// winterHungerMultiplier = map.winterHungerMultiplier
 
-loader.load(setupGame)
+// loader.load(setupGame)
