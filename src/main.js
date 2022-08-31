@@ -24,6 +24,7 @@ const colors = {
   yellow: '#fee761',
   orange: '#feae34',
   darkOrange: '#f77622',
+  darkGray: '#3a4466',
 }
 
 const colorToHex = (color) => parseInt(color.substring(1), 16)
@@ -64,6 +65,7 @@ let year = 1
 let seeds = 1
 let season = 'summer'
 let winterHungerMultiplier = null
+let currentSeasonLength = 0
 
 let scene = null
 let selected = null
@@ -76,13 +78,13 @@ let uiTopBar = null
 let populationText = null
 let selectedSprite = null
 let beeContainer = null
-let nightDimmer = null
 let backgroundScene = null
 let hexBackground = null
 let hexForeground = null
 let flowerBed = null
 let pausedText = null
 let pauseFrame = null
+let summerSun = null
 
 let hexGrid = []
 let flowers = []
@@ -104,6 +106,7 @@ loader.add('flower-is-pollinated', 'images/animation-test/flower-is-pollinated/a
 
 map = MAP_CONFIGURATIONS[0]
 cycles = map.cycles
+currentSeasonLength = cycles[0]
 MAP_SELECTION = map.id
 seeds = map.seeds
 winterHungerMultiplier = map.winterHungerMultiplier

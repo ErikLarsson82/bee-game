@@ -21,6 +21,7 @@ function setupMenu() {
   MAP_CONFIGURATIONS.forEach((map, idx) => {
     const callback = () => {
       cycles = map.cycles
+      currentSeasonLength = cycles[0]
       MAP_SELECTION = map.id
       seeds = map.seeds
       winterHungerMultiplier = map.winterHungerMultiplier

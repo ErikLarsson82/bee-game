@@ -30,6 +30,7 @@ function gameloop(delta, manualTick) {
       cycles[0]--
       if (cycles[0] === 0) {
         cycles = cycles.slice(1)
+        currentSeasonLength = cycles[0]
         season = season === 'summer' ? 'winter' : 'summer'
         if (season === 'summer') {
           backgroundScene.texture = Texture.fromImage('images/scene/background-summer.png')        
