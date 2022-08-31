@@ -58,10 +58,15 @@ function setupGame() {
     colonyLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(colonyLabel)
 
+    const gameSpeedLabel = new PIXI.Text('GAME SPEED', { ...picoFontConfig, ...smallFont, fill: colors.orange })
+    gameSpeedLabel.position.x = 337
+    gameSpeedLabel.position.y = topBarContentOffsetY
+    uiTopBar.addChild(gameSpeedLabel)
+
     populationText = new PIXI.Text('1', { ...picoFontConfig, ...smallFont, fill: colors.yellow })
     populationText.position.x = 72
     populationText.position.y = topBarContentOffsetY
-    uiTopBar.addChild(populationText) 
+    uiTopBar.addChild(populationText)
 
     const timelineText = new PIXI.Text('Year   Day   Hour', { ...picoFontConfig, ...smallFont, fill: 'gray' })
     timelineText.position.x = 110
@@ -99,15 +104,15 @@ function setupGame() {
       nextSeasonLength.text = cycles[1]
     })
 
-    pausedText = new PIXI.Text('Playing', { ...picoFontConfig, ...largeFont })
-    pausedText.position.x = 370
-    pausedText.position.y = topBarContentOffsetY
-    uiTopBar.addChild(pausedText)
+    gameSpeedIcon = Sprite.fromImage('images/ui/gamespeed1.png')
+    gameSpeedIcon.position.x = 380
+    gameSpeedIcon.position.y = topBarContentOffsetY
+    uiTopBar.addChild(gameSpeedIcon)
 
     ui.addChild(uiTopBar)
 
     pauseFrame = new Graphics()
-    pauseFrame.lineStyle(10, 0xf77622);
+    pauseFrame.lineStyle(6, colorToHex(colors.darkOrange))
     pauseFrame.drawRect(0, 0, WIDTH / 2, HEIGHT / 2)
     ui.addChild(pauseFrame)
   }
@@ -217,7 +222,7 @@ function setupGame() {
   addJobsButtons(jobsPanel)
 
   createWarningSign()
-  createSeasonTracker()
+  // createSeasonTracker()
 
   createMap(MAP_SELECTION)
   createFlowers()

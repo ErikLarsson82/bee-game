@@ -23,7 +23,10 @@ const hugeFont = { fontSize: 50 }
 const colors = {
   yellow: '#fee761',
   orange: '#feae34',
+  darkOrange: '#f77622',
 }
+
+const colorToHex = (color) => parseInt(color.substring(1), 16)
 
 const l = console.log
 const pretty = number => Math.round(number/1000)

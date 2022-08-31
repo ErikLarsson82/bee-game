@@ -1,17 +1,9 @@
 
 function setGameSpeedText() {
-  pausedText.style.fill = 0xffffff
   if (paused) {
-    pausedText.text = 'Paused'
-    pausedText.style.fill = 0xf77622
-  } else if (gameSpeed === 1) {
-    pausedText.text = '>'
-  } else if (gameSpeed === 4) {
-    pausedText.text = '>>'
-  } else if (gameSpeed === 8) {
-    pausedText.text = '>>>'
-  } else if (gameSpeed === 64) {
-    pausedText.text = '>>>>>>>'
+    gameSpeedIcon.texture = Texture.fromImage('images/ui/gamespeed0.png')
+  } else {
+    gameSpeedIcon.texture = Texture.fromImage('images/ui/gamespeed' + gameSpeed + '.png')
   }
   pauseFrame.visible = paused
 }
