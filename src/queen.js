@@ -13,8 +13,8 @@ function createQueen(parent) {
   queenSprite.addChild(queenLegAddon)
   
   queenSprite.idle = {
-    x: 250,
-    y: 56
+    x: 180,
+    y: 20
   }
   goIdle(queenSprite)
   queenSprite.animationTicker = Math.random() * 100
