@@ -20,6 +20,11 @@ const largeFont = { fontSize: 8 }
 const massiveFont = { fontSize: 16 }
 const hugeFont = { fontSize: 50 }
 
+const colors = {
+  yellow: '#fee761',
+  orange: '#feae34',
+}
+
 const l = console.log
 const pretty = number => Math.round(number/1000)
 
@@ -34,8 +39,8 @@ const speeds = {
   64: 2
 }
 
-const WIDTH = 1063
-const HEIGHT = 735
+const WIDTH = 400 * 2
+const HEIGHT = 320 * 2
 const app = new PIXI.Application(WIDTH, HEIGHT, { antialias: false })
 document.getElementById('container').appendChild(app.view)
 
@@ -91,6 +96,13 @@ loader.add('bee-unloading-animation-forager', 'images/animation-test/bee/animati
 loader.add('bee-working-animation-idle', 'images/animation-test/bee/animation-spritesheet-bee-idle.png')
 loader.add('bee-unloading-animation-idle', 'images/animation-test/bee/animation-spritesheet-bee-unloading-idle.png')
 loader.add('flower-is-pollinated', 'images/animation-test/flower-is-pollinated/animation-spritesheet-flower.png')
-loader.load(setupSplash)
+// loader.load(setupSplash)
 
-// loader.load(setupGame)
+
+map = MAP_CONFIGURATIONS[0]
+cycles = map.cycles
+MAP_SELECTION = map.id
+seeds = map.seeds
+winterHungerMultiplier = map.winterHungerMultiplier
+
+loader.load(setupGame)

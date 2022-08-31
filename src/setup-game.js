@@ -5,7 +5,7 @@ function setupGame() {
   FPS = Math.round(app.ticker.FPS)
   
   scene = 'game'
-  document.body.style['background-color'] = '#fff4bc'
+  document.body.style['background-color'] = '#262b44'
 
   const container = new Container()
   container.scale.x = 2
@@ -49,48 +49,46 @@ function setupGame() {
   }
 
   {
-    uiTopBar = new Graphics()
-    uiTopBar.beginFill(0x181425)
-    uiTopBar.drawRect(0, 0, 1024, 22)
+    uiTopBar = new Container()
 
     const topBarContentOffsetY = 5
     
-    const colonyLabel = new PIXI.Text('Colony population', { ...picoFontConfig, ...largeFont, fill: 'gray' })
-    colonyLabel.position.x = 6
+    const colonyLabel = new PIXI.Text('HIVE POPULATION', { ...picoFontConfig, ...smallFont, fill: colors.orange })
+    colonyLabel.position.x = 8
     colonyLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(colonyLabel)
 
-    populationText = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
-    populationText.position.x = 156
+    populationText = new PIXI.Text('1', { ...picoFontConfig, ...smallFont, fill: colors.yellow })
+    populationText.position.x = 72
     populationText.position.y = topBarContentOffsetY
-    uiTopBar.addChild(populationText)
+    uiTopBar.addChild(populationText) 
 
-    const timelineText = new PIXI.Text('Year   Day   Hour', { ...picoFontConfig, ...largeFont, fill: 'gray' })
-    timelineText.position.x = 210
+    const timelineText = new PIXI.Text('Year   Day   Hour', { ...picoFontConfig, ...smallFont, fill: 'gray' })
+    timelineText.position.x = 110
     timelineText.position.y = topBarContentOffsetY
     uiTopBar.addChild(timelineText)
     
-    const yearLabel = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
+    const yearLabel = new PIXI.Text('-', { ...picoFontConfig, ...smallFont })
     yearLabel.anchor.set(1, 0)
-    yearLabel.position.x = 260
+    yearLabel.position.x = 134
     yearLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(yearLabel)
 
-    const dayLabel = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
+    const dayLabel = new PIXI.Text('-', { ...picoFontConfig, ...smallFont })
     dayLabel.anchor.set(1, 0)
-    dayLabel.position.x = 308
+    dayLabel.position.x = 158
     dayLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(dayLabel)
 
-    const hourLabel = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
+    const hourLabel = new PIXI.Text('-', { ...picoFontConfig, ...smallFont })
     hourLabel.anchor.set(1, 0)
-    hourLabel.position.x = 364
+    hourLabel.position.x = 184
     hourLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(hourLabel)
 
-    const nextSeasonLength = new PIXI.Text('-', { ...picoFontConfig, ...largeFont })
+    const nextSeasonLength = new PIXI.Text('-', { ...picoFontConfig, ...smallFont })
     nextSeasonLength.anchor.set(1, 0)
-    nextSeasonLength.position.x = 520
+    nextSeasonLength.position.x = 260
     nextSeasonLength.position.y = topBarContentOffsetY
     uiTopBar.addChild(nextSeasonLength)
 
@@ -102,7 +100,7 @@ function setupGame() {
     })
 
     pausedText = new PIXI.Text('Playing', { ...picoFontConfig, ...largeFont })
-    pausedText.position.x = 470
+    pausedText.position.x = 370
     pausedText.position.y = topBarContentOffsetY
     uiTopBar.addChild(pausedText)
 
@@ -143,8 +141,8 @@ function setupGame() {
   dimmer.addChild(nightDimmer)
 
   const jobsPanel = Sprite.fromImage('images/ui/ui-jobs-panel.png')
-  jobsPanel.position.x = 140
-  jobsPanel.position.y = 95
+  jobsPanel.position.x = 20
+  jobsPanel.position.y = 25
   background.addChild(jobsPanel)
 
   const unassignedText = new PIXI.Text('-', { ...picoFontConfig, ...smallFont })

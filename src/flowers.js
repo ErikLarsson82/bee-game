@@ -22,7 +22,7 @@ function createFlowers() {
     flower.scale.x = flipped ? -1 : 1
     flower.anchor.set(flipped ? 0.6 : 0.2, 0.2)
     flower.position.x = Math.round((WIDTH / 4) + (positions[f] ? positions[f] : f))
-    flower.position.y = 330
+    flower.position.y = 280
     flowerBed.addChild(flower)
 
     flower.panelLabel = () => false

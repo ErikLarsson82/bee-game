@@ -1,6 +1,6 @@
 
-const OFFSET_X = 226
-const OFFSET_Y = 66
+const OFFSET_X = 120
+const OFFSET_Y = 36
 const VERTICAL_SIZE = 6
 const HORIZONTAL_SIZE = 9
 
