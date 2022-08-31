@@ -133,17 +133,18 @@ function setupGame() {
   const nextSeason = () => season === 'summer' ? 'winter' : 'summer'
 
   sun.interactive = true
+  const dayLabel = cycles[currentCycleIndex + 1] === 1 ? 'DAY' : 'DAYS'
   sun.mouseup = () => {
     sunBubbleTimer = FPS * 5
     sunBubble.visible = true
-    sunBubbleText.text = nextSeason().toUpperCase() + ' WILL BE ' + cycles[currentCycleIndex + 1] + ' DAYS LONG'
+    sunBubbleText.text = `${ nextSeason().toUpperCase() } WILL BE ${ cycles[currentCycleIndex + 1] } ${ dayLabel } LONG`
   }
   background.addChild(sun)
   
   sunBubble = Sprite.fromImage('images/scene/sun-bubble.png')
   sunBubble.visible = true
 
-  const sunBubbleText = new PIXI.Text(nextSeason().toUpperCase() + ' WILL BE ' + cycles[currentCycleIndex + 1] + ' DAYS LONG', { 
+  const sunBubbleText = new PIXI.Text(`${ nextSeason().toUpperCase() } WILL BE ${ cycles[currentCycleIndex + 1] } ${ dayLabel } LONG`, { 
     ...picoFontConfig, 
     ...smallFont,
     fill: colors.darkGray
