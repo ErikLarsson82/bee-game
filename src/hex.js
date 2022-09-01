@@ -10,15 +10,19 @@ const HEIGHT_FLAT = Math.round(Math.sqrt(3) * VERTICAL_SIZE)
 const WIDTH_POINTY = Math.sqrt(3) * HORIZONTAL_SIZE
 const HEIGHT_POINTY = 2 * VERTICAL_SIZE
 
+const HEX_COLUMN_WIDTH = 13
+const HEX_ROW_HEIGHT = 10
+const HEX_ODD_ROW_OFFSET = 5
+
 // “odd-q” vertical layout, shoves odd columns down
 function toLocalCoordinateFlat(index) {
   const { x, y } = index
   const odd = x % 2
 
   return {
-    x: ((x * WIDTH_FLAT * (3/4)) + OFFSET_X),
-    y: ((y * HEIGHT_FLAT) + OFFSET_Y + (odd ? HEIGHT_FLAT/2 : 0))
-  } 
+    x: x * HEX_COLUMN_WIDTH + OFFSET_X,
+    y: y * HEX_ROW_HEIGHT + (odd ? HEX_ODD_ROW_OFFSET : 0) + OFFSET_Y,
+  }
 }
 
 // “odd-r” horizontal layout, shoves odd rows right
