@@ -133,7 +133,10 @@ function setupGame() {
   const nextSeason = () => season === 'summer' ? 'winter' : 'summer'
 
   sun.interactive = true
+  sun.buttonMode = true
   const dayLabel = cycles[currentCycleIndex + 1] === 1 ? 'DAY' : 'DAYS'
+  sun.mouseover = () => sun.alpha = 0.8
+  sun.mouseout = () => sun.alpha = 1
   sun.mouseup = () => {
     sunBubbleTimer = FPS * 5
     sunBubble.visible = true
