@@ -1,8 +1,8 @@
 
 function setupSplash() {
   scene = 'splash'
-  document.body.style['background-color'] = '#ffd601'
-  
+  document.body.style['background-color'] = '#fff6c5'
+    
   const container = new Container()
   container.scale.x = 2
   container.scale.y = 2
@@ -15,7 +15,7 @@ function setupSplash() {
 
   const title = new PIXI.Text('Bee Game', { ...picoFontConfig, ...hugeFont, fill: '#c96f10' })
   title.anchor.set(0.5, 0)
-  title.position.x = Math.round(WIDTH / 2 / 2)
+  title.position.x = Math.round(WIDTH / 2 / 2) + 8
   title.position.y = 30
   container.addChild(title)
 

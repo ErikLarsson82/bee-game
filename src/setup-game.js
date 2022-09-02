@@ -6,7 +6,7 @@ function setupGame() {
   
   scene = 'game'
   document.body.style['background-color'] = '#262b44'
-
+  
   currentCycleIndex = 0
 
   const container = new Container()
@@ -150,7 +150,7 @@ function setupGame() {
     fill: colors.darkGray
   })
 
-  sunBubbleText.position.x = 9
+    sunBubbleText.position.x = 9
   sunBubbleText.position.y = 6
   sunBubble.addChild(sunBubbleText)
   

@@ -1,7 +1,7 @@
 
 function setupMenu() {
   scene = 'menu'
-  document.body.style['background-color'] = '#ffd601'
+  document.body.style['background-color'] = '#fff6c5'
   
   const container = new Container()
   container.scale.x = 2
