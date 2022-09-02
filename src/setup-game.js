@@ -250,19 +250,6 @@ function setupGame() {
   hexGrid = new Array(13).fill().map((_, x) => 
     new Array(20).fill().map((_, y) => cellDisabled(x, y, hexForeground))
   )
-
-  hoverCellSprite = Sprite.fromImage('images/ui/hover-cell.png')
-  hoverCellSprite.visible = false
-  addTicker('ui', () => {
-    if (hoveredCells.length) {
-      hoverCellSprite.visible = true
-      hoverCellSprite.position.x = hoveredCells[hoveredCells.length - 1].position.x
-      hoverCellSprite.position.y = hoveredCells[hoveredCells.length - 1].position.y
-    } else {
-      hoverCellSprite.visible = false
-    }
-  })
-  ui.addChild(hoverCellSprite)
   
   selectedSprite = new Container()
   selectedSprite.visible = false
@@ -285,6 +272,19 @@ function setupGame() {
     }
   })
   ui.addChild(selectedSprite)
+
+  hoverCellSprite = Sprite.fromImage('images/ui/hover-cell.png')
+  hoverCellSprite.visible = false
+  addTicker('ui', () => {
+    if (hoveredCells.length) {
+      hoverCellSprite.visible = true
+      hoverCellSprite.position.x = hoveredCells[hoveredCells.length - 1].position.x
+      hoverCellSprite.position.y = hoveredCells[hoveredCells.length - 1].position.y
+    } else {
+      hoverCellSprite.visible = false
+    }
+  })
+  ui.addChild(hoverCellSprite)
 
   panel = new Container()
   ui.addChild(panel)
