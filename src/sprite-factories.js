@@ -82,6 +82,12 @@ function makeFlyable(sprite) {
         }
       }
     }
+
+    if ((sprite.position.y < hiveHole.position.y && targetSprite.position.y > hiveHole.position.y) ||
+        (sprite.position.y > hiveHole.position.y && targetSprite.position.y < hiveHole.position.y)) {
+      targetSprite = hiveHole
+    }
+
     const x = targetSprite.position.x - sprite.position.x
     const y = targetSprite.position.y - sprite.position.y
 
