@@ -100,26 +100,22 @@ function cellPrepared(x, y, parent) {
   const needsHelp = () => preparedCellSprite.completeness <= 100 && bees.filter(({ type }) => type === 'worker').length === 0
   
   preparedCellSprite.panelLabel = () => false
-  preparedCellSprite.panelPosition = () => ({ x: pixelCoordinate.x + 8, y: pixelCoordinate.y + 5 })
+  preparedCellSprite.panelPosition = () => ({ x: pixelCoordinate.x, y: pixelCoordinate.y})
 
   preparedCellSprite.panelContent = () => {
     const container = new Container()
-    
-    const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
-    whiteLine.position.x = 0
-    whiteLine.position.y = -30
-    container.addChild(whiteLine)
 
-    const contentHoney = Sprite.fromImage('images/ui/button-large/button-large-content-honey.png')
-    const contentBrood = Sprite.fromImage('images/ui/button-large/button-large-content-brood.png')
-    const contentPollen = Sprite.fromImage('images/ui/button-large/button-large-content-pollen.png')
-    const contentNectar = Sprite.fromImage('images/ui/button-large/button-large-content-nectar.png')
-    
     if (preparedCellSprite.done) {
-      container.addChild(Button(70, -34, contentHoney, () => replaceSelectedHex('honey'), null, null, 'large'))
-      container.addChild(Button(100, -23, contentBrood, () => replaceSelectedHex('brood'), null, null, 'large'))
-      container.addChild(Button(70, -12, contentPollen, () => replaceSelectedHex('pollen'), null, null, 'large'))
-      container.addChild(Button(100, -1, contentNectar, () => replaceSelectedHex('converter'), null, null, 'large'))
+      const contentHoney = Sprite.fromImage('images/ui/button-large/button-large-content-honey.png')
+      const contentBrood = Sprite.fromImage('images/ui/button-large/button-large-content-brood.png')
+      const contentPollen = Sprite.fromImage('images/ui/button-large/button-large-content-pollen.png')
+      const contentNectar = Sprite.fromImage('images/ui/button-large/button-large-content-nectar.png')
+
+      container.addChild(Button(-11, -28, contentHoney, () => replaceSelectedHex('honey'), null, null, 'large'))
+      container.addChild(Button(18, -17, contentNectar, () => replaceSelectedHex('converter'), null, null, 'large'))
+      container.addChild(Button(18, 5, contentPollen, () => replaceSelectedHex('pollen'), null, null, 'large'))
+      container.addChild(Button(-11, 16, contentBrood, () => replaceSelectedHex('brood'), null, null, 'large'))
+
     } else {
       const content = Sprite.fromImage('images/ui/content-prepared.png')
       content.position.x = 72

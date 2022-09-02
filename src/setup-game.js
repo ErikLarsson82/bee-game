@@ -153,7 +153,7 @@ function setupGame() {
     fill: colors.darkGray
   })
 
-    sunBubbleText.position.x = 9
+  sunBubbleText.position.x = 9
   sunBubbleText.position.y = 6
   sunBubble.addChild(sunBubbleText)
   
