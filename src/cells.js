@@ -111,10 +111,22 @@ function cellPrepared(x, y, parent) {
       const contentPollen = Sprite.fromImage('images/ui/button-large/button-large-content-pollen.png')
       const contentNectar = Sprite.fromImage('images/ui/button-large/button-large-content-nectar.png')
 
-      container.addChild(Button(-11, -28, contentHoney, () => replaceSelectedHex('honey'), null, null, 'large'))
-      container.addChild(Button(18, -17, contentNectar, () => replaceSelectedHex('converter'), null, null, 'large'))
-      container.addChild(Button(18, 5, contentPollen, () => replaceSelectedHex('pollen'), null, null, 'large'))
-      container.addChild(Button(-11, 16, contentBrood, () => replaceSelectedHex('brood'), null, null, 'large'))
+      container.addChild(Button(-11, -28, contentHoney, () => {
+        replaceSelectedHex('honey')
+        setSelected(null)
+      }, null, null, 'large'))
+      container.addChild(Button(18, -17, contentNectar, () => {
+        replaceSelectedHex('converter')
+        setSelected(null)
+      }, null, null, 'large'))
+      container.addChild(Button(18, 5, contentPollen, () => {
+        replaceSelectedHex('pollen')
+        setSelected(null)
+      }, null, null, 'large'))
+      container.addChild(Button(-11, 16, contentBrood, () => {
+        replaceSelectedHex('brood')
+        setSelected(null)
+      }, null, null, 'large'))
 
     } else {
       const content = Sprite.fromImage('images/ui/content-prepared.png')
@@ -216,41 +228,24 @@ function cellHoney(x, y, parent) {
 
   honeySprite.panelContent = () => {
     const container = new Container()
-    
-    const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
-    whiteLine.position.x = 0
-    whiteLine.position.y = -30
-    container.addChild(whiteLine)
 
-    const content = Sprite.fromImage('images/ui/content-honey-hex.png')
-    content.position.x = 72
-    content.position.y = -29
+    const content = Sprite.fromImage('images/ui/content-honey.png')
+    content.position.x = -24
+    content.position.y = -37
     container.addChild(content)
 
-    container.addChild(ProgressBar(113, -15, 'honey', () => honeySprite.honey, honeySprite.HONEY_HEX_CAPACITY))
-
-    const textHeading = new PIXI.Text('HONEY HEX', { ...picoFontConfig })
-    textHeading.scale.set(0.15, 0.15)
-    textHeading.position.x = 90
-    textHeading.position.y = -26
-    container.addChild(textHeading)
+    container.addChild(ProgressBar2(-20, -26, 'honey', () => honeySprite.honey, honeySprite.HONEY_HEX_CAPACITY)) 
 
     const textBonus = new PIXI.Text('-', { ...picoFontConfig })
     textBonus.scale.set(0.15, 0.15)
-    textBonus.position.x = 90
-    textBonus.position.y = 100
+    textBonus.position.x = -22
+    textBonus.position.y = -46
     container.addChild(textBonus)
 
     addTicker('ui', () => {
       const buff = honeySprite.bonuses.find(isHoneyBuff)
       textBonus.text = buff ? `Adjacency bonus: +${((buff.modifier - 1) * 100).toFixed(0)}%` : 'No bonuses'
     })
-
-    const textDescription = new PIXI.Text('HONEY', { ...picoFontConfig, fill: '#96a5bc' })
-    textDescription.scale.set(0.15, 0.15)
-    textDescription.position.x = 90
-    textDescription.position.y = -16
-    container.addChild(textDescription)
 
     const notEnoughWarning = new PIXI.Text('NOT ENOUGH HONEY', { ...picoFontConfig, fill: 'white' })
     notEnoughWarning.scale.set(0.15, 0.15)
@@ -259,22 +254,21 @@ function cellHoney(x, y, parent) {
     notEnoughWarning.visible = false
     container.addChild(notEnoughWarning)
 
-    const buttonDelete = Button(84, -6, 'Delete', () => {
+    const buttonDelete = Button(-20, 11, Sprite.fromImage('images/ui/button-large/button-large-content-delete.png'), () => {
       replaceHex([x, y], 'prepared').instantlyPrepare()
       setSelected(null) 
-    })
+    }, null, null, 'large')
     container.addChild(buttonDelete)
 
-    const button = Button(84, 8, 'Make Wax', () => {
+    const button = Button(9, 0, Sprite.fromImage('images/ui/button-large/button-large-content-wax.png'), () => {
       if (honeySprite.honey >= (honeySprite.HONEY_HEX_CAPACITY * 0.9)) {
         replaceHex([x, y], 'wax')
         setSelected(null) 
       } else {
         notEnoughWarning.visible = true
       }
-    })
+    }, null, null, 'large')
     container.addChild(button)
-
 
     return container
   }
@@ -331,34 +325,17 @@ function cellWax(x, y, parent) {
   waxSprite.panelContent = () => {
     const container = new Container()
     
-    const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
-    whiteLine.position.x = 0
-    whiteLine.position.y = -30
-    container.addChild(whiteLine)
-
-    const content = Sprite.fromImage('images/ui/content-wax-hex.png')
-    content.position.x = 72
-    content.position.y = -29
+    const content = Sprite.fromImage('images/ui/content-wax.png')
+    content.position.x = -24
+    content.position.y = -37
     container.addChild(content)
 
-    container.addChild(ProgressBar(113, -15, 'wax', () => waxSprite.wax, waxSprite.WAX_HEX_CAPACITY))
+    container.addChild(ProgressBar2(-20, -26, 'wax', () => waxSprite.wax, waxSprite.WAX_HEX_CAPACITY)) 
 
-    const textHeading = new PIXI.Text('WAX HEX', { ...picoFontConfig })
-    textHeading.scale.set(0.15, 0.15)
-    textHeading.position.x = 90
-    textHeading.position.y = -26
-    container.addChild(textHeading)
-
-    const textDescription = new PIXI.Text('WAX', { ...picoFontConfig, fill: '#96a5bc' })
-    textDescription.scale.set(0.15, 0.15)
-    textDescription.position.x = 90
-    textDescription.position.y = -16
-    container.addChild(textDescription)
-
-    const buttonDelete = Button(84, -6, 'Delete', () => {
+    const buttonDelete = Button(-20, 11, Sprite.fromImage('images/ui/button-large/button-large-content-delete.png'), () => {
       replaceHex([x, y], 'prepared').instantlyPrepare()
       setSelected(null) 
-    })
+    }, null, null, 'large')
     container.addChild(buttonDelete)
 
     return container
@@ -393,49 +370,34 @@ function cellConverter(x, y, parent) {
   converterSprite.panelContent = () => {
     const container = new Container()
     
-    const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
-    whiteLine.position.x = 0
-    whiteLine.position.y = -30
-    container.addChild(whiteLine)
-
-    const content = Sprite.fromImage('images/ui/content-nectar-hex.png')
-    content.position.x = 72
-    content.position.y = -29
+    const content = Sprite.fromImage('images/ui/content-nectar.png')
+    content.position.x = -24
+    content.position.y = -37
     container.addChild(content)
 
-    container.addChild(ProgressBar(113, -15, 'nectar', () => converterSprite.nectar, converterSprite.NECTAR_CAPACITY))
+    container.addChild(ProgressBar2(-20, -26, 'nectar', () => converterSprite.nectar, converterSprite.NECTAR_CAPACITY)) 
 
-    const textHeading = new PIXI.Text('NECTAR HEX', { ...picoFontConfig })
-    textHeading.scale.set(0.15, 0.15)
-    textHeading.position.x = 90
-    textHeading.position.y = -26
-    container.addChild(textHeading)
-
-    const textDescription = new PIXI.Text('NECTAR', { ...picoFontConfig, fill: '#96a5bc' })
-    textDescription.scale.set(0.15, 0.15)
-    textDescription.position.x = 86
-    textDescription.position.y = -16
-    container.addChild(textDescription)
-
-    const buttonDelete = Button(84, -6, 'Delete', () => {
+    const buttonDelete = Button(-20, 11, Sprite.fromImage('images/ui/button-large/button-large-content-delete.png'), () => {
       replaceHex([x, y], 'prepared').instantlyPrepare()
       setSelected(null) 
-    })
+    }, null, null, 'large')
     container.addChild(buttonDelete)
 
-    const buttonUpgrade = Button(84, 20, 'Upgrade A', () => converterSprite.addUpgrade('converter-adjacent-feed'))
+    const buttonUpgrade = Button(9, 0, Sprite.fromImage('images/ui/button-large/button-large-content-upgrade-a.png'), () => {
+      converterSprite.addUpgrade('converter-adjacent-feed')
+    }, null, null, 'large')
     container.addChild(buttonUpgrade)
 
     const upgradesText = new PIXI.Text('-', { ...picoFontConfig })
     upgradesText.scale.set(0.15, 0.15)
-    upgradesText.position.x = 90
-    upgradesText.position.y = 40
+    upgradesText.position.x = 22
+    upgradesText.position.y = -4
     container.addChild(upgradesText)
 
     const textBonus = new PIXI.Text('-', { ...picoFontConfig })
     textBonus.scale.set(0.15, 0.15)
-    textBonus.position.x = 90
-    textBonus.position.y = 100
+    textBonus.position.x = -22
+    textBonus.position.y = -46
     container.addChild(textBonus)
 
     addTicker('ui', () => {
@@ -741,34 +703,17 @@ function cellPollen(x, y, parent) {
   pollenSprite.panelContent = () => {
     const container = new Container()
     
-    const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
-    whiteLine.position.x = 0
-    whiteLine.position.y = -30
-    container.addChild(whiteLine)
-
-    const content = Sprite.fromImage('images/ui/content-pollen-hex.png')
-    content.position.x = 72
-    content.position.y = -29
+    const content = Sprite.fromImage('images/ui/content-pollen.png')
+    content.position.x = -24
+    content.position.y = -37
     container.addChild(content)
 
-    container.addChild(ProgressBar(113, -15, 'pollen', () => pollenSprite.pollen, pollenSprite.POLLEN_HEX_CAPACITY))
+    container.addChild(ProgressBar2(-20, -26, 'pollen', () => pollenSprite.pollen, pollenSprite.POLLEN_HEX_CAPACITY)) 
 
-    const textHeading = new PIXI.Text('POLLEN HEX', { ...picoFontConfig })
-    textHeading.scale.set(0.15, 0.15)
-    textHeading.position.x = 90
-    textHeading.position.y = -26
-    container.addChild(textHeading)
-
-    const textDescription = new PIXI.Text('POLLEN', { ...picoFontConfig, fill: '#96a5bc' })
-    textDescription.scale.set(0.15, 0.15)
-    textDescription.position.x = 86
-    textDescription.position.y = -16
-    container.addChild(textDescription)
-
-    const buttonDelete = Button(84, -6, 'Delete', () => {
+    const buttonDelete = Button(-20, 11, Sprite.fromImage('images/ui/button-large/button-large-content-delete.png'), () => {
       replaceHex([x, y], 'prepared').instantlyPrepare()
-      setSelected(null) 
-    })
+      setSelected(null)
+    }, null, null, 'large')
     container.addChild(buttonDelete)
 
     return container
