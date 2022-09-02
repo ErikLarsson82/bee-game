@@ -266,7 +266,11 @@ function createBee(parent, type, startPosition) {
 
     if (needsResource && flower) {
       flower.claimSlot(bee)
-      bee.flyTo(flower)
+      if (bee.position.y < hiveHole.position.y) {
+        bee.flyTo(hiveHole)
+      } else {
+        bee.flyTo(flower)
+      }
       return true
     }
     return false
@@ -371,7 +375,11 @@ function createBee(parent, type, startPosition) {
     if (converterHex.length === 0 || isNectarSackEmpty()) return false
     const closest = getClosestHex(converterHex, bee)
     closest.claimSlot(bee)
-    bee.flyTo(closest)
+    if (bee.position.y > hiveHole.position.y) {
+      bee.flyTo(hiveHole)
+    } else {
+      bee.flyTo(closest)
+    }
     return true
   }
 
@@ -380,7 +388,11 @@ function createBee(parent, type, startPosition) {
     if (pollenHex.length === 0 || isPollenSackEmpty()) return false
     const closest = getClosestHex(pollenHex, bee)
     closest.claimSlot(bee)
-    bee.flyTo(closest)      
+    if (bee.position.y > hiveHole.position.y) {
+      bee.flyTo(hiveHole)
+    } else {
+      bee.flyTo(closest)
+    }
     return true
   }
 

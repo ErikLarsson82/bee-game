@@ -286,6 +286,12 @@ function setupGame() {
   })
   ui.addChild(hoverCellSprite)
 
+  hiveHole = Sprite.fromImage('images/scene/hive-hole.png')
+  hiveHole.position.x = 200
+  hiveHole.position.y = 195
+  hiveHole.anchor.x = 0.5
+  ui.addChild(hiveHole)
+
   panel = new Container()
   ui.addChild(panel)
 

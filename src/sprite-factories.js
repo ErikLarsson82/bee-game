@@ -103,7 +103,7 @@ function makeFlyable(sprite) {
 
     let velocity = new PIXI.Point(sprite.vx, sprite.vy)
 
-    if (velocity.magnitude() > velocity.normalize().magnitude() * maxSpeed * gameSpeed) {
+    if (velocity.magnitude() > maxSpeed * gameSpeed) {
       velocity = new PIXI.Point(velocity.normalize().x * maxSpeed * gameSpeed, velocity.normalize().y * maxSpeed * gameSpeed)
     }
     sprite.vx = velocity.x

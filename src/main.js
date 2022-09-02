@@ -81,6 +81,7 @@ let uiTopBar = null
 let populationText = null
 let selectedSprite = null
 let hoverCellSprite = null
+let hiveHole = null
 let beeContainer = null
 let backgroundScene = null
 let hexBackground = null

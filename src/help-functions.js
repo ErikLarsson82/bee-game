@@ -223,7 +223,7 @@ function distance(a, b) {
 
 function snapTo(a, b) {
   const threshold = gameSpeed > 4 ? 4 : 2.5 
-  if (distance(a, b) < threshold) {
+  if (dist(a.position.x, a.position.y, b.position.x, b.position.y) < threshold) {
     a.position.x = b.position.x
     a.position.y = b.position.y
     a.vx = 0
