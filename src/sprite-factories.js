@@ -1,11 +1,28 @@
 
-function makeSelectable(sprite, label) {
+function makeSelectable(sprite, label, shape) {
+  const hoverCellSprite = Sprite.fromImage('images/ui/hover-cell.png')
+  hoverCellSprite.visible = false
+
+  sprite.addChild(hoverCellSprite)
+
   sprite.label = label || 'no name'
   sprite.interactive = true
   sprite.buttonMode = true
   sprite.alpha = 1
-  sprite.mouseover = () => sprite.alpha = 0.7
-  sprite.mouseout = () => sprite.alpha = 1
+  sprite.mouseover = () => {
+    if (shape === 'round') {
+      sprite.alpha = 0.7
+    } else if (shape === 'hex') {
+      hoveredCells.push(sprite)
+    }
+  }
+  sprite.mouseout = () => {
+    if (shape === 'round') {
+      sprite.alpha = 1
+    } else if (shape === 'hex') {
+      hoveredCells = hoveredCells.filter((cell) => cell !== sprite)
+    }
+  }
   sprite.mousedown = () => setSelected(sprite)
 }
 

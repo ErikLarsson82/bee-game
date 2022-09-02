@@ -247,26 +247,36 @@ function setupGame() {
   hexGrid = new Array(13).fill().map((_, x) => 
     new Array(20).fill().map((_, y) => cellDisabled(x, y, hexForeground))
   )
+
+  hoverCellSprite = Sprite.fromImage('images/ui/hover-cell.png')
+  hoverCellSprite.visible = false
+  addTicker('ui', () => {
+    if (hoveredCells.length) {
+      hoverCellSprite.visible = true
+      hoverCellSprite.position.x = hoveredCells[hoveredCells.length - 1].position.x
+      hoverCellSprite.position.y = hoveredCells[hoveredCells.length - 1].position.y
+    } else {
+      hoverCellSprite.visible = false
+    }
+  })
+  ui.addChild(hoverCellSprite)
   
   selectedSprite = new Container()
   selectedSprite.visible = false
   const selectedSpriteSub = Sprite.fromImage('images/ui/selection-cell.png')
-  selectedSpriteSub.position.x = -2
-  selectedSpriteSub.position.y = -2
   selectedSprite.addChild(selectedSpriteSub)  
   addTicker('ui', time => {
     if (selected) {
       if (selected.label === 'bee') {
         selectedSpriteSub.texture = Texture.fromImage('images/ui/selection-circle.png')
-        selectedSprite.position.x = selected.position.x + 1
-        selectedSprite.position.y = selected.position.y - 1
+        selectedSprite.position.x = selected.position.x - 1
+        selectedSprite.position.y = selected.position.y - 3
       } else {
         selectedSpriteSub.texture = Texture.fromImage('images/ui/selection-cell.png')
         selectedSprite.position.x = selected.position.x
         selectedSprite.position.y = selected.position.y
       }
       selectedSprite.visible = true
-      
     } else {
       selectedSprite.visible = false
     }

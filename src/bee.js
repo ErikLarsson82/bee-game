@@ -53,7 +53,7 @@ function createBee(parent, type, startPosition) {
   beeExclamation.position.y = -2
   beeExclamation.visible = false
   bee.addChild(beeExclamation)
-  makeSelectable(bee, 'bee')
+  makeSelectable(bee, 'bee', 'round')
   makeHungry(bee)
   makeParticleCreator(bee)
   const isAt = samePosition(bee)

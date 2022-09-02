@@ -1,7 +1,7 @@
 function createQueen(parent) {
   const queenSprite = PIXI.Sprite.fromImage('images/queen/bee-queen.png')
 
-  makeSelectable(queenSprite, 'queen')
+  makeSelectable(queenSprite, 'queen', 'round')
   queenSprite.type = 'queen'
   
   const queenWingAddon = Sprite.fromImage('images/queen/bee-queen-wings-flapped.png')

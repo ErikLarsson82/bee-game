@@ -80,6 +80,7 @@ let ui = null
 let uiTopBar = null
 let populationText = null
 let selectedSprite = null
+let hoverCellSprite = null
 let beeContainer = null
 let backgroundScene = null
 let hexBackground = null
@@ -96,6 +97,7 @@ let flowers = []
 let tickers = []
 let bees = []
 let angels = []
+let hoveredCells = []
 
 loader.add('pico8-mono.ttf')
 loader.add('bee-working-animation-worker', 'images/animation-test/bee/animation-spritesheet-bee-worker.png')
