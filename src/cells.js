@@ -40,24 +40,13 @@ function cellEmpty(x, y, parent) {
 
   emptySprite.panelContent = () => {
     const container = new Container()
-    
-    const whiteLine = Sprite.fromImage('images/ui/prepare-cell.png')
-    whiteLine.anchor.set(0, 0.65)
-    container.addChild(whiteLine)
 
-    const description = Sprite.fromImage('images/ui/prepare-cell-hover.png')
-    description.visible = false
-    description.position.x = 95
-    description.position.y = -29
-    container.addChild(description)
+    const contentPrepare = Sprite.fromImage('images/ui/button-large/button-large-content-prepare.png')
 
-    const buttonText = Sprite.fromImage('images/text/prepare.png')
-    buttonText.position.x = 24
-    buttonText.position.y = 2
-    buttonText.anchor.set(0.5, 0)
-    
-    const button = Button(44, -29, buttonText, () => replaceSelectedHex('prepared'), () => description.visible = true, () => description.visible = false)
-    container.addChild(button)
+    container.addChild(Button(-19, -34, contentPrepare, () => {
+      replaceSelectedHex('prepared')
+      setSelected(null)
+    }, null, null, 'large'))
 
     return container
   }
