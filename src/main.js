@@ -112,5 +112,4 @@ loader.load(setupSplash)
 // MAP_SELECTION = map.id
 // seeds = map.seeds
 // winterHungerMultiplier = map.winterHungerMultiplier
-
 // loader.load(setupGame)

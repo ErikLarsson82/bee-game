@@ -24,11 +24,26 @@ function createBee(parent, type, startPosition) {
   const shadow = Sprite.fromImage('images/bee/shadow.png')
   bee.addChild(shadow)
 
+  const honeyBucket = Sprite.fromImage('images/buckets/honey.png')
+  bee.addChild(honeyBucket)
+  const nectarBucket = Sprite.fromImage('images/buckets/nectar.png')
+  bee.addChild(nectarBucket)
+  const waxBucket = Sprite.fromImage('images/buckets/wax.png')
+  bee.addChild(waxBucket)
+  const pollenBucket = Sprite.fromImage('images/buckets/pollen.png')
+  bee.addChild(pollenBucket)
+
   const droneBody = Sprite.fromImage('images/bee/bee-drone-body-idle.png')
   bee.addChild(droneBody)
+
+  const droneHand = Sprite.fromImage('images/bee/bee-drone-hand.png')
+  droneHand.position.x = 10
+  droneHand.position.y = 5
+  droneHand.visible = false
+  bee.addChild(droneHand)  
   
   const animationSprite = Sprite.fromImage('images/bee/cell-conversion-animation-a.png')
-  animationSprite.position.y = -2
+  animationSprite.position.y = -4
   animationSprite.visible = true
   animationSprite.delay = 0
   bee.addChild(animationSprite)
@@ -37,18 +52,7 @@ function createBee(parent, type, startPosition) {
   beeAddon.position.x = -1
   beeAddon.position.y = -1
   bee.addChild(beeAddon)
-  const honeyDrop = Sprite.fromImage('images/drops/drop-honey.png')
-  honeyDrop.position.x = 2
-  honeyDrop.position.y = 6
-  bee.addChild(honeyDrop)
-  const nectarDrop = Sprite.fromImage('images/drops/drop-nectar.png')
-  nectarDrop.position.x = 0
-  nectarDrop.position.y = 5
-  bee.addChild(nectarDrop)
-  const waxDrop = Sprite.fromImage('images/drops/drop-wax.png')
-  waxDrop.position.x = -2
-  waxDrop.position.y = 5
-  bee.addChild(waxDrop)
+  
   const beeExclamation = Sprite.fromImage('images/exclamations/exclamation-warning-severe.png')
   beeExclamation.position.x = 12
   beeExclamation.position.y = -2
@@ -710,9 +714,10 @@ function createBee(parent, type, startPosition) {
 
     if (bee.isDead()) {
       bee.texture = Texture.fromImage('images/bee/bee-drone-dead.png')
-      honeyDrop.visible = false
-      nectarDrop.visible = false
-      waxDrop.visible = false
+      honeyBucket.visible = false
+      nectarBucket.visible = false
+      waxBucket.visible = false
+      pollenBucket.visible = false
       beeAddon.visible = false
       beeExclamation.visible = false
       bee.hideAllAnimations()
@@ -729,9 +734,23 @@ function createBee(parent, type, startPosition) {
     
     bee.animationTicker += speeds[gameSpeed]
 
-    honeyDrop.visible = isHoneySackFull()
-    nectarDrop.visible = isNectarSackFull()
-    waxDrop.visible = isWaxSackFull()
+    // 3 buckets can be visible, and is placed "in order"
+    let bucketCount = 0
+    const bucketMeasures = [isHoneySackFull(), isNectarSackFull(), isWaxSackFull(), isPollenSackFull()]
+    const bucketTargets = [honeyBucket, nectarBucket, waxBucket, pollenBucket]
+    const bucketPositions = [{ x: 7, y: 7 }, { x: 2, y: 7 }, { x: 10, y: 2 }]
+
+    for (let i = 0; i < 4; i++) {
+      if (bucketMeasures[i] && bucketCount < 3) {
+        bucketTargets[i].visible = true
+        bucketTargets[i].position.x = bucketPositions[bucketCount].x
+        bucketTargets[i].position.y = bucketPositions[bucketCount].y
+        bucketCount++
+      } else {
+        bucketTargets[i].visible = false
+      }        
+    }
+    droneHand.visible = bucketCount > 2
 
     if (bee.vx !== 0 || bee.vy !== 0) {
       (bee.vx >= -0.15 || bee.vx === 0) ? bee.scale.set(1, 1) : bee.scale.set(-1, 1) //
