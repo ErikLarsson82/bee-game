@@ -324,6 +324,7 @@ function typeIdlePos(type, pos) {
     forager: baseline + (1 * rowHeight),
     nurser: baseline + (2 * rowHeight),
     worker: baseline + (3 * rowHeight),
+    bookie: baseline + (4 * rowHeight),
   }[type]
 
   return {

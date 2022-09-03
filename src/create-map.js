@@ -54,6 +54,9 @@ function createMap(m) {
     createBee(beeContainer, 'idle').setHunger(100).setAge(5)
     createBee(beeContainer, 'idle').setHunger(100).setAge(0)
 
+    const bee = createBee(beeContainer, 'bookie').setHunger(100).setAge(0)
+    bee.setType('bookie')
+
     replaceHex([0, 0], 'prepared', 'activate').instantlyPrepare()
     replaceHex([0, 8], 'prepared', 'activate').instantlyPrepare()
     replaceHex([8, 0], 'prepared', 'activate').instantlyPrepare()

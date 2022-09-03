@@ -11,6 +11,7 @@ function createBee(parent, type, startPosition) {
     worker: animateSprite(bee, 'bee-working-animation-worker', 43, 13, 8),
     nurser: animateSprite(bee, 'bee-working-animation-nurser', 43, 13, 8),
     forager: animateSprite(bee, 'bee-working-animation-forager', 43, 13, 8),
+    bookie: animateSprite(bee, 'bee-working-animation-forager', 43, 13, 8),
   }
 
   const unloadingAnimations = {
@@ -100,6 +101,8 @@ function createBee(parent, type, startPosition) {
     bee.waxSack = cap(0, bee.WAX_SACK_CAPACITY)(amount)
     return bee
   }
+
+  bee.tallyIndex = 0
 
   bee.type = type
   bee.setType = type => {
@@ -515,6 +518,44 @@ function createBee(parent, type, startPosition) {
     bee.flyTo(null)
   }
 
+  function bookie() {
+    if (ageBee()) return
+    if (bee.feedBee()) return
+    if (tallyFlower()) return
+    if (flyToFlowerToTally()) return
+    if (flyToQueenToReport()) return
+    bee.flyTo(null)
+  }
+
+  function tallyFlower() {
+    const flower = bee.isAtType('flower')
+
+    if (flower) {
+      bee.tallyIndex++
+    }
+    return false
+  }
+
+  function flyToFlowerToTally() {
+    const flower = flowers[bee.tallyIndex]
+
+    if (flower) {
+      bee.flyTo(flower)
+      return true
+    }
+    return false
+  }
+
+  function flyToQueenToReport() {
+    if (samePosition(bee, queen)) {
+      bee.tallyIndex = 0
+      return false
+    } else {
+      bee.flyTo(queen)
+      return true
+    }
+  }
+
   function convertNectar() {
     const hex = bee.isAtType('converter')
     if (!hex || isHoneySackFull()) return false
@@ -711,6 +752,7 @@ function createBee(parent, type, startPosition) {
     if (bee.type === 'forager') forager()
     if (bee.type === 'nurser') nurser()
     if (bee.type === 'worker') worker()
+    if (bee.type === 'bookie') bookie()
     if (bee.type === 'idle') idle()
     
     bee.setShadowPosition()
