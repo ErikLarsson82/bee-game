@@ -288,8 +288,9 @@ function setupGame() {
 
   hiveHole = Sprite.fromImage('images/scene/hive-hole.png')
   hiveHole.position.x = 200
-  hiveHole.position.y = 195
+  hiveHole.position.y = 214
   hiveHole.anchor.x = 0.5
+  hiveHole.anchor.y = 1
   ui.addChild(hiveHole)
 
   panel = new Container()
