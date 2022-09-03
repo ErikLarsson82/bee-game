@@ -655,6 +655,7 @@ function cellBrood(x, y, parent) {
 function cellPollen(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const pollenSprite = Sprite.fromImage('images/hex/pollen/cell-pollen-empty.png')
+  makeUpgradeable(pollenSprite)
   makeHexagon(pollenSprite, x, y, 'pollen')
   makeOccupiable(pollenSprite)
   makeSelectable(pollenSprite, 'pollen', 'hex')
@@ -704,6 +705,26 @@ function cellPollen(x, y, parent) {
       setSelected(null)
     }, null, null, 'large')
     container.addChild(buttonDelete)
+
+    const buttonUpgrade = Button(9, 0, Sprite.fromImage('images/ui/button-large/button-large-content-upgrade-b.png'), () => {
+      pollenSprite.addUpgrade('pollen-feeder')
+    }, null, null, 'large')
+    container.addChild(buttonUpgrade)
+
+    const upgradesText = new PIXI.Text('-', { ...fontConfig })
+    upgradesText.scale.set(0.15, 0.15)
+    upgradesText.position.x = 22
+    upgradesText.position.y = -4
+    container.addChild(upgradesText)
+
+    addTicker('ui', () => {
+      upgradesText.text = ''
+      buttonUpgrade.visible = true
+      if (pollenSprite.hasUpgrade('pollen-feeder')) {
+        upgradesText.text = 'Upgrade B: Eat surplus\npollen as food.\nCan never be filled.'
+        buttonUpgrade.visible = false
+      }
+    })
 
     return container
   }

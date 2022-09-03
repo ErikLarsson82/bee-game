@@ -284,11 +284,21 @@ function createBee(parent, type, startPosition) {
     if (!hex) return false
     hex.claimSlot(bee)
 
-    const rate = bee.POLLEN_SACK_CAPACITY
-    bee.pollenSack -= transferTo(rate).inSeconds(30)
-    bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
-    hex.pollen += transferTo(rate).inSeconds(30)
-    hex.pollen = cap(0, hex.POLLEN_HEX_CAPACITY)(hex.pollen)
+    if (hex.hasUpgrade('pollen-feeder')) {
+      const rate = bee.POLLEN_SACK_CAPACITY
+      bee.pollenSack -= transferTo(rate).inSeconds(10)
+      bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
+      hex.pollen += transferTo(rate).inSeconds(10)      
+      hex.pollen = cap(0, hex.POLLEN_HEX_CAPACITY - 10)(hex.pollen) // This can never be completely filled
+      bee.hunger += transferTo(bee.HUNGER_CAPACITY).inSeconds(10)
+      bee.hunger = cap(0, bee.HUNGER_CAPACITY)(bee.hunger)
+    } else {
+      const rate = bee.POLLEN_SACK_CAPACITY
+      bee.pollenSack -= transferTo(rate).inSeconds(30)
+      bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
+      hex.pollen += transferTo(rate).inSeconds(30)
+      hex.pollen = cap(0, hex.POLLEN_HEX_CAPACITY)(hex.pollen)
+    }
 
     if (isPollenSackEmpty() || hex.isPollenFull()) {
       bee.position.y = hex.position.y - 5

@@ -102,6 +102,10 @@ function isNectarBuff(hex) {
   return hex.bonusType === 'nectar-buff'
 }
 
+function isPollenFeederBuff(hex) {
+  return hex.bonusType === 'pollen-feeder'
+}
+
 function calculateAdjacencyBonuses() {
   forEachHexagon(hexGrid, hex => {
     // Recaulculate all from scratch
