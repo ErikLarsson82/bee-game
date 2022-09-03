@@ -1,17 +1,10 @@
 let MAP_SELECTION = 'default'
 let DEBUG = false
 
-const fontConfig = {
-    fontFamily: '"Lucida Console", Monaco, monospace',
-    fontSize: 8,
-    fontWeight: 'bolder',
-    fill: 'black'
-}
-
 // Works on PC =  "PICO-8 mono Regular"'
-// Works on MAC = 'pico8'
-const picoFontConfig = {
-    fontFamily: 'pico8',
+// Works on MAC = 'beefont'
+const fontConfig = {
+    fontFamily: 'beefont',
     fill: 'white'
 }
 
@@ -100,7 +93,7 @@ let bees = []
 let angels = []
 let hoveredCells = []
 
-loader.add('pico8-mono.ttf')
+loader.add('ironchest-bee.ttf')
 loader.add('bee-working-animation-worker', 'images/animation-test/bee/animation-spritesheet-bee-worker.png')
 loader.add('bee-unloading-animation-worker', 'images/animation-test/bee/animation-spritesheet-bee-unloading-worker.png')
 loader.add('bee-working-animation-nurser', 'images/animation-test/bee/animation-spritesheet-bee-nurser.png')

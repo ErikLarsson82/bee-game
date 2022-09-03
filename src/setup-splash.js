@@ -13,13 +13,13 @@ function setupSplash() {
   splashscreen.drawRect(0, 0, WIDTH, HEIGHT)
   container.addChild(splashscreen)
 
-  const title = new PIXI.Text('Bee Game', { ...picoFontConfig, ...hugeFont, fill: '#c96f10' })
+  const title = new PIXI.Text('Bee Game', { ...fontConfig, ...hugeFont, fill: '#c96f10' })
   title.anchor.set(0.5, 0)
   title.position.x = Math.round(WIDTH / 2 / 2) + 8
   title.position.y = 30
   container.addChild(title)
 
-  const catchphrase = new PIXI.Text('No bee puns guaranteed', { ...picoFontConfig, ...massiveFont, fill: 'black' })
+  const catchphrase = new PIXI.Text('No bee puns guaranteed', { ...fontConfig, ...massiveFont, fill: 'black' })
   catchphrase.anchor.set(0.5, 0)
   catchphrase.position.x = Math.round(WIDTH / 2 / 2)
   catchphrase.position.y = 110

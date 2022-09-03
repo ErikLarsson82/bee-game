@@ -64,7 +64,7 @@ function Button(x, y, content, callback, hoverover, hoverout, _size) {
   }
 
   if (typeof content === 'string') {
-    const buttonText = new PIXI.Text(content, { ...picoFontConfig, ...smallFont })
+    const buttonText = new PIXI.Text(content, { ...fontConfig, ...smallFont })
     buttonText.position.x = 7
     buttonText.position.y = 3
     buttonSprite.addChild(buttonText)    

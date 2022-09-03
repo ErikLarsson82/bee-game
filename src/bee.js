@@ -209,7 +209,7 @@ function createBee(parent, type, startPosition) {
     container.addChild(ProgressBar(106, p[4], 'pollen', () => bee.pollenSack, bee.POLLEN_SACK_CAPACITY))
     container.addChild(ProgressBar(106, p[5], 'age', () => bee.age, 100))
     
-    const textHeading = new PIXI.Text('BEE', { ...picoFontConfig })
+    const textHeading = new PIXI.Text('BEE', { ...fontConfig })
     textHeading.scale.set(0.15, 0.15)
     textHeading.position.x = contentOffsetX + 30
     textHeading.position.y = contentOffsetY + 3
@@ -218,14 +218,14 @@ function createBee(parent, type, startPosition) {
     const texts = ['HUNGER', 'HONEY', 'NECTAR', 'WAX', 'POLLEN', 'AGE']
 
     texts.forEach((text, idx) => {
-      const textDescription = new PIXI.Text(text, { ...picoFontConfig, fill: '#8b9bb4' })
+      const textDescription = new PIXI.Text(text, { ...fontConfig, fill: '#8b9bb4' })
       textDescription.scale.set(0.15, 0.15)
       textDescription.position.x = contentOffsetX + 10
       textDescription.position.y = contentOffsetY + 13 + (idx * 7)
       container.addChild(textDescription)
     })
 
-    const helper = new PIXI.Text('Loading...', { ...picoFontConfig, lineHeight: 44 })
+    const helper = new PIXI.Text('Loading...', { ...fontConfig, lineHeight: 44 })
     helper.scale.set(0.15, 0.15)
     helper.position.x = contentOffsetX + 10
     helper.position.y = contentOffsetY + 58

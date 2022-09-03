@@ -12,7 +12,7 @@ function createWarningSign() {
   }
   foreground.addChild(queenWarning)
 
-  const textHeading = new PIXI.Text('WINTER IN ONE DAY', { ...picoFontConfig, fill: 'black' })
+  const textHeading = new PIXI.Text('WINTER IN ONE DAY', { ...fontConfig, fill: 'black' })
   textHeading.scale.set(0.15, 0.15)
   textHeading.position.x = 10
   textHeading.position.y = 3

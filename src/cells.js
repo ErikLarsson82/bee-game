@@ -124,7 +124,7 @@ function cellPrepared(x, y, parent) {
       container.addChild(content)
 
       const text = '  1.Have wax\n\n  2.Have\n  worker bees'
-      const helperText = new PIXI.Text(text, { ...picoFontConfig, fill: '#96a5bc' })
+      const helperText = new PIXI.Text(text, { ...fontConfig, fill: '#96a5bc' })
       helperText.scale.set(0.15, 0.15)
       helperText.position.x = 80
       helperText.position.y = -6
@@ -225,7 +225,7 @@ function cellHoney(x, y, parent) {
 
     container.addChild(ProgressBar2(-20, -26, 'honey', () => honeySprite.honey, honeySprite.HONEY_HEX_CAPACITY)) 
 
-    const textBonus = new PIXI.Text('-', { ...picoFontConfig })
+    const textBonus = new PIXI.Text('-', { ...fontConfig })
     textBonus.scale.set(0.15, 0.15)
     textBonus.position.x = -22
     textBonus.position.y = -46
@@ -236,7 +236,7 @@ function cellHoney(x, y, parent) {
       textBonus.text = buff ? `Adjacency bonus: +${((buff.modifier - 1) * 100).toFixed(0)}%` : 'No bonuses'
     })
 
-    const notEnoughWarning = new PIXI.Text('NOT ENOUGH HONEY', { ...picoFontConfig, fill: 'white' })
+    const notEnoughWarning = new PIXI.Text('NOT ENOUGH HONEY', { ...fontConfig, fill: 'white' })
     notEnoughWarning.scale.set(0.15, 0.15)
     notEnoughWarning.position.x = 76
     notEnoughWarning.position.y = 26
@@ -377,13 +377,13 @@ function cellConverter(x, y, parent) {
     }, null, null, 'large')
     container.addChild(buttonUpgrade)
 
-    const upgradesText = new PIXI.Text('-', { ...picoFontConfig })
+    const upgradesText = new PIXI.Text('-', { ...fontConfig })
     upgradesText.scale.set(0.15, 0.15)
     upgradesText.position.x = 22
     upgradesText.position.y = -4
     container.addChild(upgradesText)
 
-    const textBonus = new PIXI.Text('-', { ...picoFontConfig })
+    const textBonus = new PIXI.Text('-', { ...fontConfig })
     textBonus.scale.set(0.15, 0.15)
     textBonus.position.x = -22
     textBonus.position.y = -46
@@ -547,13 +547,13 @@ function cellBrood(x, y, parent) {
     content.position.y = -29
     container.addChild(content)
 
-    const textHeading = new PIXI.Text('BROOD HEX', { ...picoFontConfig })
+    const textHeading = new PIXI.Text('BROOD HEX', { ...fontConfig })
     textHeading.scale.set(0.15, 0.15)
     textHeading.position.x = 90
     textHeading.position.y = -26
     container.addChild(textHeading)
 
-    const textState = new PIXI.Text('-', { ...picoFontConfig, fill: '#96a5bc' })
+    const textState = new PIXI.Text('-', { ...fontConfig, fill: '#96a5bc' })
     textState.scale.set(0.15, 0.15)
     textState.position.x = 80
     textState.position.y = -16
@@ -571,26 +571,26 @@ function cellBrood(x, y, parent) {
     const nutrientsBar = ProgressBar(113, 3, 'nutrition', () => broodSprite.nutrition, broodSprite.NUTRITION_CAPACITY)
     container.addChild(nutrientsBar)
 
-    const textProgress = new PIXI.Text('Progress', { ...picoFontConfig, fill: '#96a5bc' })
+    const textProgress = new PIXI.Text('Progress', { ...fontConfig, fill: '#96a5bc' })
     textProgress.scale.set(0.15, 0.15)
     textProgress.position.x = 80
     textProgress.position.y = -8
     container.addChild(textProgress)
 
-    const textNutrients = new PIXI.Text('Nutrient', { ...picoFontConfig, fill: '#96a5bc' })
+    const textNutrients = new PIXI.Text('Nutrient', { ...fontConfig, fill: '#96a5bc' })
     textNutrients.scale.set(0.15, 0.15)
     textNutrients.position.x = 80
     textNutrients.position.y = 1
     textNutrients.visible = false
     container.addChild(textNutrients)
 
-    const paused = new PIXI.Text('-', { ...picoFontConfig })
+    const paused = new PIXI.Text('-', { ...fontConfig })
     paused.scale.set(0.15, 0.15)
     paused.position.x = 82
     paused.position.y = 15 
     container.addChild(paused)
 
-    const helper = new PIXI.Text('Loading...', { ...picoFontConfig })
+    const helper = new PIXI.Text('Loading...', { ...fontConfig })
     helper.scale.set(0.15, 0.15)
     helper.position.x = 82
     helper.position.y = 35

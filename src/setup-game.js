@@ -55,39 +55,39 @@ function setupGame() {
 
     const topBarContentOffsetY = 5
     
-    const colonyLabel = new PIXI.Text('HIVE POPULATION', { ...picoFontConfig, ...smallFont, fill: colors.orange })
+    const colonyLabel = new PIXI.Text('HIVE POPULATION', { ...fontConfig, ...smallFont, fill: colors.orange })
     colonyLabel.position.x = 8
     colonyLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(colonyLabel)
 
-    const gameSpeedLabel = new PIXI.Text('GAME SPEED', { ...picoFontConfig, ...smallFont, fill: colors.orange })
+    const gameSpeedLabel = new PIXI.Text('GAME SPEED', { ...fontConfig, ...smallFont, fill: colors.orange })
     gameSpeedLabel.position.x = 337
     gameSpeedLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(gameSpeedLabel)
 
-    populationText = new PIXI.Text('1', { ...picoFontConfig, ...smallFont, fill: colors.yellow })
+    populationText = new PIXI.Text('1', { ...fontConfig, ...smallFont, fill: colors.yellow })
     populationText.position.x = 72
     populationText.position.y = topBarContentOffsetY
     uiTopBar.addChild(populationText)
 
-    const timelineText = new PIXI.Text('Year   Day', { ...picoFontConfig, ...smallFont, fill: 'gray' })
+    const timelineText = new PIXI.Text('Year   Day', { ...fontConfig, ...smallFont, fill: 'gray' })
     timelineText.position.x = 110
     timelineText.position.y = topBarContentOffsetY
     uiTopBar.addChild(timelineText)
     
-    const yearLabel = new PIXI.Text('-', { ...picoFontConfig, ...smallFont })
+    const yearLabel = new PIXI.Text('-', { ...fontConfig, ...smallFont })
     yearLabel.anchor.set(1, 0)
     yearLabel.position.x = 134
     yearLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(yearLabel)
 
-    const dayLabel = new PIXI.Text('-', { ...picoFontConfig, ...smallFont })
+    const dayLabel = new PIXI.Text('-', { ...fontConfig, ...smallFont })
     dayLabel.anchor.set(1, 0)
     dayLabel.position.x = 158
     dayLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(dayLabel)
 
-    const nextSeasonLength = new PIXI.Text('-', { ...picoFontConfig, ...smallFont })
+    const nextSeasonLength = new PIXI.Text('-', { ...fontConfig, ...smallFont })
     nextSeasonLength.anchor.set(1, 0)
     nextSeasonLength.position.x = 260
     nextSeasonLength.position.y = topBarContentOffsetY
@@ -148,7 +148,7 @@ function setupGame() {
   sunBubble.visible = true
 
   const sunBubbleText = new PIXI.Text(`${ nextSeason().toUpperCase() } WILL BE ${ cycles[currentCycleIndex + 1] } ${ dayLabel } LONG`, { 
-    ...picoFontConfig, 
+    ...fontConfig, 
     ...smallFont,
     fill: colors.darkGray
   })
@@ -189,7 +189,7 @@ function setupGame() {
   angelBubble.position.x = -7
   angelBubble.position.y = 18
 
-  angelBubbleText = new PIXI.Text('', { ...picoFontConfig, ...smallFont, fill: colors.darkGray })
+  angelBubbleText = new PIXI.Text('', { ...fontConfig, ...smallFont, fill: colors.darkGray })
   angelBubbleText.position.x = 9
   angelBubbleText.position.y = 6
   angelBubble.addChild(angelBubbleText)
@@ -210,25 +210,25 @@ function setupGame() {
   jobsPanel.position.y = 25
   background.addChild(jobsPanel)
 
-  const unassignedText = new PIXI.Text('-', { ...picoFontConfig, ...smallFont })
+  const unassignedText = new PIXI.Text('-', { ...fontConfig, ...smallFont })
   unassignedText.anchor.set(1, 0)
   unassignedText.position.x = 73
   unassignedText.position.y = 3
   jobsPanel.addChild(unassignedText)
 
-  const foragerText = new PIXI.Text('-', { ...picoFontConfig, ...smallFont })
+  const foragerText = new PIXI.Text('-', { ...fontConfig, ...smallFont })
   foragerText.anchor.set(1, 0)
   foragerText.position.x = 52
   foragerText.position.y = 41.5
   jobsPanel.addChild(foragerText)
 
-  const nurserText = new PIXI.Text('-', { ...picoFontConfig, ...smallFont })
+  const nurserText = new PIXI.Text('-', { ...fontConfig, ...smallFont })
   nurserText.anchor.set(1, 0)
   nurserText.position.x = 50
   nurserText.position.y = 79.5
   jobsPanel.addChild(nurserText)
 
-  const workerText = new PIXI.Text('-', { ...picoFontConfig, ...smallFont })
+  const workerText = new PIXI.Text('-', { ...fontConfig, ...smallFont })
   workerText.anchor.set(1, 0)
   workerText.position.x = 53
   workerText.position.y = 117.5

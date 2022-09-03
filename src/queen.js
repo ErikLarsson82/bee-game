@@ -48,13 +48,13 @@ function createQueen(parent) {
     content.position.y = -29
     container.addChild(content)
 
-    const textHeading = new PIXI.Text('QUEEN', { ...picoFontConfig })
+    const textHeading = new PIXI.Text('QUEEN', { ...fontConfig })
     textHeading.scale.set(0.15, 0.15)
     textHeading.position.x = 100
     textHeading.position.y = -26
     container.addChild(textHeading)
 
-    const helper = new PIXI.Text('Loading...', { ...picoFontConfig })
+    const helper = new PIXI.Text('Loading...', { ...fontConfig })
     helper.scale.set(0.15, 0.15)
     helper.position.x = 82
     helper.position.y = -14

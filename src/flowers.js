@@ -43,13 +43,13 @@ function createFlowers() {
 
       container.addChild(ProgressBar(124, -15, 'flower', () => flower.pollinationLevel, flower.POLLINATION_REQUIREMENT))
 
-      const textHeading = new PIXI.Text('FLOWER', { ...picoFontConfig })
+      const textHeading = new PIXI.Text('FLOWER', { ...fontConfig })
       textHeading.scale.set(0.15, 0.15)
       textHeading.position.x = 105
       textHeading.position.y = -26
       container.addChild(textHeading)
 
-      const textDescription = new PIXI.Text('POLLINATED', { ...picoFontConfig, fill: '#96a5bc' })
+      const textDescription = new PIXI.Text('POLLINATED', { ...fontConfig, fill: '#96a5bc' })
       textDescription.scale.set(0.15, 0.15)
       textDescription.position.x = 82
       textDescription.position.y = -16
