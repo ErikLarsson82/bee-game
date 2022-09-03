@@ -87,16 +87,9 @@ function setupGame() {
     dayLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(dayLabel)
 
-    const nextSeasonLength = new PIXI.Text('-', { ...fontConfig, ...smallFont })
-    nextSeasonLength.anchor.set(1, 0)
-    nextSeasonLength.position.x = 260
-    nextSeasonLength.position.y = topBarContentOffsetY
-    uiTopBar.addChild(nextSeasonLength)
-
     addTicker('ui', time => {
       yearLabel.text = year
       dayLabel.text = day
-      nextSeasonLength.text = cycles[currentCycleIndex + 1]
     })
 
     gameSpeedIcon = Sprite.fromImage('images/ui/gamespeed1.png')
@@ -130,24 +123,26 @@ function setupGame() {
   sun.addChild(summerSunSprite)
   sun.addChild(winterSunSprite)
 
-  const nextSeason = () => season === 'summer' ? 'winter' : 'summer'
+  const getSunBubbleText = () => {
+    const nextSeasonLength = cycles[currentCycleIndex + 1]
+    return `${ season === 'summer' ? 'WINTER' : 'SUMMER' } WILL BE ${ nextSeasonLength } ${ nextSeasonLength === 1 ? 'DAY' : 'DAYS' } LONG`
+  }
 
   sun.interactive = true
   sun.buttonMode = true
-  const dayLabel = cycles[currentCycleIndex + 1] === 1 ? 'DAY' : 'DAYS'
   sun.mouseover = () => sun.alpha = 0.8
   sun.mouseout = () => sun.alpha = 1
   sun.mouseup = () => {
     sunBubbleTimer = FPS * 5
     sunBubble.visible = true
-    sunBubbleText.text = `${ nextSeason().toUpperCase() } WILL BE ${ cycles[currentCycleIndex + 1] } ${ dayLabel } LONG`
+    sunBubbleText.text = getSunBubbleText()
   }
   background.addChild(sun)
   
   sunBubble = Sprite.fromImage('images/scene/sun-bubble.png')
   sunBubble.visible = true
 
-  const sunBubbleText = new PIXI.Text(`${ nextSeason().toUpperCase() } WILL BE ${ cycles[currentCycleIndex + 1] } ${ dayLabel } LONG`, { 
+  const sunBubbleText = new PIXI.Text(getSunBubbleText(), {
     ...fontConfig, 
     ...smallFont,
     fill: colors.darkGray
