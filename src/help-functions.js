@@ -247,6 +247,11 @@ const nameToFunction = (input) => {
 	}[input] 
 }
 
+function sortHexForeground() {
+  hexForeground.children.sort((a, b) => b.index.x - a.index.x)
+  hexForeground.children.sort((a, b) => (a.index.y * 2 + a.index.y % 2) - (b.index.y * 2 + b.index.y % 2))
+}
+
 function replaceHex(coordinate, type, activate) {
   if (!nameToFunction(type)) {
     throw 'No type!'
@@ -260,6 +265,7 @@ function replaceHex(coordinate, type, activate) {
   
   const newHex = nameToFunction(type)(x, y, hexForeground)
   hexGrid[y][x] = newHex
+  sortHexForeground()
 
   calculateAdjacencyBonuses()
 
@@ -277,6 +283,8 @@ function replaceSelectedHex(type) {
       }
       const newHex = nameToFunction(type)(xIdx, yIdx, hexForeground)
       hexGrid[yIdx][xIdx] = newHex
+      sortHexForeground()
+
       returnHex = newHex
       setSelected(newHex)
     }

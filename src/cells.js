@@ -174,9 +174,6 @@ function cellPrepared(x, y, parent) {
   
   parent.addChild(preparedCellSprite)
 
-  parent.children.sort((a, b) => b.index.x - a.index.x)
-  parent.children.sort((a, b) => (a.index.y * 2 + a.index.y % 2) - (b.index.y * 2 + b.index.y % 2))
-
   return preparedCellSprite
 }
 
