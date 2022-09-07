@@ -67,7 +67,6 @@ function createFlowers() {
 
           const doneCallback = () => {
             flower.removeChild(flower.pollinationAnimationSprite)
-            delete flower.pollinationAnimationSprite  
             flower.pollinationAnimationSprite = 'no not animate again'
           }
           const { sprite } = animateSprite(flower, 'flower-is-pollinated', 7, 46, 50, false, doneCallback)
@@ -90,7 +89,6 @@ function killFlowers() {
     flower.removeChild(flower.flowerSprite)
     delete flower.flowerSprite
     flowerBed.removeChild(flower)
-    delete flower    
   })
   flowers = []
 }

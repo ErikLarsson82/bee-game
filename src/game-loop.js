@@ -2,9 +2,6 @@
 function gameloop(delta, manualTick) {
   const newTickers = tickers.filter(ticker => ticker.remove === false)
   if (tickers.length > newTickers.length) {
-    newTickers.filter(ticker => ticker.remove).forEach(ticker => {
-      delete ticker
-    })
     tickers = tickers.filter(ticker => ticker.remove === false)
   }
 

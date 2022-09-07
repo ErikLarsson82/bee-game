@@ -223,7 +223,6 @@ function makeParticleCreator(bee) {
         if (!bee.particleActive) {
           removeParticle()
           foreground.removeChild(pollenPixel)
-          delete pollenPixel
           return
         }
         pollenPixel.position.y += 0.0003 * FPS * gameSpeed
@@ -231,7 +230,6 @@ function makeParticleCreator(bee) {
         if (lifetime > 1) {
           removeParticle()
           foreground.removeChild(pollenPixel)
-          delete pollenPixel
         }
       })
       foreground.addChild(pollenPixel)

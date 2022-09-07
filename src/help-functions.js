@@ -248,17 +248,16 @@ const nameToFunction = (input) => {
 }
 
 function replaceHex(coordinate, type, activate) {
+  if (!nameToFunction(type)) {
+    throw 'No type!'
+  }
 
   const [x, y] = coordinate
 
   if (activate === 'activate') activateAdjacent(x, y)
 
   hexForeground.removeChild(hexGrid[x][y])
-  delete hexGrid[x][y]
   
-  if (!nameToFunction(type)) {
-    console.error('No type!')
-  }
   const newHex = nameToFunction(type)(x, y, hexForeground)
   hexGrid[x][y] = newHex
 
@@ -272,7 +271,6 @@ function replaceSelectedHex(type) {
   hexGrid.forEach((row, xIdx) => row.forEach((hex, yIdx) => {
     if (hex === selected) {
       hexForeground.removeChild(hex)
-      delete hex
       
       if (!nameToFunction(type)) {
         console.error('No type!')
