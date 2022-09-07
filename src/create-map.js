@@ -177,7 +177,7 @@ function createMap(m) {
     
     for (let i = 0; i < hexGrid.length; i++) {
       for (let j = 0; j < hexGrid[0].length; j++) {
-        replaceHex([i, j], 'prepared', 'activate').instantlyPrepare()
+        replaceHex([j, i], 'prepared', 'activate').instantlyPrepare()
       }
     }
   }
@@ -252,20 +252,20 @@ function createMap(m) {
     
     setSelected(hexGrid[0][0])
     replaceSelectedHex('converter').setNectar(15)
-    setSelected(hexGrid[0][1])
+    setSelected(hexGrid[1][0])
     replaceSelectedHex('pollen').setPollen(120)
-    setSelected(hexGrid[0][2])
+    setSelected(hexGrid[2][0])
 
     setSelected(hexGrid[2][2])
     replaceSelectedHex('brood')
-    setSelected(hexGrid[2][3])
+    setSelected(hexGrid[3][2])
     replaceSelectedHex('brood')
-    setSelected(hexGrid[2][4])
-    replaceSelectedHex('brood')
-
     setSelected(hexGrid[4][2])
     replaceSelectedHex('brood')
-    setSelected(hexGrid[4][3])
+
+    setSelected(hexGrid[2][4])
+    replaceSelectedHex('brood')
+    setSelected(hexGrid[3][4])
     replaceSelectedHex('brood')
     setSelected(hexGrid[4][4])
     replaceSelectedHex('brood')
@@ -278,11 +278,11 @@ function createMap(m) {
 
     setSelected(hexGrid[0][0])
     replaceSelectedHex('honey')
-    setSelected(hexGrid[0][1])
+    setSelected(hexGrid[1][0])
     replaceSelectedHex('pollen')
-    setSelected(hexGrid[0][2])
+    setSelected(hexGrid[2][0])
     replaceSelectedHex('converter')
-    setSelected(hexGrid[0][3])
+    setSelected(hexGrid[3][0])
     replaceSelectedHex('brood')
   }
 
@@ -293,7 +293,7 @@ function createMap(m) {
 
     setSelected(hexGrid[0][0])
     replaceSelectedHex('pollen')
-    setSelected(hexGrid[0][1])
+    setSelected(hexGrid[1][0])
     replaceSelectedHex('converter')
   }
 
@@ -304,7 +304,7 @@ function createMap(m) {
 
     setSelected(hexGrid[0][0])
     replaceSelectedHex('honey').setHoney(60)
-    setSelected(hexGrid[0][1])
+    setSelected(hexGrid[1][0])
     replaceSelectedHex('honey').setHoney(60)
   }
 
@@ -320,23 +320,23 @@ function createMap(m) {
 
     setSelected(hexGrid[0][0])
     replaceSelectedHex('honey').setHoney(15)
-    setSelected(hexGrid[0][1])
-    replaceSelectedHex('honey')
-    setSelected(hexGrid[0][2])
-    replaceSelectedHex('honey')
-
     setSelected(hexGrid[1][0])
-    replaceSelectedHex('pollen')
+    replaceSelectedHex('honey')
     setSelected(hexGrid[2][0])
+    replaceSelectedHex('honey')
+
+    setSelected(hexGrid[0][1])
     replaceSelectedHex('pollen')
-    setSelected(hexGrid[3][0])
+    setSelected(hexGrid[0][2])
     replaceSelectedHex('pollen')
-    setSelected(hexGrid[4][0])
+    setSelected(hexGrid[0][3])
+    replaceSelectedHex('pollen')
+    setSelected(hexGrid[0][4])
     replaceSelectedHex('pollen')
 
-    setSelected(hexGrid[0][3])
+    setSelected(hexGrid[3][0])
     replaceSelectedHex('converter').setNectar(15)
-    setSelected(hexGrid[0][4])
+    setSelected(hexGrid[4][0])
     replaceSelectedHex('converter')
   }
 
@@ -345,14 +345,14 @@ function createMap(m) {
     createBee(beeContainer, 'forager').setNectar(18)
     createBee(beeContainer, 'worker').setHunger(20)
 
-    setSelected(hexGrid[1][0])
+    setSelected(hexGrid[0][1])
     replaceSelectedHex('converter')
   }
 
   if (m === 'deposit honey sceanrio') {
     createBee(beeContainer, 'worker').setHoney(20)
 
-    setSelected(hexGrid[1][0])
+    setSelected(hexGrid[0][1])
     replaceSelectedHex('honey')
   }
 
@@ -363,7 +363,7 @@ function createMap(m) {
     setSelected(hexGrid[0][0])
     replaceSelectedHex('honey').setHoney(0)
 
-    setSelected(hexGrid[1][0])
+    setSelected(hexGrid[0][1])
     replaceSelectedHex('converter').setNectar(15)
   }
 
@@ -376,16 +376,16 @@ function createMap(m) {
     setSelected(hexGrid[0][0])
     replaceSelectedHex('honey')
 
-    setSelected(hexGrid[0][2])
+    setSelected(hexGrid[2][0])
     replaceSelectedHex('pollen')
-    hexGrid[0][2].pollen = hexGrid[0][2].POLLEN_HEX_CAPACITY
+    hexGrid[2][0].pollen = hexGrid[2][0].POLLEN_HEX_CAPACITY
     
-    setSelected(hexGrid[0][3])
+    setSelected(hexGrid[3][0])
     replaceSelectedHex('pollen')
-    hexGrid[0][3].pollen = hexGrid[0][3].POLLEN_HEX_CAPACITY   
+    hexGrid[3][0].pollen = hexGrid[3][0].POLLEN_HEX_CAPACITY   
 
-    setSelected(hexGrid[2][1])
+    setSelected(hexGrid[1][2])
     replaceSelectedHex('brood')
-    hexGrid[2][1].setContents('egg')
+    hexGrid[1][2].setContents('egg')
   }  
 }

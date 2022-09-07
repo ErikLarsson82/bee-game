@@ -79,7 +79,7 @@ function adjacent(_x, _y) {
   const instructions = _x % 2 === 0 ? DIRECTIONS_FLAT_EVEN : DIRECTIONS_FLAT_ODD
   for (direction in instructions) {
     const modifier = instructions[direction]
-    const target = hexGrid[_x + modifier.x] && hexGrid[_x + modifier.x][_y + modifier.y]
+    const target = hexGrid[_y + modifier.y] && hexGrid[_y + modifier.y][_x + modifier.x]
     ad.push(target)
   }
   return ad.filter(something)
@@ -153,7 +153,7 @@ function activateAdjacent(_x, _y) {
   adjacentHexagons.filter(hex => hex.isDisabled && hex.isDisabled())
     .forEach(hex => {
       const { x, y } = hex.index
-      hexGrid[x][y] = cellEmpty(x, y, hexForeground, hexBackground)
+      hexGrid[y][x] = cellEmpty(x, y, hexForeground, hexBackground)
     })
 }
 
@@ -256,10 +256,10 @@ function replaceHex(coordinate, type, activate) {
 
   if (activate === 'activate') activateAdjacent(x, y)
 
-  hexForeground.removeChild(hexGrid[x][y])
+  hexForeground.removeChild(hexGrid[y][x])
   
   const newHex = nameToFunction(type)(x, y, hexForeground)
-  hexGrid[x][y] = newHex
+  hexGrid[y][x] = newHex
 
   calculateAdjacencyBonuses()
 
@@ -268,7 +268,7 @@ function replaceHex(coordinate, type, activate) {
 
 function replaceSelectedHex(type) {
   let returnHex = null
-  hexGrid.forEach((row, xIdx) => row.forEach((hex, yIdx) => {
+  hexGrid.forEach((row, yIdx) => row.forEach((hex, xIdx) => {
     if (hex === selected) {
       hexForeground.removeChild(hex)
       
@@ -276,7 +276,7 @@ function replaceSelectedHex(type) {
         console.error('No type!')
       }
       const newHex = nameToFunction(type)(xIdx, yIdx, hexForeground)
-      hexGrid[xIdx][yIdx] = newHex
+      hexGrid[yIdx][xIdx] = newHex
       returnHex = newHex
       setSelected(newHex)
     }
