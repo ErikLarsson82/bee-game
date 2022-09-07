@@ -187,7 +187,8 @@ function makeHungry(bee) {
     const honeyHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.honey > 0 && hex.isUnclaimed(bee))
     if (honeyHex.length > 0 && bee.isHungry()) {
       honeyHex[0].claimSlot(bee)
-      bee.flyTo(honeyHex[0])
+      const closest = getClosestHex(honeyHex, bee)
+      bee.flyTo(closest)
       return true
     }
     return false
