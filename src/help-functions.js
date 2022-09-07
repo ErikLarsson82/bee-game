@@ -243,7 +243,8 @@ const nameToFunction = (input) => {
 	  honey: cellHoney,
 	  wax: cellWax,
 	  prepared: cellPrepared,
-    empty: cellEmpty
+    empty: cellEmpty,
+    ['forager-resting-place']: cellForagerRestingPlace,
 	}[input] 
 }
 

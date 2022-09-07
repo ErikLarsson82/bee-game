@@ -496,7 +496,8 @@ function createBee(parent, type, startPosition) {
     if (depositNectar()) return
     if (flyToNectarToDeposit()) return
     if (flyToPollenToDeposit()) return    
-    if (flyToFlower()) return    
+    if (flyToFlower()) return
+    if (flyToRestingPlace()) return
     bee.flyTo(null)
   }
 
@@ -568,6 +569,25 @@ function createBee(parent, type, startPosition) {
       bee.flyTo(queen)
       return true
     }
+  }
+
+  const flyToRestingPlace = () => {
+    const restingPlaces = filterHexagon(hexGrid, (hex) => hex.type === 'forager-resting-place' && hex.isUnclaimed(bee))
+    const myRestingPlace = bee.isAtType('forager-resting-place')
+    if (restingPlaces.length === 0 && !myRestingPlace) {
+      return false
+    }
+    
+    if (myRestingPlace) {
+      myRestingPlace.claimSlot(bee)
+      return true
+    }
+
+    const closest = getClosestHex(restingPlaces, bee)
+    closest.claimSlot(bee)
+    bee.flyTo(closest)
+
+    return true
   }
 
   function convertNectar() {

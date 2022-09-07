@@ -711,6 +711,12 @@ function cellPollen(x, y, parent) {
     }, null, null, 'large')
     container.addChild(buttonUpgrade)
 
+    const buttonUpgrade2 = Button(-49, 0, Sprite.fromImage('images/ui/button-large/button-large-content-pollen.png'), () => {
+      replaceHex([x, y], 'forager-resting-place')
+      setSelected(null)
+    }, null, null, 'large')
+    container.addChild(buttonUpgrade2)
+
     const upgradesText = new PIXI.Text('-', { ...fontConfig })
     upgradesText.scale.set(0.15, 0.15)
     upgradesText.position.x = 22
@@ -731,4 +737,39 @@ function cellPollen(x, y, parent) {
   
   parent.addChild(pollenSprite)
   return pollenSprite
+}
+
+const cellForagerRestingPlace = (x, y, parent) => {
+  const pixelCoordinate = toLocalCoordinateFlat({ x, y })
+  const restingSprite = Sprite.fromImage('images/hex/forager-resting-place.png')
+  makeHexagon(restingSprite, x, y, 'forager-resting-place')
+  makeOccupiable(restingSprite)
+  makeSelectable(restingSprite, 'forager-resting-place', 'hex')
+  restingSprite.hitArea = generateHitArea()
+  restingSprite.position.x = pixelCoordinate.x
+  restingSprite.position.y = pixelCoordinate.y
+
+  restingSprite.panelLabel = () => false
+  restingSprite.panelPosition = () => ({ x: pixelCoordinate.x + 8, y: pixelCoordinate.y + 5 })
+
+  restingSprite.panelContent = () => {
+    const container = new Container()
+
+    const text = new PIXI.Text('Forager resting place', { ...fontConfig, fill: colors.yellow })
+    text.scale.set(0.15, 0.15)
+    text.position.x = -30
+    text.position.y = -14
+    container.addChild(text)
+    
+    const buttonDelete = Button(-20, 11, Sprite.fromImage('images/ui/button-large/button-large-content-delete.png'), () => {
+      replaceHex([x, y], 'prepared').instantlyPrepare()
+      setSelected(null) 
+    }, null, null, 'large')
+    container.addChild(buttonDelete)
+
+    return container
+  }
+
+  parent.addChild(restingSprite)
+  return restingSprite
 }
