@@ -83,42 +83,11 @@ function createMap(m) {
     createBee(beeContainer, 'idle').setHunger(90).setAge(10)
     createBee(beeContainer, 'idle').setHunger(100).setAge(0)
     
-    replaceHex([3, 5], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([3, 6], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([3, 7], 'prepared', 'activate').instantlyPrepare()
-
-    replaceHex([4, 5], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([4, 6], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([4, 7], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([4, 8], 'prepared', 'activate').instantlyPrepare()
-
-    replaceHex([5, 4], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([5, 5], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([5, 6], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([5, 7], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([5, 8], 'prepared', 'activate').instantlyPrepare()
-
-    replaceHex([6, 4], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([6, 5], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([6, 6], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([6, 7], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([6, 8], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([6, 9], 'prepared', 'activate').instantlyPrepare()
-
-    replaceHex([7, 4], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([7, 5], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([7, 6], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([7, 7], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([7, 8], 'prepared', 'activate').instantlyPrepare()
-
-    replaceHex([8, 5], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([8, 6], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([8, 7], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([8, 8], 'prepared', 'activate').instantlyPrepare()
-
-    replaceHex([9, 5], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([9, 6], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([9, 7], 'prepared', 'activate').instantlyPrepare()
+    for (let i = 2; i <= 10; i++) {
+      for (var j = 3; j <= 12; j++) {
+        replaceHex([i, j], 'prepared', 'activate').instantlyPrepare()    
+      }
+    }
   }
 
   if (m === 'mini') {
