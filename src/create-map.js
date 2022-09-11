@@ -9,6 +9,14 @@ const MAP_CONFIGURATIONS = [
     winterHungerMultiplier: 1
   },
   {
+    // Give players many many empty hexagons to choose from
+    name: 'Many empty hex',
+    id: 'many empty',
+    cycles: [3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1],
+    seeds: 1,
+    winterHungerMultiplier: 4
+  },
+  {
     // Give players lots of resources at the start, but have winters be pretty punishing
     name: 'Generous start - punishing',
     id: 'generous start',
@@ -66,6 +74,51 @@ function createMap(m) {
     replaceHex([3, 4], 'honey', 'activate').setHoney(30)
     replaceHex([4, 4], 'wax', 'activate')
     replaceHex([4, 5], 'wax', 'activate')
+  }
+
+  if (m === 'many empty') {
+    createBee(beeContainer, 'idle').setHunger(60).setAge(40)
+    createBee(beeContainer, 'idle').setHunger(70).setAge(30)
+    createBee(beeContainer, 'idle').setHunger(80).setAge(20)
+    createBee(beeContainer, 'idle').setHunger(90).setAge(10)
+    createBee(beeContainer, 'idle').setHunger(100).setAge(0)
+    
+    replaceHex([3, 5], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([3, 6], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([3, 7], 'prepared', 'activate').instantlyPrepare()
+
+    replaceHex([4, 5], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([4, 6], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([4, 7], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([4, 8], 'prepared', 'activate').instantlyPrepare()
+
+    replaceHex([5, 4], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([5, 5], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([5, 6], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([5, 7], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([5, 8], 'prepared', 'activate').instantlyPrepare()
+
+    replaceHex([6, 4], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([6, 5], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([6, 6], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([6, 7], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([6, 8], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([6, 9], 'prepared', 'activate').instantlyPrepare()
+
+    replaceHex([7, 4], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([7, 5], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([7, 6], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([7, 7], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([7, 8], 'prepared', 'activate').instantlyPrepare()
+
+    replaceHex([8, 5], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([8, 6], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([8, 7], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([8, 8], 'prepared', 'activate').instantlyPrepare()
+
+    replaceHex([9, 5], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([9, 6], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([9, 7], 'prepared', 'activate').instantlyPrepare()
   }
 
   if (m === 'mini') {
