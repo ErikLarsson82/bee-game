@@ -69,7 +69,7 @@ function createFlowers() {
             flower.removeChild(flower.pollinationAnimationSprite)
             flower.pollinationAnimationSprite = 'no not animate again'
           }
-          const { sprite } = animateSprite(flower, 'flower-is-pollinated', 7, 46, 50, false, doneCallback)
+          const { sprite } = animateSprite(flower, 'flower-is-pollinated', 7, 46, 50, false, doneCallback, true)
           sprite.anchor.set(flipped ? 0.6 : 0.2, 0.2)
           flower.pollinationAnimationSprite = sprite
         }

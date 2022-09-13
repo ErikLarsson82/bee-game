@@ -1,5 +1,5 @@
 
-function animateSprite(sprite, res, amount, w, h, _loop, callback) {
+function animateSprite(sprite, res, amount, w, h, _loop, callback, _timelocked) {
 	const frame = new Sprite()
 
     const spritesheet = new PIXI.BaseTexture.from(resources[res].url)
@@ -14,6 +14,7 @@ function animateSprite(sprite, res, amount, w, h, _loop, callback) {
 	let delay = 0
     let pause = false
     const loop = _loop === undefined ? true : _loop
+    const timelocked = _timelocked === undefined ? false : _timelocked
 	const frameDurationModifier = 0.1
 	const MOD = FPS * frameDurationModifier
 
@@ -35,7 +36,7 @@ function animateSprite(sprite, res, amount, w, h, _loop, callback) {
 
     addTicker('game-stuff', () => {
         if (pause) return
-    	delay += gameSpeed
+    	delay += timelocked ? 1 : gameSpeed
     	if (delay >= MOD * amount) {
             if (loop) {
                 delay = 0
