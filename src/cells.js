@@ -536,112 +536,78 @@ function cellBrood(x, y, parent) {
 
   broodSprite.panelContent = () => {
     const container = new Container()
-    
-    const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
-    whiteLine.position.x = 0
-    whiteLine.position.y = -30
-    container.addChild(whiteLine)
 
-    const content = Sprite.fromImage('images/ui/content-brood.png')
-    content.position.x = 72
-    content.position.y = -29
+    const content = Sprite.fromImage('images/ui/content-brood-empty.png')
+    content.position.x = -24
+    content.position.y = -54
     container.addChild(content)
 
-    const textHeading = new PIXI.Text('BROOD HEX', { ...fontConfig })
-    textHeading.scale.set(0.15, 0.15)
-    textHeading.position.x = 90
-    textHeading.position.y = -26
-    container.addChild(textHeading)
+    const emptyText = new PIXI.Text('NO EGG', { ...fontConfig, ...smallFont, fill: colors.darkPink })
+    emptyText.position.x = -20
+    emptyText.position.y = -26
+    container.addChild(emptyText)
 
-    const textState = new PIXI.Text('-', { ...fontConfig, fill: '#96a5bc' })
-    textState.scale.set(0.15, 0.15)
-    textState.position.x = 80
-    textState.position.y = -16
-    container.addChild(textState)
-
-    const eggLifecycleBar = ProgressBar(113, -6, 'lifecycle', () => broodSprite.lifecycle, eggDuration)
+    const eggLifecycleBar = ProgressBar2(-20, -26, 'brood', () => broodSprite.lifecycle, eggDuration)
     container.addChild(eggLifecycleBar)
 
-    const larvaeLifecycleBar = ProgressBar(113, -6, 'lifecycle', () => broodSprite.lifecycle - eggDuration, larvaeDuration)
-    container.addChild(larvaeLifecycleBar)
+    const larvaLifecycleBar = ProgressBar2(-20, -43, 'brood', () => broodSprite.lifecycle - eggDuration, larvaeDuration)
+    container.addChild(larvaLifecycleBar)
 
-    const puppaLifecycleBar = ProgressBar(113, -6, 'lifecycle', () => broodSprite.lifecycle - eggDuration - larvaeDuration, puppaDuration)
+    const larvaDeadProgress = ProgressBar2(-20, -43, 'brood-dead', () => broodSprite.lifecycle - eggDuration, larvaeDuration)
+    container.addChild(larvaDeadProgress)
+
+    const puppaLifecycleBar = ProgressBar2(-20, -26, 'brood', () => broodSprite.lifecycle - eggDuration - larvaeDuration, puppaDuration)
     container.addChild(puppaLifecycleBar)
 
-    const nutrientsBar = ProgressBar(113, 3, 'nutrition', () => broodSprite.nutrition, broodSprite.NUTRITION_CAPACITY)
+    const nutrientsBar = ProgressBar2(-20, -26, 'pollen', () => broodSprite.nutrition, broodSprite.NUTRITION_CAPACITY)
     container.addChild(nutrientsBar)
 
-    const textProgress = new PIXI.Text('Progress', { ...fontConfig, fill: '#96a5bc' })
-    textProgress.scale.set(0.15, 0.15)
-    textProgress.position.x = 80
-    textProgress.position.y = -8
-    container.addChild(textProgress)
-
-    const textNutrients = new PIXI.Text('Nutrient', { ...fontConfig, fill: '#96a5bc' })
-    textNutrients.scale.set(0.15, 0.15)
-    textNutrients.position.x = 80
-    textNutrients.position.y = 1
-    textNutrients.visible = false
-    container.addChild(textNutrients)
-
-    const paused = new PIXI.Text('-', { ...fontConfig })
-    paused.scale.set(0.15, 0.15)
-    paused.position.x = 82
-    paused.position.y = 15 
-    container.addChild(paused)
-
-    const helper = new PIXI.Text('Loading...', { ...fontConfig })
-    helper.scale.set(0.15, 0.15)
-    helper.position.x = 82
-    helper.position.y = 35
-    container.addChild(helper)
-
-    const buttonDelete = Button(84, 80, 'Delete', () => {
-      replaceHex([x, y], 'prepared').instantlyPrepare()
-      setSelected(null) 
-    })
-    container.addChild(buttonDelete)
-
-    const helperText = () => {
-      if (broodSprite.content === 'dead') {
-        return 'Larvae needs\npollen from\nnurser bees\nto survive'
-      }
-      if (broodSprite.content === 'puppa' && season === 'winter') {
-        return 'Puppa will\nhatch first\nday of summer'
-      }
-      return ''
-    }
-
     addTicker('ui', () => {
-      textState.text = broodSprite.content
       const isDead = broodSprite.content === 'dead'
       const isEmpty = broodSprite.content === 'empty'
       const isEgg = broodSprite.content === 'egg'
-      const isLarvae = broodSprite.content === 'larvae'
+      const isLarva = broodSprite.content === 'larvae'
       const isPuppa = broodSprite.content === 'puppa'
-      if (isEmpty || isDead) {
-        content.texture = Texture.fromImage('images/ui/content-brood.png')
-      } else if (isLarvae) {
-        content.texture = Texture.fromImage('images/ui/content-larvae.png')
-      } else if (isEgg || isPuppa) {
-        content.texture = Texture.fromImage('images/ui/content-egg-puppa.png')
-      }
-      textProgress.visible = !isEmpty && !isDead
-      
+
+      emptyText.visible = isEmpty
       eggLifecycleBar.visible = isEgg
-      larvaeLifecycleBar.visible = isLarvae
+      larvaLifecycleBar.visible = isLarva
+      larvaDeadProgress.visible = isDead
+      nutrientsBar.visible = isLarva || isDead
       puppaLifecycleBar.visible = isPuppa
-      
-      textNutrients.visible = isLarvae
-      nutrientsBar.visible = isLarvae
 
-      paused.text = broodSprite.paused ? 'paused' : 'active'
+      if (isEmpty) {
+        content.texture = Texture.fromImage('images/ui/content-brood-empty.png')
+        if (broodSprite.paused) {
+          emptyText.text = 'PAUSED'
+          emptyText.style.fill = colors.orange
+        } else {
+          emptyText.text = 'NO EGG'
+          emptyText.style.fill = colors.darkPink
+        }
 
-      helper.text = helperText()
+      } else if (isEgg) {
+        content.texture = Texture.fromImage('images/ui/content-brood-egg.png')
+
+      } else if (isDead) {
+        content.texture = Texture.fromImage('images/ui/content-brood-dead.png')
+
+      } else if (isLarva) {
+        content.texture = Texture.fromImage('images/ui/content-brood-larva.png')
+
+      } else if (isPuppa) {
+        content.texture = Texture.fromImage('images/ui/content-brood-puppa.png')
+      }
+
     })
 
+    const buttonDelete = Button(-20, 11, Sprite.fromImage('images/ui/button-large/button-large-content-delete.png'), () => {
+      replaceHex([x, y], 'prepared').instantlyPrepare()
+      setSelected(null)
+    }, null, null, 'large')
+    container.addChild(buttonDelete)
 
-    const button = Button(83, 60, 'Disable', () => broodSprite.togglePause())
+    const button = Button(9, 0, Sprite.fromImage('images/ui/button-large/button-large-content-toggle.png'), broodSprite.togglePause, null, null, 'large')
     container.addChild(button)
     
     return container

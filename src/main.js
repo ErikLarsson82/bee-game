@@ -18,6 +18,7 @@ const colors = {
   orange: '#feae34',
   darkOrange: '#f77622',
   darkGray: '#3a4466',
+  darkPink: '#b55088',
 }
 
 const colorToHex = (color) => parseInt(color.substring(1), 16)
