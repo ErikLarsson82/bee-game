@@ -711,7 +711,7 @@ function cellPollen(x, y, parent) {
     }, null, null, 'large')
     container.addChild(buttonUpgrade)
 
-    const buttonUpgrade2 = Button(-49, 0, Sprite.fromImage('images/ui/button-large/button-large-content-pollen.png'), () => {
+    const buttonUpgrade2 = Button(-49, 0, Sprite.fromImage('images/ui/button-large/button-large-content-forager-resting-place.png'), () => {
       replaceHex([x, y], 'forager-resting-place')
       setSelected(null)
     }, null, null, 'large')
