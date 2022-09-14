@@ -534,8 +534,6 @@ function createBee(parent, type, startPosition) {
   }
 
   function bookie() {
-    if (ageBee()) return
-    if (bee.feedBee()) return
     if (tallyFlower()) return
     if (flyToFlowerToTally()) return
     if (flyToQueenToReport()) return
