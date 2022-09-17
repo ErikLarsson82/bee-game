@@ -20,7 +20,7 @@ const MAP_CONFIGURATIONS = [
     // Give players lots of resources at the start, but have winters be pretty punishing
     name: 'Generous start - punishing',
     id: 'generous start',
-    cycles: [4, 2, 4, 2, 4, 2, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3],
+    cycles: [5, 2, 5, 2, 5, 2, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3],
     seeds: 4,
     winterHungerMultiplier: 4
   },
@@ -28,7 +28,7 @@ const MAP_CONFIGURATIONS = [
     // Give players lots of resources at the start, but have winters be pretty punishing
     name: 'Generous start - easy',
     id: 'generous start',
-    cycles: [4, 2, 4, 2, 4, 2, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3],
+    cycles: [5, 2, 5, 2, 5, 2, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3],
     seeds: 4,
     winterHungerMultiplier: 1
   },

@@ -792,6 +792,7 @@ function createBee(parent, type, startPosition) {
       if ((bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) || Math.sin(bee.animationTicker / 2) > 0) {
         beeAddon.texture = Texture.fromImage('images/bee/bee-drone-legs.png')
       } else {
+        console.log('here')
         beeAddon.texture = Texture.fromImage('images/bee/bee-drone-legs-jerk.png')
       }
     }
