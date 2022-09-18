@@ -101,8 +101,6 @@ const filterHexagon = (hexGrid, f) => {
   return result
 }
 
-const dist = (x1, y1, x2, y2) => Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
-
 const getClosestHex = (hexes, bee) => {
   if (hexes.length === 0) {
     throw 'hexes array must have length above 0'
@@ -112,7 +110,7 @@ const getClosestHex = (hexes, bee) => {
   let i = 0
 
   do {
-    const d = dist(
+    const d = distance(
       hexes[i].worldTransform.tx,
       hexes[i].worldTransform.ty,
       bee.worldTransform.tx,

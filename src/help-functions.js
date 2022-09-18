@@ -236,7 +236,9 @@ function samePosition(a, b) {
   } 
 }
 
-function distance(a, b) {
+const distance = (x1, y1, x2, y2) => Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
+
+function distanceFactor(a, b) {
   const x2 = Math.abs(a.position.x - b.position.x) * 2
   const y2 = Math.abs(a.position.y - b.position.y) * 2
   return Math.sqrt(x2 + y2)
@@ -244,7 +246,7 @@ function distance(a, b) {
 
 function snapTo(a, b) {
   const threshold = gameSpeed > 4 ? 4 : 2.5 
-  if (dist(a.position.x, a.position.y, b.position.x, b.position.y) < threshold) {
+  if (distance(a.position.x, a.position.y, b.position.x, b.position.y) < threshold) {
     a.position.x = b.position.x
     a.position.y = b.position.y
     a.vx = 0
