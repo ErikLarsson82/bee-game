@@ -46,6 +46,23 @@ function removeTicker(id) {
   })
 }
 
+function updateTotals(valueLabel, capacityLabel, type, funcA, funcB) {
+  return time => {
+    let value = 0
+    let capacity = 0
+    forEachHexagon(hexGrid, hex => {
+      if (hex.type === type) {
+        value += funcA(hex)
+        capacity += funcB(hex)
+      }
+    })
+    valueLabel.text = value.toFixed(0)
+    capacityLabel.text = capacity.toFixed(0)
+  }  
+}
+
+
+
 function isUI(ticker) {
   return ticker.type === 'ui'
 }
@@ -91,7 +108,7 @@ function isHoney(hex) {
 }
 
 function isNectar(hex) {
-  return hex.type === 'converter'
+  return hex.type === 'nectar'
 }
 
 function isHoneyBuff(hex) {
@@ -237,7 +254,7 @@ function snapTo(a, b) {
 
 const nameToFunction = (input) => {
 	return {
-	  converter: cellConverter,
+	  nectar: cellNectar,
 	  brood: cellBrood,
 	  pollen: cellPollen,
 	  honey: cellHoney,

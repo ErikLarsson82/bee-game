@@ -93,7 +93,7 @@ function createMap(m) {
   if (m === 'mini') {
     createBee(beeContainer, 'idle').setHunger(20).setAge(80).setNectar(60).setPollen(30) //.setHoney(30)
     
-    replaceHex([4, 5], 'converter', 'activate')
+    replaceHex([4, 5], 'nectar', 'activate')
     replaceHex([4, 6], 'pollen', 'activate')
     replaceHex([4, 7], 'honey', 'activate')
   }
@@ -137,8 +137,8 @@ function createMap(m) {
     replaceHex([2, 3], 'pollen', 'activate').setPollen(60)
     replaceHex([2, 2], 'pollen', 'activate').setPollen(60)
     
-    replaceHex([6, 6], 'converter', 'activate')
-    replaceHex([6, 7], 'converter', 'activate')
+    replaceHex([6, 6], 'nectar', 'activate')
+    replaceHex([6, 7], 'nectar', 'activate')
 
     replaceHex([4, 4], 'wax', 'activate')
     replaceHex([4, 5], 'wax', 'activate')
@@ -251,7 +251,7 @@ function createMap(m) {
     
     for (let x = 0; x < 5; x++) {
       for (let y = 0; y < 5; y++) {
-        const type = ['pollen', 'honey', 'wax', 'brood', 'converter'][Math.floor(Math.random()*5)]
+        const type = ['pollen', 'honey', 'wax', 'brood', 'nectar'][Math.floor(Math.random()*5)]
         replaceHex([x, y], type, 'activate')
         // replaceSelectedHex(type)
         //activateAdjacent(x, y)  
@@ -273,7 +273,7 @@ function createMap(m) {
     createBee(beeContainer, 'nurser')
     
     setSelected(hexGrid[0][0])
-    replaceSelectedHex('converter').setNectar(15)
+    replaceSelectedHex('nectar').setNectar(15)
     setSelected(hexGrid[1][0])
     replaceSelectedHex('pollen').setPollen(120)
     setSelected(hexGrid[2][0])
@@ -303,7 +303,7 @@ function createMap(m) {
     setSelected(hexGrid[1][0])
     replaceSelectedHex('pollen')
     setSelected(hexGrid[2][0])
-    replaceSelectedHex('converter')
+    replaceSelectedHex('nectar')
     setSelected(hexGrid[3][0])
     replaceSelectedHex('brood')
   }
@@ -316,7 +316,7 @@ function createMap(m) {
     setSelected(hexGrid[0][0])
     replaceSelectedHex('pollen')
     setSelected(hexGrid[1][0])
-    replaceSelectedHex('converter')
+    replaceSelectedHex('nectar')
   }
 
   if (m === 'honey-deposits') {
@@ -357,9 +357,9 @@ function createMap(m) {
     replaceSelectedHex('pollen')
 
     setSelected(hexGrid[3][0])
-    replaceSelectedHex('converter').setNectar(15)
+    replaceSelectedHex('nectar').setNectar(15)
     setSelected(hexGrid[4][0])
-    replaceSelectedHex('converter')
+    replaceSelectedHex('nectar')
   }
 
 
@@ -368,7 +368,7 @@ function createMap(m) {
     createBee(beeContainer, 'worker').setHunger(20)
 
     setSelected(hexGrid[0][1])
-    replaceSelectedHex('converter')
+    replaceSelectedHex('nectar')
   }
 
   if (m === 'deposit honey sceanrio') {
@@ -386,7 +386,7 @@ function createMap(m) {
     replaceSelectedHex('honey').setHoney(0)
 
     setSelected(hexGrid[0][1])
-    replaceSelectedHex('converter').setNectar(15)
+    replaceSelectedHex('nectar').setNectar(15)
   }
 
   if (m === 'brooder scenario') {

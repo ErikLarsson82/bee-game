@@ -174,7 +174,7 @@ function createBee(parent, type, startPosition) {
       return 'Honey sack\nfull. Cannot\nfind honey\nhexagon to\ndeposit honey\ntoo'
     }
     if (bee.type === 'worker' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) {
-      return 'Cannot find a\nconverter hex\nfilled with\nnectar'
+      return 'Cannot find a\nnectar hex\nfilled with\nnectar'
     }
     if (bee.type === 'idle') {
       return 'Bee needs\na job'
@@ -359,7 +359,7 @@ function createBee(parent, type, startPosition) {
   }
 
   function depositNectar() {
-    const targetHex = bee.isAtType('converter')
+    const targetHex = bee.isAtType('nectar')
     if (!targetHex) return false
     const valid = !isNectarSackEmpty() && !targetHex.isNectarFull()
     if (!valid) return false
@@ -384,9 +384,9 @@ function createBee(parent, type, startPosition) {
   }
 
   function flyToNectarToDeposit() {
-    const converterHex = filterHexagon(hexGrid, hex => hex.type === 'converter' && hex.isUnclaimed(bee) && !hex.isNectarFull())
-    if (converterHex.length === 0 || isNectarSackEmpty()) return false
-    const closest = getClosestHex(converterHex, bee)
+    const nectarHex = filterHexagon(hexGrid, hex => hex.type === 'nectar' && hex.isUnclaimed(bee) && !hex.isNectarFull())
+    if (nectarHex.length === 0 || isNectarSackEmpty()) return false
+    const closest = getClosestHex(nectarHex, bee)
     closest.claimSlot(bee)
     bee.flyTo(closest)
     return true
@@ -529,7 +529,7 @@ function createBee(parent, type, startPosition) {
     if (prepareCell()) return
     if (flyToPrepareCell()) return
     if (flyToWax()) return
-    if (flyToConverterToConvert()) return
+    if (flyToNectarToConvert()) return
     bee.flyTo(null)
   }
 
@@ -589,7 +589,7 @@ function createBee(parent, type, startPosition) {
   }
 
   function convertNectar() {
-    const hex = bee.isAtType('converter')
+    const hex = bee.isAtType('nectar')
     if (!hex || isHoneySackFull()) return false
     hex.claimSlot(bee)
     if (!isNectarSackEmpty()) {
@@ -626,10 +626,10 @@ function createBee(parent, type, startPosition) {
     return true
   }
 
-  function flyToConverterToConvert() {
-    const converterHex = filterHexagon(hexGrid, hex => hex.type === 'converter' && hex.isUnclaimed(bee) && (!hex.isNectarEmpty() || !isNectarSackEmpty()))
-    if (converterHex.length === 0 || isHoneySackFull()) return false
-    const closest = getClosestHex(converterHex, bee)
+  function flyToNectarToConvert() {
+    const nectarHex = filterHexagon(hexGrid, hex => hex.type === 'nectar' && hex.isUnclaimed(bee) && (!hex.isNectarEmpty() || !isNectarSackEmpty()))
+    if (nectarHex.length === 0 || isHoneySackFull()) return false
+    const closest = getClosestHex(nectarHex, bee)
     closest.claimSlot(bee)
     bee.flyTo(closest)      
     return true
@@ -701,7 +701,7 @@ function createBee(parent, type, startPosition) {
       // Specifically conversion animation only
       animationSprite.delay++
       animationSprite.delay = animationSprite.delay < 12 ? animationSprite.delay : 0
-      const isConverting = bee.isAtType('converter') && bee.type === 'worker'
+      const isConverting = bee.isAtType('nectar') && bee.type === 'worker'
       if (isConverting) {
         animationSprite.visible = true
         animationSprite.texture = animationSprite.delay > 6
@@ -713,7 +713,7 @@ function createBee(parent, type, startPosition) {
     // Unloading animation
     const isUnloading =
       (bee.isAtType('pollen') && bee.type === 'forager') ||
-      (bee.isAtType('converter') && bee.type === 'forager') ||
+      (bee.isAtType('nectar') && bee.type === 'forager') ||
       (bee.isAtType('honey') && bee.type === 'worker' && season === 'summer')
 
     if (isUnloading) {
@@ -722,7 +722,7 @@ function createBee(parent, type, startPosition) {
     }
 
     // Generic working animation
-    const isWorking = bee.isAtType('brood') || bee.isAtType('pollen') || bee.isAtType('prepared') || bee.isAtType('honey') || bee.isAtType('wax') || bee.isAtType('converter') || bee.isAtType('flower')
+    const isWorking = bee.isAtType('brood') || bee.isAtType('pollen') || bee.isAtType('prepared') || bee.isAtType('honey') || bee.isAtType('wax') || bee.isAtType('nectar') || bee.isAtType('flower')
     
     if (isWorking) {
       workingAnimations[bee.type].sprite.visible = true

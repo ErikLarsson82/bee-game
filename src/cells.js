@@ -105,7 +105,7 @@ function cellPrepared(x, y, parent) {
         setSelected(null)
       }, null, null, 'large'))
       container.addChild(Button(18, -17, contentNectar, () => {
-        replaceSelectedHex('converter')
+        replaceSelectedHex('nectar')
         setSelected(null)
       }, null, null, 'large'))
       container.addChild(Button(18, 5, contentPollen, () => {
@@ -335,28 +335,28 @@ function cellWax(x, y, parent) {
 }
 
 
-function cellConverter(x, y, parent) {
+function cellNectar(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
-  const converterSprite = Sprite.fromImage('images/hex/nectar/cell-nectar-empty.png')
-  makeUpgradeable(converterSprite)
-  makeHexagon(converterSprite, x, y, 'converter')
-  makeHexDetectable(converterSprite)
-  makeOccupiable(converterSprite)
-  makeSelectable(converterSprite, 'converter', 'hex')
-  converterSprite.hitArea = generateHitArea()
-  converterSprite.position.x = pixelCoordinate.x
-  converterSprite.position.y = pixelCoordinate.y
-  converterSprite.NECTAR_CAPACITY_BASELINE = 15
-  converterSprite.NECTAR_CAPACITY = 15
-  converterSprite.nectar = 0
-  converterSprite.setNectar = amount => { converterSprite.nectar = cap(0, converterSprite.NECTAR_CAPACITY)(amount); return converterSprite }
-  converterSprite.isNectarFull = () => converterSprite.nectar >= converterSprite.NECTAR_CAPACITY
-  converterSprite.isNectarEmpty = () => converterSprite.nectar <= 0
+  const nectarSprite = Sprite.fromImage('images/hex/nectar/cell-nectar-empty.png')
+  makeUpgradeable(nectarSprite)
+  makeHexagon(nectarSprite, x, y, 'nectar')
+  makeHexDetectable(nectarSprite)
+  makeOccupiable(nectarSprite)
+  makeSelectable(nectarSprite, 'nectar', 'hex')
+  nectarSprite.hitArea = generateHitArea()
+  nectarSprite.position.x = pixelCoordinate.x
+  nectarSprite.position.y = pixelCoordinate.y
+  nectarSprite.NECTAR_CAPACITY_BASELINE = 15
+  nectarSprite.NECTAR_CAPACITY = 15
+  nectarSprite.nectar = 0
+  nectarSprite.setNectar = amount => { nectarSprite.nectar = cap(0, nectarSprite.NECTAR_CAPACITY)(amount); return nectarSprite }
+  nectarSprite.isNectarFull = () => nectarSprite.nectar >= nectarSprite.NECTAR_CAPACITY
+  nectarSprite.isNectarEmpty = () => nectarSprite.nectar <= 0
  
-  converterSprite.panelLabel = () => false
-  converterSprite.panelPosition = () => ({ x: pixelCoordinate.x + 8, y: pixelCoordinate.y + 5 })
+  nectarSprite.panelLabel = () => false
+  nectarSprite.panelPosition = () => ({ x: pixelCoordinate.x + 8, y: pixelCoordinate.y + 5 })
 
-  converterSprite.panelContent = () => {
+  nectarSprite.panelContent = () => {
     const container = new Container()
     
     const content = Sprite.fromImage('images/ui/content-nectar.png')
@@ -364,7 +364,7 @@ function cellConverter(x, y, parent) {
     content.position.y = -37
     container.addChild(content)
 
-    container.addChild(ProgressBar2(-20, -26, 'nectar', () => converterSprite.nectar, converterSprite.NECTAR_CAPACITY)) 
+    container.addChild(ProgressBar2(-20, -26, 'nectar', () => nectarSprite.nectar, nectarSprite.NECTAR_CAPACITY)) 
 
     const buttonDelete = Button(-20, 11, Sprite.fromImage('images/ui/button-large/button-large-content-delete.png'), () => {
       replaceHex([x, y], 'prepared').instantlyPrepare()
@@ -373,7 +373,7 @@ function cellConverter(x, y, parent) {
     container.addChild(buttonDelete)
 
     const buttonUpgrade = Button(9, 0, Sprite.fromImage('images/ui/button-large/button-large-content-upgrade-a.png'), () => {
-      converterSprite.addUpgrade('converter-adjacent-feed')
+      nectarSprite.addUpgrade('converter-adjacent-feed')
     }, null, null, 'large')
     container.addChild(buttonUpgrade)
 
@@ -390,12 +390,12 @@ function cellConverter(x, y, parent) {
     container.addChild(textBonus)
 
     addTicker('ui', () => {
-      const buff = converterSprite.bonuses.find(isNectarBuff)
+      const buff = nectarSprite.bonuses.find(isNectarBuff)
       textBonus.text = buff ? `Adjacency bonus: +${((buff.modifier - 1) * 100).toFixed(0)}%` : 'No bonuses'
 
       upgradesText.text = ''
       buttonUpgrade.visible = true
-      if (converterSprite.hasUpgrade('converter-adjacent-feed')) {
+      if (nectarSprite.hasUpgrade('converter-adjacent-feed')) {
         upgradesText.text = 'Upgrade A: Adds bonus\nhoney to adjacent\nhoney hexagons\nwhen converting'
         buttonUpgrade.visible = false
       }
@@ -405,25 +405,25 @@ function cellConverter(x, y, parent) {
   }
 
   addTicker('game-stuff', time => {
-    if (converterSprite.nectar > converterSprite.NECTAR_CAPACITY * 0.9) {
-      converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-full.png')
-    } else if (converterSprite.nectar > converterSprite.NECTAR_CAPACITY * 0.72) {
-      converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-a.png')
-    } else if (converterSprite.nectar > converterSprite.NECTAR_CAPACITY * 0.66 ) {
-      converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-b.png')
-    } else if (converterSprite.nectar > converterSprite.NECTAR_CAPACITY * 0.5) {
-      converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-c.png')
-    } else if (converterSprite.nectar > converterSprite.NECTAR_CAPACITY * 0.25) {
-      converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-d.png')
-    } else if (converterSprite.nectar > converterSprite.NECTAR_CAPACITY * 0.05) {
-      converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-e.png')
+    if (nectarSprite.nectar > nectarSprite.NECTAR_CAPACITY * 0.9) {
+      nectarSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-full.png')
+    } else if (nectarSprite.nectar > nectarSprite.NECTAR_CAPACITY * 0.72) {
+      nectarSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-a.png')
+    } else if (nectarSprite.nectar > nectarSprite.NECTAR_CAPACITY * 0.66 ) {
+      nectarSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-b.png')
+    } else if (nectarSprite.nectar > nectarSprite.NECTAR_CAPACITY * 0.5) {
+      nectarSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-c.png')
+    } else if (nectarSprite.nectar > nectarSprite.NECTAR_CAPACITY * 0.25) {
+      nectarSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-d.png')
+    } else if (nectarSprite.nectar > nectarSprite.NECTAR_CAPACITY * 0.05) {
+      nectarSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-e.png')
     } else {
-      converterSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-empty.png')
+      nectarSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-empty.png')
     }
   })
   
-  parent.addChild(converterSprite)
-  return converterSprite
+  parent.addChild(nectarSprite)
+  return nectarSprite
 }
 
 

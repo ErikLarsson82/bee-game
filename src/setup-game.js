@@ -74,7 +74,7 @@ function setupGame() {
     timelineText.position.x = 110
     timelineText.position.y = topBarContentOffsetY
     uiTopBar.addChild(timelineText)
-    
+
     const yearLabel = new PIXI.Text('-', { ...fontConfig, ...smallFont })
     yearLabel.anchor.set(1, 0)
     yearLabel.position.x = 134
@@ -86,11 +86,42 @@ function setupGame() {
     dayLabel.position.x = 158
     dayLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(dayLabel)
-
+    
     addTicker('ui', time => {
       yearLabel.text = year
       dayLabel.text = day
     })
+
+    function summaryLabel(type, y, color, funcA, funcB) {
+      const descriptionLabel = new PIXI.Text(`Total ${type}`, { ...fontConfig, ...smallFont, fill: 'gray' })
+      descriptionLabel.position.x = 292
+      descriptionLabel.position.y = y
+      uiTopBar.addChild(descriptionLabel)
+
+      const divider = new PIXI.Text('/', { ...fontConfig, ...smallFont, fill: 'gray' })
+      divider.position.x = 370
+      divider.position.y = y
+      uiTopBar.addChild(divider)
+
+      const valueLabel = new PIXI.Text('-', { ...fontConfig, ...smallFont, fill: color })
+      valueLabel.anchor.set(1, 0)
+      valueLabel.position.x = 366
+      valueLabel.position.y = y
+      uiTopBar.addChild(valueLabel)
+
+      const capacityLabel = new PIXI.Text('-', { ...fontConfig, ...smallFont, fill: color })
+      capacityLabel.anchor.set(1, 0)
+      capacityLabel.position.x = 396
+      capacityLabel.position.y = y
+      uiTopBar.addChild(capacityLabel)
+    
+      addTicker('ui', updateTotals(valueLabel, capacityLabel, type, funcA, funcB))      
+    }
+
+    summaryLabel('honey', 40, '#feae34', hex => hex.honey, hex => hex.HONEY_HEX_CAPACITY)
+    summaryLabel('nectar', 50, '#2ce8f5', hex => hex.nectar, hex => hex.NECTAR_CAPACITY)
+    summaryLabel('pollen', 60, '#fee761', hex => hex.pollen, hex => hex.POLLEN_HEX_CAPACITY)
+    summaryLabel('wax', 70, '#e8b796', hex => hex.wax, hex => hex.WAX_HEX_CAPACITY)
 
     gameSpeedIcon = Sprite.fromImage('images/ui/gamespeed1.png')
     gameSpeedIcon.position.x = 380
