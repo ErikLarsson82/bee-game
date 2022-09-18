@@ -106,11 +106,4 @@ loader.add('bee-unloading-animation-idle', 'images/animation-test/bee/animation-
 loader.add('flower-is-pollinated', 'images/animation-test/flower-is-pollinated/animation-spritesheet-flower.png')
 loader.load(setupSplash)
 
-
-// map = MAP_CONFIGURATIONS[0]
-// cycles = map.cycles
-// currentSeasonLength = cycles[0]
-// MAP_SELECTION = map.id
-// seeds = map.seeds
-// winterHungerMultiplier = map.winterHungerMultiplier
-// loader.load(setupGame)
+// loader.load(setupMenu)

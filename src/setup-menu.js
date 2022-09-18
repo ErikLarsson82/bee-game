@@ -18,7 +18,7 @@ function setupMenu() {
   scaler.scale.y = 2
   container.addChild(scaler)
 
-  MAP_CONFIGURATIONS.forEach((map, idx) => {
+  MAP_CONFIGURATIONS = MAP_CONFIGURATIONS.map((map, idx) => {
     const callback = () => {
       cycles = Array.from(map.cycles)
       currentCycleIndex = 0
@@ -32,6 +32,12 @@ function setupMenu() {
     }
     const button = Button(Math.round(WIDTH/2/2/2)-50, 40 + (idx * 20), map.name, callback, null, null, 'huge')
     scaler.addChild(button)
+
+    return {
+      callback,
+      ...map,
+    }
   })
   
+  // MAP_CONFIGURATIONS[0].callback()
 }

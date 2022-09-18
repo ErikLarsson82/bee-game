@@ -1,5 +1,5 @@
 
-const MAP_CONFIGURATIONS = [
+let MAP_CONFIGURATIONS = [
   {
     // The one we've been playing for all this time
     name: 'Default',
