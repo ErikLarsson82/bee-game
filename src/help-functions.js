@@ -236,7 +236,9 @@ function samePosition(a, b) {
   } 
 }
 
-const distance = (x1, y1, x2, y2) => Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
+function distance(x1, y1, x2, y2) {
+  return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
+}
 
 function distanceFactor(a, b) {
   const x2 = Math.abs(a.position.x - b.position.x) * 2
