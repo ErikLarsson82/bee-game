@@ -8,8 +8,16 @@ function setupGame() {
   document.body.style['background-color'] = '#262b44'
   
   currentCycleIndex = 0
+  gameover = false
+  paused = false
+  gameSpeed = 1
+  hour = 0
+  day = 1
+  year = 1
+  seeds = 1
+  season = 'summer'
 
-  const container = new Container()
+  container = new Container()
   container.scale.x = 2
   container.scale.y = 2
   app.stage.addChild(container)
@@ -42,6 +50,7 @@ function setupGame() {
     const clickFinder = new Graphics()
     clickFinder.beginFill(0xff0000)
     clickFinder.drawRect(0, 0, WIDTH, HEIGHT)
+    clickFinder.alpha = 0.1
     clickFinder.buttonMode = true
     clickFinder.interactive = true
     clickFinder.mousedown = e => {
@@ -317,7 +326,25 @@ function setupGame() {
   hiveHole.position.y = 214
   hiveHole.anchor.x = 0.5
   hiveHole.anchor.y = 1
-  ui.addChild(hiveHole)
+  foreground.addChild(hiveHole)
+
+  const clickblocker = new Container()
+  foreground.addChild(clickblocker)
+  const blocker = new Graphics()
+  blocker.visible = false
+  blocker.beginFill(0x000000)
+  blocker.drawRect(0, 0, WIDTH, HEIGHT)
+  blocker.alpha = 0.3
+  blocker.buttonMode = false
+  blocker.interactive = true
+  blocker.mousedown = () => {}
+  blocker.mouseover = () => {}
+  clickblocker.addChild(blocker)
+  addTicker('ui', () => {
+    if (gameover) {
+      blocker.visible = true
+    }
+  })
 
   panel = new Container()
   ui.addChild(panel)
@@ -328,6 +355,8 @@ function setupGame() {
 
   createMap(MAP_SELECTION)
   createFlowers()
+
+  createGameOverUI()
 
   app.ticker.add((delta) => gameloop(delta))
 

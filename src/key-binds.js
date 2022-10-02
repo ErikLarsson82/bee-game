@@ -1,6 +1,7 @@
 
 window.addEventListener('keydown', e => {
-  if (scene !== 'game') return;
+  if (scene !== 'game') return
+  if (gameover) return
 
   //Space
   if (e.keyCode === 32) {

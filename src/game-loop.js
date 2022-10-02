@@ -5,7 +5,7 @@ function gameloop(delta, manualTick) {
     tickers = tickers.filter(ticker => ticker.remove === false)
   }
 
-  tickers.filter(isUI).forEach(ticker => ticker.func());
+  tickers.filter(isUI).forEach(ticker => ticker.func())
 
   if (selected && selected.panelContent) {
     const { x, y } = selected.panelPosition && selected.panelPosition() || { x: 350, y: 100 }
@@ -13,9 +13,19 @@ function gameloop(delta, manualTick) {
     panel.position.y = y
   }
 
+  const aliveBees = bees.filter(bee => !bee.isDead() && bee.type !== 'bookie')
+
+  if (aliveBees.length === 0) {
+    gameover = true
+  }
+
+  if (gameover) {
+    paused = true
+  }
+
   if (paused && !manualTick) return
   
-  tickers.filter(isGameStuff).forEach(ticker => ticker.func());
+  tickers.filter(isGameStuff).forEach(ticker => ticker.func())
 
   {
     // Time management

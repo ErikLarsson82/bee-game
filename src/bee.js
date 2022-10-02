@@ -534,6 +534,9 @@ function createBee(parent, type, startPosition) {
   }
 
   function bookie() {
+    if (gameover) {
+      bee.destroy()
+    }
     if (tallyFlower()) return
     if (flyToFlowerToTally()) return
     if (flyToQueenToReport()) return

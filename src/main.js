@@ -51,13 +51,14 @@ app.renderer.view.style.display = 'block'
 
 let cycles = null
 
-let gameSpeed = 1
-let paused = false
-let hour = 0
-let day = 1
-let year = 1
-let seeds = 1
-let season = 'summer'
+let gameover = null
+let gameSpeed = null
+let paused = null
+let hour = null
+let day = null
+let year = null
+let seeds = null
+let season = null 
 let winterHungerMultiplier = null
 let currentSeasonLength = 0
 let currentCycle = 0
@@ -68,6 +69,7 @@ let scene = null
 let selected = null
 let queen = null
 
+let container = null
 let panel = null
 let background = null
 let ui = null
