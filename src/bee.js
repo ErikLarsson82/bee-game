@@ -76,6 +76,8 @@ function createBee(parent, type, startPosition) {
   bee.HONEY_SACK_CAPACITY = 10
   bee.WAX_SACK_CAPACITY = 10
   
+  bee.roundedPos = { x: 0, y: 0 }
+  
   bee.age = 0
   bee.setAge = amount => {
     bee.age = amount
@@ -183,7 +185,7 @@ function createBee(parent, type, startPosition) {
   }
 
   bee.panelLabel = () => false
-  bee.panelPosition = () => ({ x: bee.position.x + 8, y: bee.position.y + 5 })
+  bee.panelPosition = () => ({ x: bee.roundedPos.x + 8, y: bee.roundedPos.y + 5 })
 
   bee.panelContent = () => {
     const container = new Container()
@@ -736,6 +738,11 @@ function createBee(parent, type, startPosition) {
   }
 
   bee.ticker = addTicker('game-stuff', time => {
+    bee.roundedPos = {
+      x: Math.round(bee.position.x),
+      y: Math.round(bee.position.y)
+    }
+
     bee.setShadowPosition()
     
     bee.handleAnimations()
