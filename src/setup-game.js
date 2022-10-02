@@ -7,6 +7,8 @@ function setupGame() {
   scene = 'game'
   document.body.style['background-color'] = '#262b44'
   
+  tickers = []
+  
   currentCycleIndex = 0
   gameover = false
   paused = false
