@@ -30,7 +30,7 @@ function setupMenu() {
       app.stage.removeChild(container)
       setupGame()
     }
-    const button = Button(Math.round(WIDTH/2/2/2)-50, 40 + (idx * 20), map.name, callback, null, null, 'huge')
+    const button = Button(Math.round(WIDTH/2/2/2)-50, 10 + (idx * 20), map.name, callback, null, null, 'huge')
     scaler.addChild(button)
 
     return {
