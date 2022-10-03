@@ -34,7 +34,15 @@ let MAP_CONFIGURATIONS = [
   },
   {
     // Bees are VERY hungry during winter, albeit they are short - this one could be considered a very hard map, especially to get far
-    name: 'Hunger winter',
+    name: 'Hunger winter - stable',
+    id: 'corner start',
+    cycles: [3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1],
+    seeds: 2,
+    winterHungerMultiplier: 5
+  },
+  {
+    // Bees are VERY hungry during winter, albeit they are short - this one could be considered a very hard map, especially to get far
+    name: 'Hunger winter - escalating',
     id: 'corner start',
     cycles: [3, 1, 3, 1, 3, 1, 3, 1, 3, 2, 3, 2, 3, 3, 3, 3, 3, 4, 3, 4, 3, 5, 3, 6, 3, 7, 3, 8, 3, 9, 3, 10, 3, 11],
     seeds: 2,
