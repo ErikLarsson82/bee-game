@@ -39,5 +39,5 @@ function setupMenu() {
     }
   })
   
-  // MAP_CONFIGURATIONS[0].callback()
+  //MAP_CONFIGURATIONS[4].callback()
 }

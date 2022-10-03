@@ -146,16 +146,12 @@ function makeHungry(bee) {
   bee.isDead = () => bee.hunger <= 0 || bee.age >= 100
   bee.isWellFed = () => bee.hunger >= bee.HUNGER_CAPACITY
   bee.isHungry = () => bee.hunger < 30
+  bee.isWinterHungry = () => bee.hunger < 80
   bee.setHunger = amount => { bee.hunger = cap(0, bee.HUNGER_CAPACITY)(amount); return bee }
 
   bee.consumeEnergy = () => {
-    // A bee will survive approx 15 minutes at speed 1 with a full belly, which is 15 min * 60 sec = 900 sec
-    // 900 sec * 144 FPS = 129600 game ticks
-    // 100 hunger value points / 129600 gameticks = 0.00077160 reduction in hunger each tick
-    // Above is calculated during summer
-
     if (season === 'summer') {
-      bee.hunger -= transferTo(bee.HUNGER_CAPACITY).inSeconds(900)
+      bee.hunger -= transferTo(bee.HUNGER_CAPACITY).inSeconds(1300)
     } else {
       bee.hunger -= transferTo(bee.HUNGER_CAPACITY).inSeconds(900 / winterHungerMultiplier)
     }
@@ -169,6 +165,13 @@ function makeHungry(bee) {
   }
 
   bee.eat = () => {
+    if (season === 'winter') {
+      if (bee.isHungry()) {
+        bee.hunger += transferTo(bee.HUNGER_CAPACITY).inSeconds(20)
+      }
+      return
+    }
+    //const eatRate = season === 'summer' ? 20 : 800
     bee.hunger += transferTo(bee.HUNGER_CAPACITY).inSeconds(20)
     bee.hunger = cap(0, bee.HUNGER_CAPACITY)(bee.hunger)
   }
@@ -178,14 +181,17 @@ function makeHungry(bee) {
     if (honeyTarget && !bee.isWellFed() && honeyTarget.honey > 0) {
       honeyTarget.claimSlot(bee)
       bee.eat()
-      honeyTarget.honey -= transferTo(honeyTarget.HONEY_HEX_CAPACITY).inSeconds(40)
+      const honeyRate = season === 'summer' ? 40 : 330
+      honeyTarget.honey -= transferTo(honeyTarget.HONEY_HEX_CAPACITY).inSeconds(honeyRate)
+      honeyTarget.honey = cap(0, honeyTarget.HONEY_HEX_CAPACITY)(honeyTarget.honey)
       return true
     } else {
       bee.consumeEnergy()
     }
 
     const honeyHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.honey > 0 && hex.isUnclaimed(bee))
-    if (honeyHex.length > 0 && bee.isHungry()) {
+    const wantsFood = (season === 'summer' && bee.isHungry()) || (season === 'winter' && bee.isWinterHungry())
+    if (honeyHex.length > 0 && wantsFood) {
       honeyHex[0].claimSlot(bee)
       const closest = getClosestHex(honeyHex, bee)
       bee.flyTo(closest)

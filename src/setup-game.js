@@ -330,6 +330,33 @@ function setupGame() {
   hiveHole.anchor.y = 1
   foreground.addChild(hiveHole)
 
+  {
+    const haveFoodContainer = new Container()
+    haveFoodContainer.position.x = 292
+    haveFoodContainer.position.y = 79
+    haveFoodContainer.visible = true
+    ui.addChild(haveFoodContainer)
+    
+    const haveFoodLabel = new PIXI.Text(`Winter food`, { ...fontConfig, ...smallFont, fill: 'gray' })
+    haveFoodContainer.addChild(haveFoodLabel)
+
+    const haveWinterFood = Sprite.fromImage('images/ui/have-winter-food-progress-background.png')
+    haveWinterFood.position.x = 61
+    haveFoodContainer.addChild(haveWinterFood)
+
+    haveFoodContainer.addChild(ProgressBar2(61, 0, 'honey', () => {
+      haveFoodContainer.visible = season === 'summer'
+      let meetRequirement = 0
+      forEachHexagon(hexGrid, hex => {
+        if (hex.type === 'honey' && hex.honey >= 30) {
+          meetRequirement++
+        }
+      })
+      const totalBees = bees.filter(bee => bee.type !== 'bookie').length
+      return (meetRequirement / totalBees) * 100
+    }, 100)) 
+  }
+
   const clickblocker = new Container()
   foreground.addChild(clickblocker)
   const blocker = new Graphics()
