@@ -15,10 +15,17 @@ function createBee(parent, type, startPosition) {
   }
 
   const unloadingAnimations = {
-    idle: animateSprite(bee, 'bee-unloading-animation-idle', 43, 13, 8),
-    worker: animateSprite(bee, 'bee-unloading-animation-worker', 43, 13, 8),
-    nurser: animateSprite(bee, 'bee-unloading-animation-nurser', 43, 13, 8),
-    forager: animateSprite(bee, 'bee-unloading-animation-forager', 43, 13, 8),
+    idle: animateSprite(bee, 'bee-unloading-animation-idle', 31, 13, 8),
+    worker: animateSprite(bee, 'bee-unloading-animation-worker', 31, 13, 8),
+    nurser: animateSprite(bee, 'bee-unloading-animation-nurser', 31, 13, 8),
+    forager: animateSprite(bee, 'bee-unloading-animation-forager', 31, 13, 8),
+  }
+
+  const eatingAnimations = {
+    idle: animateSprite(bee, 'bee-eating-animation-idle', 17, 13, 8),
+    worker: animateSprite(bee, 'bee-eating-animation-worker', 17, 13, 8),
+    nurser: animateSprite(bee, 'bee-eating-animation-nurser', 17, 13, 8),
+    forager: animateSprite(bee, 'bee-eating-animation-forager', 17, 13, 8),
   }
 
   const shadow = Sprite.fromImage('images/bee/shadow.png')
@@ -693,6 +700,7 @@ function createBee(parent, type, startPosition) {
   bee.hideAllAnimations = () => {
     Object.values(workingAnimations).forEach((animation) => animation.sprite.visible = false)
     Object.values(unloadingAnimations).forEach((animation) => animation.sprite.visible = false)
+    Object.values(eatingAnimations).forEach((animation) => animation.sprite.visible = false)
     animationSprite.visible = false
   }
 
@@ -715,6 +723,15 @@ function createBee(parent, type, startPosition) {
         return
       }
     }
+    // Is eating
+    const honeyTarget = bee.isAtType('honey')
+    const isEating = honeyTarget && !bee.isWellFed() && honeyTarget.honey > 0
+    
+    if (isEating) {
+      eatingAnimations[bee.type].sprite.visible = true
+      return
+    }
+
     // Unloading animation
     const isUnloading =
       (bee.isAtType('pollen') && bee.type === 'forager') ||

@@ -97,15 +97,24 @@ let angels = []
 let hoveredCells = []
 
 loader.add('ironchest-bee.ttf')
-loader.add('bee-working-animation-worker', 'images/animation-test/bee/animation-spritesheet-bee-worker.png')
-loader.add('bee-unloading-animation-worker', 'images/animation-test/bee/animation-spritesheet-bee-unloading-worker.png')
-loader.add('bee-working-animation-nurser', 'images/animation-test/bee/animation-spritesheet-bee-nurser.png')
-loader.add('bee-unloading-animation-nurser', 'images/animation-test/bee/animation-spritesheet-bee-unloading-nurser.png')
-loader.add('bee-working-animation-forager', 'images/animation-test/bee/animation-spritesheet-bee-forager.png')
-loader.add('bee-unloading-animation-forager', 'images/animation-test/bee/animation-spritesheet-bee-unloading-forager.png')
-loader.add('bee-working-animation-idle', 'images/animation-test/bee/animation-spritesheet-bee-idle.png')
-loader.add('bee-unloading-animation-idle', 'images/animation-test/bee/animation-spritesheet-bee-unloading-idle.png')
-loader.add('flower-is-pollinated', 'images/animation-test/flower-is-pollinated/animation-spritesheet-flower.png')
+
+loader.add('bee-working-animation-worker', 'images/sprite-sheets/bee/worker/working.png')
+loader.add('bee-eating-animation-worker', 'images/sprite-sheets/bee/worker/eating.png')
+loader.add('bee-unloading-animation-worker', 'images/sprite-sheets/bee/worker/unloading.png')
+
+loader.add('bee-working-animation-nurser', 'images/sprite-sheets/bee/nurser/working.png')
+loader.add('bee-eating-animation-nurser', 'images/sprite-sheets/bee/nurser/eating.png')
+loader.add('bee-unloading-animation-nurser', 'images/sprite-sheets/bee/nurser/unloading.png')
+
+loader.add('bee-working-animation-forager', 'images/sprite-sheets/bee/forager/working.png')
+loader.add('bee-eating-animation-forager', 'images/sprite-sheets/bee/forager/eating.png')
+loader.add('bee-unloading-animation-forager', 'images/sprite-sheets/bee/forager/unloading.png')
+
+loader.add('bee-working-animation-idle', 'images/sprite-sheets/bee/idle/working.png')
+loader.add('bee-eating-animation-idle', 'images/sprite-sheets/bee/idle/eating.png')
+loader.add('bee-unloading-animation-idle', 'images/sprite-sheets/bee/idle/unloading.png')
+
+loader.add('flower-is-pollinated', 'images/sprite-sheets/flower-is-pollinated/animation-spritesheet-flower.png')
 loader.load(setupSplash)
 
 // loader.load(setupMenu)
