@@ -94,16 +94,30 @@ function setupSplash() {
   }
   const callbackB = () => {
     app.stage.removeChild(container)
+    setupWorldMap()
+  }
+  const callbackC = () => {
+    app.stage.removeChild(container)
     setupWorldMap2()
+  }
+  const callbackD = () => {
+    app.stage.removeChild(container)
+    setupWorldMap3()
   }
   const scaler = new Container()
   scaler.scale.x = 2
   scaler.scale.y = 2
   container.addChild(scaler)
 
-  const buttonA = Button(Math.round(WIDTH/2/2/2)-20, 120, '  Play', callbackA)
+  const buttonA = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 0), '  Play', callbackA)
   scaler.addChild(buttonA)
 
-  const buttonB = Button(Math.round(WIDTH/2/2/2)-20, 140, 'World Map', callbackB)
+  const buttonB = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 1), 'World Map 1', callbackB)
   scaler.addChild(buttonB)
+
+  const buttonC = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 2), 'World Map 2', callbackC)
+  scaler.addChild(buttonC)
+
+  const buttonD = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 3), 'World Map 3', callbackD)
+  scaler.addChild(buttonD)
 }
