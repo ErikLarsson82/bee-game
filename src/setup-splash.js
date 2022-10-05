@@ -39,7 +39,11 @@ function setupSplash() {
   welcomeHoney.position.y = Math.round(HEIGHT / 2 / 2) - 1
   splashscreen.addChild(welcomeHoney)
 
-  const callback = () => {
+  const callbackA = () => {
+    app.stage.removeChild(container)
+    setupMenu()
+  }
+  const callbackB = () => {
     app.stage.removeChild(container)
     setupWorldMap()
   }
@@ -48,8 +52,9 @@ function setupSplash() {
   scaler.scale.y = 2
   container.addChild(scaler)
 
-  const button = Button(Math.round(WIDTH/2/2/2)-20, 120, '  Play', callback)
-  scaler.addChild(button)
+  const buttonA = Button(Math.round(WIDTH/2/2/2)-20, 120, '  Play', callbackA)
+  scaler.addChild(buttonA)
 
-  setupWorldMap()
+  const buttonB = Button(Math.round(WIDTH/2/2/2)-20, 140, 'World Map', callbackB)
+  scaler.addChild(buttonB)
 }
