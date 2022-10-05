@@ -70,6 +70,15 @@ const easeInOutAnimation = new Bezier(
   ].flatMap(p => p)
 )
 
+const easeInOutButFasterAnimation = new Bezier(
+  ...[
+    [0, 0],
+    [0.59, 0.21],
+    [0.67, 0.89],
+    [1, 1],
+  ].flatMap(p => p)
+)
+
 function setupWorldMap3() {
   scene = 'world-map-3'
   document.body.style['background-color'] = '#fff6c5'
@@ -81,6 +90,7 @@ function setupWorldMap3() {
 
   let animating = false
   let beeIsAtIndex = 0
+  let lastPos = 0
 
   const mapImage = Sprite.fromImage('images/world-map-3/sample.png')
   container.addChild(mapImage)
@@ -121,7 +131,12 @@ function setupWorldMap3() {
         const beeBetweenLevelsAnimation = new Bezier(
           ...beeAnimationPoints.flatMap(p => p)
         )
-        const beeBetweenPositionInterpolation = generateBezierLUTS(beeBetweenLevelsAnimation, easeInOutAnimation, PAN_ANIM_DURATION)
+        const beeBetweenPositionInterpolation = generateBezierLUTS(beeBetweenLevelsAnimation, easeInOutButFasterAnimation, PAN_ANIM_DURATION)
+
+        welcomeBee.texture = mapPanAnimationCounter % 10 < 5 ? welcomeFlapA : welcomeFlapB
+        const goingLeft = beeBetweenPositionInterpolation[mapPanAnimationCounter].x > lastPos
+        welcomeBee.scale.x = goingLeft ? 2 : -2
+        lastPos = beeBetweenPositionInterpolation[mapPanAnimationCounter].x
 
         welcomeBee.position.x = beeBetweenPositionInterpolation[mapPanAnimationCounter].x
         welcomeBee.position.y = beeBetweenPositionInterpolation[mapPanAnimationCounter].y
@@ -145,6 +160,7 @@ function setupWorldMap3() {
           beeIsAtIndex = levelIdx
           clearInterval(mapPanAnimationInterval)
           animating = false
+          welcomeBee.texture = welcomeFlapC
         }
       }, 16.66)
     }
@@ -234,7 +250,7 @@ function setupWorldMap3() {
   }, 16.66)
   
   let counter = 0
-  let lastPos = 0
+  
   const interval = setInterval(() => {
     if (DEBUG_MAP_ANIMATION) return
     const cappedCounter = Math.min(counter, ANIM_DURATION)
