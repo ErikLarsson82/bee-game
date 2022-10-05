@@ -1,6 +1,48 @@
 
 const DEBUG_MAP_ANIMATION = false
 
+const levels = [
+  {
+    name: 'first level',
+    placement:
+      {
+        x: 160,
+        y: 140
+      },
+    camera:
+      {
+        x: 20,
+        y: 74
+      }
+  },
+  {
+    name: 'second level',
+    placement:
+      {
+        x: 168,
+        y: 344
+      },
+    camera:
+      {
+        x: 100,
+        y: 264
+      }
+  },
+  {
+    name: 'third level',
+    placement:
+      {
+        x: 398,
+        y: 360
+      },
+    camera:
+      {
+        x: 308,
+        y: 340
+      }
+  }
+]
+
 const linearAnimation = new Bezier(
   ...[
     [0, 0],
@@ -37,6 +79,9 @@ function setupWorldMap3() {
   container.scale.y = DEBUG_MAP_ANIMATION ? 0.4 : 2
   app.stage.addChild(container)
 
+  let animating = false
+  let beeIsAtIndex = 0
+
   const mapImage = Sprite.fromImage('images/world-map-3/sample.png')
   container.addChild(mapImage)
 
@@ -48,8 +93,65 @@ function setupWorldMap3() {
   welcomeBee.scale.y = 2
   welcomeBee.position.x = 0
   welcomeBee.position.y = 0
-  welcomeBee.anchor.set(0.5, 0)
-  container.addChild(welcomeBee)
+  welcomeBee.anchor.set(0.5, 1)
+  
+  levels.forEach((level, levelIdx) => {
+    const levelSprite = new Sprite.fromImage('images/world-map-3/placement.png')
+    levelSprite.position.x = level.placement.x
+    levelSprite.position.y = level.placement.y
+    levelSprite.anchor.set(0.5, 0.5)
+    levelSprite.interactive = true
+    levelSprite.buttonmode = true
+    levelSprite.mouseover = () => levelSprite.alpha = 0.7
+    levelSprite.mouseout = () => levelSprite.alpha = 1
+    levelSprite.mousedown = () => {
+      if (animating) return
+      animating = true
+
+      const PAN_ANIM_DURATION = 200
+      let mapPanAnimationCounter = 0
+      const mapPanAnimationInterval = setInterval(() => {
+
+        const beeAnimationPoints = [
+          [levels[beeIsAtIndex].placement.x, levels[beeIsAtIndex].placement.y],
+          [levels[beeIsAtIndex].placement.x, levels[beeIsAtIndex].placement.y],
+          [levels[levelIdx].placement.x, levels[levelIdx].placement.y],
+          [levels[levelIdx].placement.x, levels[levelIdx].placement.y],
+        ]
+        const beeBetweenLevelsAnimation = new Bezier(
+          ...beeAnimationPoints.flatMap(p => p)
+        )
+        const beeBetweenPositionInterpolation = generateBezierLUTS(beeBetweenLevelsAnimation, easeInOutAnimation, PAN_ANIM_DURATION)
+
+        welcomeBee.position.x = beeBetweenPositionInterpolation[mapPanAnimationCounter].x
+        welcomeBee.position.y = beeBetweenPositionInterpolation[mapPanAnimationCounter].y
+
+        const cameraAnimationPoints = [
+          [levels[beeIsAtIndex].camera.x, levels[beeIsAtIndex].camera.y],
+          [levels[beeIsAtIndex].camera.x, levels[beeIsAtIndex].camera.y],
+          [levels[levelIdx].camera.x, levels[levelIdx].camera.y],
+          [levels[levelIdx].camera.x, levels[levelIdx].camera.y],
+        ]
+        const cameraBetweenLevelsAnimation = new Bezier(
+          ...cameraAnimationPoints.flatMap(p => p)
+        )
+        const cameraBetweenPositionInterpolation = generateBezierLUTS(cameraBetweenLevelsAnimation, easeInOutAnimation, PAN_ANIM_DURATION)
+
+        container.position.x = 0 - cameraBetweenPositionInterpolation[mapPanAnimationCounter].x
+        container.position.y = 0 - cameraBetweenPositionInterpolation[mapPanAnimationCounter].y
+
+        mapPanAnimationCounter++
+        if (mapPanAnimationCounter >= PAN_ANIM_DURATION) {
+          beeIsAtIndex = levelIdx
+          clearInterval(mapPanAnimationInterval)
+          animating = false
+        }
+      }, 16.66)
+    }
+    container.addChild(levelSprite)
+  })
+
+  container.addChild(welcomeBee) // after level icons
 
   const ANIM_DURATION = 700
   
@@ -57,7 +159,7 @@ function setupWorldMap3() {
     [300, 500],
     [800, 500],
     [400, 130],
-    [160, 130],
+    [20, 74],
   ]
   const worldMapAnimation = new Bezier(
     ...points.flatMap(p => p)
@@ -131,7 +233,7 @@ function setupWorldMap3() {
     if (animCounter > ANIM_DURATION) animCounter = 0
   }, 16.66)
   
-  let counter = 1
+  let counter = 0
   let lastPos = 0
   const interval = setInterval(() => {
     if (DEBUG_MAP_ANIMATION) return
@@ -156,13 +258,25 @@ function setupWorldMap3() {
 
   setInterval(() => {
     if (speed) counter = counter + 100
-    if (dirs[0]) mapImage.position.y += 10
-    if (dirs[1]) mapImage.position.y -= 10
-    if (dirs[2]) mapImage.position.x += 10
-    if (dirs[3]) mapImage.position.x -= 10
+    if (dirs[0]) container.position.y += 10
+    if (dirs[1]) container.position.y -= 10
+    if (dirs[2]) container.position.x += 10
+    if (dirs[3]) container.position.x -= 10
   }, 16.66)
 
   window.addEventListener('keydown', e => {
+    if (e.keyCode === 49) {
+      container.position.x = 0 - levels[0].camera.x
+      container.position.y = 0 - levels[0].camera.y
+    }
+    if (e.keyCode === 50) {
+      container.position.x = 0 - levels[1].camera.x
+      container.position.y = 0 - levels[1].camera.y
+    }
+    if (e.keyCode === 51) {
+      container.position.x = 0 - levels[2].camera.x
+      container.position.y = 0 - levels[2].camera.y
+    }
     if (e.keyCode === 13) {
       speed = true
     }
@@ -211,32 +325,3 @@ function generateBezierLUTS(originBezierCurve, temporalBezier, amount) {
   output.push({ x: calc2.x, y: calc2.y })
   return output
 }
-
-/*
-const points = [
-  [0, 0],
-  [0, 1],
-  [0, 1],
-  [1, 1],
-]
-const linearAnimation = new Bezier(
-  ...[
-  [0, 0],
-  [0, 1],
-  [0, 1],
-  [1, 1],
-].flatMap(p => p)
-)
-const points2 = [
-  [100, 25],
-  [10, 90],
-  [110, 110],
-  [150, 195],
-]
-const outputcurve = new Bezier(
-  ...points2.flatMap(p => p)
-)
-
-const result = generateBezierLUTS(outputcurve, linearAnimation, 100)
-console.log(result)
-*/
