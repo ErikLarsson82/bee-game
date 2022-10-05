@@ -94,7 +94,7 @@ function setupSplash() {
   }
   const callbackB = () => {
     app.stage.removeChild(container)
-    setupWorldMap()
+    setupWorldMap2()
   }
   const scaler = new Container()
   scaler.scale.x = 2
