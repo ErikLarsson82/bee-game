@@ -1,10 +1,40 @@
+
+const DEBUG_MAP_ANIMATION = false
+
+const linearAnimation = new Bezier(
+  ...[
+    [0, 0],
+    [0.5, 0.5],
+    [0.5, 0.5],
+    [1, 1],
+  ].flatMap(p => p)
+)
+
+const easeOutAnimation = new Bezier(
+  ...[
+    [0, 0],
+    [0, 1],
+    [0, 1],
+    [1, 1],
+  ].flatMap(p => p)
+)
+
+const easeInOutAnimation = new Bezier(
+  ...[
+    [0, 0],
+    [0.59, 0.21],
+    [0, 1],
+    [1, 1],
+  ].flatMap(p => p)
+)
+
 function setupWorldMap3() {
   scene = 'world-map-3'
   document.body.style['background-color'] = '#fff6c5'
   
   const container = new Container()
-  container.scale.x = 2
-  container.scale.y = 2
+  container.scale.x = DEBUG_MAP_ANIMATION ? 0.4 : 2
+  container.scale.y = DEBUG_MAP_ANIMATION ? 0.4 : 2
   app.stage.addChild(container)
 
   const mapImage = Sprite.fromImage('images/world-map-3/sample.png')
@@ -21,7 +51,7 @@ function setupWorldMap3() {
   welcomeBee.anchor.set(0.5, 0)
   container.addChild(welcomeBee)
 
-  const ANIM_DURATION = 900
+  const ANIM_DURATION = 700
   
   const points = [
     [300, 500],
@@ -32,7 +62,7 @@ function setupWorldMap3() {
   const worldMapAnimation = new Bezier(
     ...points.flatMap(p => p)
   )
-  const mapPositionInterpolation = worldMapAnimation.getLUT(ANIM_DURATION)
+  const mapPositionInterpolation = generateBezierLUTS(worldMapAnimation, easeInOutAnimation, ANIM_DURATION)
 
   const points2 = [
     [120, 400],
@@ -43,54 +73,56 @@ function setupWorldMap3() {
   const beeAnimation = new Bezier(
     ...points2.flatMap(p => p)
   )
-  const beePositionInterpolation = beeAnimation.getLUT(ANIM_DURATION)
+  const beePositionInterpolation = generateBezierLUTS(beeAnimation, easeInOutAnimation, ANIM_DURATION)
 
-  // Draw debug
-  /*
-  mapPositionInterpolation.forEach(({ x, y }) => {
-    const p = new Graphics()
-    p.beginFill(0x00ff00)
-    p.drawRect(x, y, 10, 10)
-    container.addChild(p)
-  })
+  let animTarget, animTarget2
 
-  beePositionInterpolation.forEach(({ x, y }) => {
-    const p = new Graphics()
-    p.beginFill(0x00f000)
-    p.drawRect(x, y, 10, 10)
-    container.addChild(p)
-  })
+  if (DEBUG_MAP_ANIMATION) {
+    mapPositionInterpolation.forEach(({ x, y }) => {
+      const p = new Graphics()
+      p.beginFill(0x00ff00)
+      p.drawRect(x, y, 10, 10)
+      container.addChild(p)
+    })
 
-  points.forEach(point => {
-    const [x, y] = point
-    const p = new Graphics()
-    p.beginFill(0xff0000)
-    p.drawRect(x, y, 10, 10)
-    container.addChild(p)
-  })
+    beePositionInterpolation.forEach(({ x, y }) => {
+      const p = new Graphics()
+      p.beginFill(0x00f000)
+      p.drawRect(x, y, 10, 10)
+      container.addChild(p)
+    })
 
-  points2.forEach(point => {
-    const [x, y] = point
-    const p = new Graphics()
-    p.beginFill(0xfc0000)
-    p.drawRect(x, y, 10, 10)
-    container.addChild(p)
-  })
-  */
+    points.forEach(point => {
+      const [x, y] = point
+      const p = new Graphics()
+      p.beginFill(0xff0000)
+      p.drawRect(x, y, 10, 10)
+      container.addChild(p)
+    })
 
-  const animTarget = new Graphics()
-  animTarget.beginFill(0x0000ff)
-  animTarget.drawRect(0, 0, 10, 10)
-  container.addChild(animTarget)
+    points2.forEach(point => {
+      const [x, y] = point
+      const p = new Graphics()
+      p.beginFill(0xfc0000)
+      p.drawRect(x, y, 10, 10)
+      container.addChild(p)
+    })
 
-  const animTarget2 = new Graphics()
-  animTarget2.beginFill(0x0000ff)
-  animTarget2.drawRect(0, 0, 10, 10)
-  container.addChild(animTarget2)
+    animTarget = new Graphics()
+    animTarget.beginFill(0x0000ff)
+    animTarget.drawRect(0, 0, 10, 10)
+    container.addChild(animTarget)
+
+    animTarget2 = new Graphics()
+    animTarget2.beginFill(0x0000ff)
+    animTarget2.drawRect(0, 0, 10, 10)
+    container.addChild(animTarget2)
+  }
+  
 
   let animCounter = 0
   setInterval(() => {
-    return
+    if (!DEBUG_MAP_ANIMATION) return
     animTarget.position.x = mapPositionInterpolation[animCounter].x
     animTarget.position.y = mapPositionInterpolation[animCounter].y
     animTarget2.position.x = beePositionInterpolation[animCounter].x
@@ -99,9 +131,10 @@ function setupWorldMap3() {
     if (animCounter > ANIM_DURATION) animCounter = 0
   }, 16.66)
   
-  let counter = 0
+  let counter = 1
   let lastPos = 0
   const interval = setInterval(() => {
+    if (DEBUG_MAP_ANIMATION) return
     const cappedCounter = Math.min(counter, ANIM_DURATION)
     welcomeBee.texture = cappedCounter % 10 < 5 ? welcomeFlapA : welcomeFlapB
     const goingLeft = beePositionInterpolation[cappedCounter].x > lastPos
@@ -164,3 +197,46 @@ function setupWorldMap3() {
     }
   })
 }
+
+
+function generateBezierLUTS(originBezierCurve, temporalBezier, amount) {
+  let output = []
+  for (var i = 0; i < amount; i++) {
+    const t = i / amount
+    const { y } = temporalBezier.compute(t)
+    const calc = originBezierCurve.compute(y)
+    output.push({ x: calc.x, y: calc.y })
+  }
+  const calc2 = originBezierCurve.compute(1)
+  output.push({ x: calc2.x, y: calc2.y })
+  return output
+}
+
+/*
+const points = [
+  [0, 0],
+  [0, 1],
+  [0, 1],
+  [1, 1],
+]
+const linearAnimation = new Bezier(
+  ...[
+  [0, 0],
+  [0, 1],
+  [0, 1],
+  [1, 1],
+].flatMap(p => p)
+)
+const points2 = [
+  [100, 25],
+  [10, 90],
+  [110, 110],
+  [150, 195],
+]
+const outputcurve = new Bezier(
+  ...points2.flatMap(p => p)
+)
+
+const result = generateBezierLUTS(outputcurve, linearAnimation, 100)
+console.log(result)
+*/
