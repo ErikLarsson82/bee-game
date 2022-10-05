@@ -41,7 +41,7 @@ function setupSplash() {
 
   const callback = () => {
     app.stage.removeChild(container)
-    setupMenu()
+    setupWorldMap()
   }
   const scaler = new Container()
   scaler.scale.x = 2
@@ -50,4 +50,6 @@ function setupSplash() {
 
   const button = Button(Math.round(WIDTH/2/2/2)-20, 120, '  Play', callback)
   scaler.addChild(button)
+
+  setupWorldMap()
 }
