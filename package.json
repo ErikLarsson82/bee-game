@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@pixi/math-extras": "^6.2.0",
+    "bezier-js": "^6.1.0",
     "pixi-display": "^1.1.1",
     "pixi-picture": "^1.1.0",
     "pixi.js": "^4.3.4"
