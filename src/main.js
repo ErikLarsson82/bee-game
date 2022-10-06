@@ -94,7 +94,7 @@ let angelBubbleText = null
 let tickers = null
 let hexGrid = []
 let flowers = []
-let bees = []
+let bees = null
 let angels = []
 let hoveredCells = []
 

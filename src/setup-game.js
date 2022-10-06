@@ -8,6 +8,7 @@ function setupGame() {
   document.body.style['background-color'] = '#262b44'
   
   tickers = []
+  bees = []
   
   currentCycleIndex = 0
   gameover = false
@@ -360,8 +361,8 @@ function setupGame() {
 
   createGameOverUI()
 
-  app.ticker.add((delta) => gameloop(delta))
-
+  app.ticker.add(gameloop)
+  
   function handleVisibilityChange() {
     if (document.visibilityState === 'hidden') {
       paused = true
