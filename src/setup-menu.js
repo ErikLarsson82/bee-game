@@ -22,6 +22,7 @@ function setupMenu() {
     const callback = () => {
       cycles = Array.from(map.cycles)
       backgroundImage = map.backgroundImage
+      levelIndex = idx
       currentCycleIndex = 0
       currentCycle = cycles[0]
       currentSeasonLength = cycles[0]

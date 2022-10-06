@@ -65,6 +65,7 @@ let currentCycle = 0
 let currentCycleIndex = 0
 let angelBubbleTimer = 0
 let backgroundImage = null
+let levelIndex = null
 
 let scene = null
 let selected = null

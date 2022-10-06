@@ -102,8 +102,9 @@ function setupWorldMap3() {
   container.scale.y = DEBUG_MAP_ANIMATION ? 0.4 : 2
   app.stage.addChild(container)
 
+  let startIntroAnimation = levelIndex === null
   let animating = false
-  let beeIsAtIndex = 0
+  let beeIsAtIndex = null
   let lastPos = 0
   let speed = false
 
@@ -141,6 +142,7 @@ function setupWorldMap3() {
     const map = MAP_CONFIGURATIONS[beeIsAtIndex]
     cycles = Array.from(map.cycles)
     backgroundImage = map.backgroundImage
+    levelIndex = beeIsAtIndex
     currentCycleIndex = 0
     currentCycle = cycles[0]
     currentSeasonLength = cycles[0]
@@ -162,6 +164,21 @@ function setupWorldMap3() {
   welcomeBee.position.x = 0
   welcomeBee.position.y = 0
   welcomeBee.anchor.set(0.5, 1)
+
+  const reset = () => {
+    welcomeBee.texture = welcomeFlapC
+    levelSelect.visible = true
+    levelLabel.texture = levelTextures[beeIsAtIndex]
+    levelText.text = levels[beeIsAtIndex].name
+    levelSelect.position.x = levels[beeIsAtIndex].placement.x + 30
+    levelSelect.position.y = levels[beeIsAtIndex].placement.y - 80
+
+    welcomeBee.position.x = levels[beeIsAtIndex].placement.x
+    welcomeBee.position.y = levels[beeIsAtIndex].placement.y
+
+    container.position.x = 0 - levels[beeIsAtIndex].camera.x
+    container.position.y = 0 - levels[beeIsAtIndex].camera.y
+  }
   
   levels.forEach((level, levelIdx) => {
     const levelSprite = new Sprite.fromImage('images/world-map-3/placement.png')
@@ -218,12 +235,7 @@ function setupWorldMap3() {
           beeIsAtIndex = levelIdx
           clearInterval(mapPanAnimationInterval)
           animating = false
-          welcomeBee.texture = welcomeFlapC
-          levelSelect.visible = true
-          levelLabel.texture = levelTextures[beeIsAtIndex]
-          levelText.text = levels[beeIsAtIndex].name
-          levelSelect.position.x = levels[beeIsAtIndex].placement.x + 30
-          levelSelect.position.y = levels[beeIsAtIndex].placement.y - 80
+          reset()          
         }
       }, 16.66)
     }
@@ -314,29 +326,29 @@ function setupWorldMap3() {
   
   let counter = 0
   
-  const interval = setInterval(() => {
-    if (DEBUG_MAP_ANIMATION) return
-    levelSelect.visible = false
-    const cappedCounter = Math.min(counter, ANIM_DURATION)
-    welcomeBee.texture = cappedCounter % 10 < 5 ? welcomeFlapA : welcomeFlapB
-    const goingLeft = beePositionInterpolation[cappedCounter].x > lastPos
-    welcomeBee.scale.x = goingLeft ? 2 : -2
-    lastPos = beePositionInterpolation[cappedCounter].x
-    welcomeBee.position.x = beePositionInterpolation[cappedCounter].x
-    welcomeBee.position.y = beePositionInterpolation[cappedCounter].y
-    container.position.x = 0 - mapPositionInterpolation[cappedCounter].x
-    container.position.y = 0 - mapPositionInterpolation[cappedCounter].y
-    counter++
-    if (counter >= ANIM_DURATION) {
-      clearInterval(interval)
-      welcomeBee.texture = welcomeFlapC
-      levelSelect.visible = true
-      levelLabel.texture = levelTextures[beeIsAtIndex]
-      levelText.text = levels[beeIsAtIndex].name
-      levelSelect.position.x = levels[beeIsAtIndex].placement.x + 30
-      levelSelect.position.y = levels[beeIsAtIndex].placement.y - 80
-    }
-  }, 16.66)
+  if (startIntroAnimation) {
+    const interval = setInterval(() => {
+      levelSelect.visible = false
+      const cappedCounter = Math.min(counter, ANIM_DURATION)
+      welcomeBee.texture = cappedCounter % 10 < 5 ? welcomeFlapA : welcomeFlapB
+      const goingLeft = beePositionInterpolation[cappedCounter].x > lastPos
+      welcomeBee.scale.x = goingLeft ? 2 : -2
+      lastPos = beePositionInterpolation[cappedCounter].x
+      welcomeBee.position.x = beePositionInterpolation[cappedCounter].x
+      welcomeBee.position.y = beePositionInterpolation[cappedCounter].y
+      container.position.x = 0 - mapPositionInterpolation[cappedCounter].x
+      container.position.y = 0 - mapPositionInterpolation[cappedCounter].y
+      counter++
+      if (counter >= ANIM_DURATION) {
+        clearInterval(interval)
+        beeIsAtIndex = 0
+        reset()
+      }
+    }, 16.66)
+  } else {
+    beeIsAtIndex = levelIndex
+    reset()
+  }
 
   const dirs = [false, false, false, false]
   
