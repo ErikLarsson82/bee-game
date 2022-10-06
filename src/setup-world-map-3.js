@@ -200,11 +200,14 @@ function setupWorldMap3() {
     levelSprite.position.y = level.placement.y
     levelSprite.anchor.set(0.5, 0.5)
     levelSprite.interactive = true
-    levelSprite.buttonmode = true
-    levelSprite.mouseover = () => levelSprite.alpha = 0.7
+    levelSprite.buttonMode = true
+    levelSprite.mouseover = () => {
+      if (animating || levelIdx === beeIsAtIndex) return
+      levelSprite.alpha = 0.7
+    }
     levelSprite.mouseout = () => levelSprite.alpha = 1
     levelSprite.mousedown = () => {
-      if (animating) return
+      if (animating || levelIdx === beeIsAtIndex) return
       animating = true
 
       const PAN_ANIM_DURATION = 200
