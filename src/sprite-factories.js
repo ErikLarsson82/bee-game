@@ -151,7 +151,8 @@ function makeHungry(bee) {
 
   bee.consumeEnergy = () => {
     if (season === 'summer') {
-      bee.hunger -= transferTo(bee.HUNGER_CAPACITY).inSeconds(1300)
+      const seconds = blizzardWinter ? 1300 : 900
+      bee.hunger -= transferTo(bee.HUNGER_CAPACITY).inSeconds(seconds)
     } else {
       bee.hunger -= transferTo(bee.HUNGER_CAPACITY).inSeconds(900 / winterHungerMultiplier)
     }
