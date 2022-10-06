@@ -265,6 +265,7 @@ const nameToFunction = (input) => {
 	  wax: cellWax,
 	  prepared: cellPrepared,
     empty: cellEmpty,
+    blocked: cellBlocked,
     ['forager-resting-place']: cellForagerRestingPlace,
 	}[input] 
 }

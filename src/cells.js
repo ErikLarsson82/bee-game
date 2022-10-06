@@ -20,6 +20,17 @@ function cellDisabled(x, y, parent) {
   return disabledSprite
 }
 
+function cellBlocked(x, y, parent) {
+  const pixelCoordinate = toLocalCoordinateFlat({ x, y })
+  const blockedSprite = Sprite.fromImage('images/hex/states/cell-blocked.png')
+  makeHexagon(blockedSprite, x, y, 'blocked')
+  blockedSprite.position.x = pixelCoordinate.x
+  blockedSprite.position.y = pixelCoordinate.y
+  
+  parent.addChild(blockedSprite)
+  return blockedSprite
+}
+
 function cellEmpty(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
 

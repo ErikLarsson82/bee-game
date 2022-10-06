@@ -17,7 +17,7 @@ let MAP_CONFIGURATIONS = [
     backgroundImage: 'background-summer-cold'
   },
   {
-    name: 'Level 3 - Desert',
+    name: 'Level 3 - Desert haze',
     id: 'some-hexes-blocked',
     cycles: [5, 2, 5, 2, 5, 2, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3],
     seeds: 4,
@@ -107,15 +107,23 @@ function createMap(m) {
   }
 
   if (m === 'some-hexes-blocked') {
-    // TODO
     createBee(beeContainer, 'idle').setHunger(60).setAge(40)
     createBee(beeContainer, 'idle').setHunger(70).setAge(30)
     createBee(beeContainer, 'idle').setHunger(80).setAge(20)
     
-    replaceHex([0, 0], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([0, 8], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([8, 0], 'prepared', 'activate').instantlyPrepare()
-    replaceHex([8, 8], 'prepared', 'activate').instantlyPrepare()
+    replaceHex([4, 2], 'blocked', 'no-activation')
+    replaceHex([3, 2], 'blocked', 'no-activation')
+    replaceHex([5, 2], 'blocked', 'no-activation')
+    replaceHex([2, 3], 'blocked', 'no-activation')
+    replaceHex([6, 3], 'blocked', 'no-activation')
+    replaceHex([2, 4], 'blocked', 'no-activation')
+    replaceHex([6, 4], 'blocked', 'no-activation')
+    replaceHex([2, 5], 'blocked', 'no-activation')
+    replaceHex([6, 5], 'blocked', 'no-activation')
+    replaceHex([3, 4], 'honey', 'activate').setHoney(30)
+    replaceHex([5, 4], 'honey', 'activate').setHoney(30)
+    replaceHex([4, 4], 'wax', 'activate')
+    replaceHex([4, 5], 'wax', 'activate')    
   }
 
   if (m === 'mini') {
