@@ -91,9 +91,46 @@ function setupWorldMap3() {
   let animating = false
   let beeIsAtIndex = 0
   let lastPos = 0
+  let speed = false
 
   const mapImage = Sprite.fromImage('images/world-map-3/sample.png')
+  mapImage.interactive = true
+  mapImage.mousedown = () => {
+    speed = true
+  }
+  mapImage.mouseup = () => {
+    speed = false
+  }
   container.addChild(mapImage)
+
+  const levelSelect = Sprite.fromImage('images/world-map-3/level-select.png')
+  levelSelect.visible = false
+  container.addChild(levelSelect)
+
+  const levelTextures = [
+    Texture.fromImage('images/world-map-3/level-1-label.png'),
+    Texture.fromImage('images/world-map-3/level-2-label.png'),
+    Texture.fromImage('images/world-map-3/level-3-label.png'),
+  ]
+  const levelLabel = new Sprite(levelTextures[beeIsAtIndex])
+  levelLabel.position.x = 31
+  levelLabel.position.y = 9
+  levelSelect.addChild(levelLabel)
+
+  const callback = () => {
+    const map = MAP_CONFIGURATIONS[beeIsAtIndex]
+    cycles = Array.from(map.cycles)
+    currentCycleIndex = 0
+    currentCycle = cycles[0]
+    currentSeasonLength = cycles[0]
+    MAP_SELECTION = map.id
+    seeds = map.seeds
+    winterHungerMultiplier = map.winterHungerMultiplier
+    app.stage.removeChild(container)
+    setupGame()
+  }
+  const button = Button(39, 91, 'Play', callback)
+  levelSelect.addChild(button)
 
   const welcomeFlapA = Texture.fromImage('images/bee/bee-drone-flap.png')
   const welcomeFlapB = Texture.fromImage('images/bee/bee-drone-flop.png')
@@ -121,7 +158,7 @@ function setupWorldMap3() {
       const PAN_ANIM_DURATION = 200
       let mapPanAnimationCounter = 0
       const mapPanAnimationInterval = setInterval(() => {
-
+        levelSelect.visible = false
         const beeAnimationPoints = [
           [levels[beeIsAtIndex].placement.x, levels[beeIsAtIndex].placement.y],
           [levels[beeIsAtIndex].placement.x, levels[beeIsAtIndex].placement.y],
@@ -161,6 +198,10 @@ function setupWorldMap3() {
           clearInterval(mapPanAnimationInterval)
           animating = false
           welcomeBee.texture = welcomeFlapC
+          levelSelect.visible = true
+          levelLabel.texture = levelTextures[beeIsAtIndex]
+          levelSelect.position.x = levels[beeIsAtIndex].placement.x + 30
+          levelSelect.position.y = levels[beeIsAtIndex].placement.y - 50
         }
       }, 16.66)
     }
@@ -253,6 +294,7 @@ function setupWorldMap3() {
   
   const interval = setInterval(() => {
     if (DEBUG_MAP_ANIMATION) return
+    levelSelect.visible = false
     const cappedCounter = Math.min(counter, ANIM_DURATION)
     welcomeBee.texture = cappedCounter % 10 < 5 ? welcomeFlapA : welcomeFlapB
     const goingLeft = beePositionInterpolation[cappedCounter].x > lastPos
@@ -266,14 +308,17 @@ function setupWorldMap3() {
     if (counter >= ANIM_DURATION) {
       clearInterval(interval)
       welcomeBee.texture = welcomeFlapC
+      levelSelect.visible = true
+      levelLabel.texture = levelTextures[beeIsAtIndex]
+      levelSelect.position.x = levels[beeIsAtIndex].placement.x + 30
+      levelSelect.position.y = levels[beeIsAtIndex].placement.y - 50
     }
   }, 16.66)
 
   const dirs = [false, false, false, false]
-  let speed = false
-
+  
   setInterval(() => {
-    if (speed) counter = counter + 100
+    if (speed) counter = counter + 40
     if (dirs[0]) container.position.y += 10
     if (dirs[1]) container.position.y -= 10
     if (dirs[2]) container.position.x += 10
