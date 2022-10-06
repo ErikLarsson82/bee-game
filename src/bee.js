@@ -28,6 +28,14 @@ function createBee(parent, type, startPosition) {
     forager: animateSprite(bee, 'bee-eating-animation-forager', 36, 13, 13),
   }
 
+  const dyingAgeAnimations = {
+    idle: animateSprite(bee, 'bee-dying-age-animation-idle', 44, 13, 9, false, null, true),
+    worker: animateSprite(bee, 'bee-dying-age-animation-worker', 44, 13, 9, false, null, true),
+    nurser: animateSprite(bee, 'bee-dying-age-animation-nurser', 44, 13, 9, false, null, true),
+    forager: animateSprite(bee, 'bee-dying-age-animation-forager', 44, 13, 9, false, null, true),
+  }
+  Object.values(dyingAgeAnimations).forEach((animation) => animation.pause())
+
   const shadow = Sprite.fromImage('images/bee/shadow.png')
   bee.addChild(shadow)
 
@@ -82,6 +90,15 @@ function createBee(parent, type, startPosition) {
   bee.POLLEN_SACK_CAPACITY = 20
   bee.HONEY_SACK_CAPACITY = 10
   bee.WAX_SACK_CAPACITY = 10
+
+  bee.dying = {
+    direction: {
+      x: (Math.random() * 2) - 1,
+      y: (Math.random() * 2) - 1,
+    },
+    magnitude: 0.1,
+    duration: 620 
+  }
   
   bee.roundedPos = { x: 0, y: 0 }
   
@@ -485,7 +502,27 @@ function createBee(parent, type, startPosition) {
     }
   }
 
+  function dying() {
+    if (bee.hunger <= 0) {
+      if (!dyingAgeAnimations[bee.type].isRunning()) dyingAgeAnimations[bee.type].start()
+      bee.hideBee()
+      shadow.visible = false
+      beeExclamation.visible = false
+      dyingAgeAnimations[bee.type].sprite.visible = true
+      bee.position.x += bee.dying.direction.x * bee.dying.magnitude
+      bee.position.y += bee.dying.direction.y * bee.dying.magnitude
+      bee.dying.magnitude -= 0.0003
+      bee.dying.magnitude = Math.max(0, bee.dying.magnitude)
+      bee.dying.duration -= 1
+      if (bee.dying.duration <= 0) {
+        bee.setType('dead')
+      }
+      return true
+    }
+  }
+
   function idle() {
+    if (dying()) return
     if (ageBee()) return
     if (bee.feedBee()) return
     if (depositPollen()) return
@@ -498,6 +535,7 @@ function createBee(parent, type, startPosition) {
   }
 
   function forager() {
+    if (dying()) return
     if (ageBee()) return
     if (bee.feedBee()) return
     if (pollinateFlower()) return
@@ -511,6 +549,7 @@ function createBee(parent, type, startPosition) {
   }
 
   function nurser() {
+    if (dying()) return
     if (ageBee()) return
     if (bee.feedBee()) return
     if (refillPollen()) return
@@ -525,6 +564,7 @@ function createBee(parent, type, startPosition) {
   }
 
   function worker() {
+    if (dying()) return
     if (ageBee()) return
     if (convertNectar()) return
     if (depositHoney()) return
@@ -701,6 +741,7 @@ function createBee(parent, type, startPosition) {
     Object.values(workingAnimations).forEach((animation) => animation.sprite.visible = false)
     Object.values(unloadingAnimations).forEach((animation) => animation.sprite.visible = false)
     Object.values(eatingAnimations).forEach((animation) => animation.sprite.visible = false)
+    Object.values(dyingAgeAnimations).forEach((animation) => animation.sprite.visible = false)
     animationSprite.visible = false
   }
 

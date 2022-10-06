@@ -31,6 +31,9 @@ function animateSprite(sprite, res, amount, w, h, _loop, callback, _timelocked) 
         pause: () => {
             pause = true
             return handler
+        },
+        isRunning: () => {
+            return !pause
         }
     }
 
