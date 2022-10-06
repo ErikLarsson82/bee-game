@@ -147,7 +147,7 @@ function setupGame() {
     ui.addChild(pauseFrame)
   }
 
-  backgroundScene = Sprite.fromImage('images/scene/background-summer.png')
+  backgroundScene = Sprite.fromImage(`images/scene/${backgroundImage}.png`)
   backgroundScene.interactive = true
   backgroundScene.mouseup = () => setSelected(null)
   background.addChild(backgroundScene)

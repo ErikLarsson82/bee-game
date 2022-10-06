@@ -3,7 +3,7 @@ const DEBUG_MAP_ANIMATION = false
 
 const levels = [
   {
-    name: 'first level',
+    name: 'Green fields',
     placement:
       {
         x: 160,
@@ -16,7 +16,7 @@ const levels = [
       }
   },
   {
-    name: 'second level',
+    name: 'Green gone cold',
     placement:
       {
         x: 168,
@@ -29,7 +29,7 @@ const levels = [
       }
   },
   {
-    name: 'third level',
+    name: 'Desert haze',
     placement:
       {
         x: 398,
@@ -40,7 +40,21 @@ const levels = [
         x: 308,
         y: 340
       }
+  },
+  {
+    name: 'Blizzard winter',
+    placement:
+      {
+        x: 504,
+        y: 406
+      },
+    camera:
+      {
+        x: 550,
+        y: 300
+      }
   }
+
 ]
 
 const linearAnimation = new Bezier(
@@ -111,15 +125,22 @@ function setupWorldMap3() {
     Texture.fromImage('images/world-map-3/level-1-label.png'),
     Texture.fromImage('images/world-map-3/level-2-label.png'),
     Texture.fromImage('images/world-map-3/level-3-label.png'),
+    Texture.fromImage('images/world-map-3/level-4-label.png'),
   ]
   const levelLabel = new Sprite(levelTextures[beeIsAtIndex])
   levelLabel.position.x = 31
   levelLabel.position.y = 9
   levelSelect.addChild(levelLabel)
 
+  const levelText = new PIXI.Text('-', { ...fontConfig, ...smallFont, fill: colors.orange })
+  levelText.position.x = 21
+  levelText.position.y = 25
+  levelSelect.addChild(levelText)
+
   const callback = () => {
     const map = MAP_CONFIGURATIONS[beeIsAtIndex]
     cycles = Array.from(map.cycles)
+    backgroundImage = map.backgroundImage
     currentCycleIndex = 0
     currentCycle = cycles[0]
     currentSeasonLength = cycles[0]
@@ -200,8 +221,9 @@ function setupWorldMap3() {
           welcomeBee.texture = welcomeFlapC
           levelSelect.visible = true
           levelLabel.texture = levelTextures[beeIsAtIndex]
+          levelText.text = levels[beeIsAtIndex].name
           levelSelect.position.x = levels[beeIsAtIndex].placement.x + 30
-          levelSelect.position.y = levels[beeIsAtIndex].placement.y - 50
+          levelSelect.position.y = levels[beeIsAtIndex].placement.y - 80
         }
       }, 16.66)
     }
@@ -310,8 +332,9 @@ function setupWorldMap3() {
       welcomeBee.texture = welcomeFlapC
       levelSelect.visible = true
       levelLabel.texture = levelTextures[beeIsAtIndex]
+      levelText.text = levels[beeIsAtIndex].name
       levelSelect.position.x = levels[beeIsAtIndex].placement.x + 30
-      levelSelect.position.y = levels[beeIsAtIndex].placement.y - 50
+      levelSelect.position.y = levels[beeIsAtIndex].placement.y - 80
     }
   }, 16.66)
 

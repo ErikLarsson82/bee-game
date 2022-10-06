@@ -64,6 +64,7 @@ let currentSeasonLength = 0
 let currentCycle = 0
 let currentCycleIndex = 0
 let angelBubbleTimer = 0
+let backgroundImage = null
 
 let scene = null
 let selected = null
