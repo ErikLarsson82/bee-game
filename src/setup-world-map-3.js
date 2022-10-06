@@ -153,15 +153,7 @@ function setupWorldMap3() {
 
   const callback = () => {
     const map = MAP_CONFIGURATIONS[beeIsAtIndex]
-    cycles = Array.from(map.cycles)
-    backgroundImage = map.backgroundImage
-    levelIndex = beeIsAtIndex
-    currentCycleIndex = 0
-    currentCycle = cycles[0]
-    currentSeasonLength = cycles[0]
-    MAP_SELECTION = map.id
-    seeds = map.seeds
-    winterHungerMultiplier = map.winterHungerMultiplier
+    loadMapParameters(map, beeIsAtIndex)
     app.stage.removeChild(container)
     setupGame()
   }

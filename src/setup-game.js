@@ -346,7 +346,7 @@ function setupGame() {
     haveFoodContainer.addChild(haveWinterFood)
 
     haveFoodContainer.addChild(ProgressBar2(61, 0, 'honey', () => {
-      haveFoodContainer.visible = season === 'summer'
+      haveFoodContainer.visible = season === 'summer' && blizzardWinter
       let meetRequirement = 0
       forEachHexagon(hexGrid, hex => {
         if (hex.type === 'honey' && hex.honey >= 30) {

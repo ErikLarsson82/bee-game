@@ -20,15 +20,7 @@ function setupMenu() {
 
   MAP_CONFIGURATIONS = MAP_CONFIGURATIONS.map((map, idx) => {
     const callback = () => {
-      cycles = Array.from(map.cycles)
-      backgroundImage = map.backgroundImage
-      levelIndex = idx
-      currentCycleIndex = 0
-      currentCycle = cycles[0]
-      currentSeasonLength = cycles[0]
-      MAP_SELECTION = map.id
-      seeds = map.seeds
-      winterHungerMultiplier = map.winterHungerMultiplier
+      loadMapParameters(map, idx)
       app.stage.removeChild(container)
       setupGame()
     }

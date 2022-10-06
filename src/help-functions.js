@@ -1,4 +1,17 @@
 
+function loadMapParameters(map, idx) {
+  cycles = Array.from(map.cycles)
+  backgroundImage = map.backgroundImage
+  blizzardWinter = map.blizzardWinter
+  levelIndex = idx
+  currentCycleIndex = 0
+  currentCycle = cycles[0]
+  currentSeasonLength = cycles[0]
+  MAP_SELECTION = map.id
+  seeds = map.seeds
+  winterHungerMultiplier = map.winterHungerMultiplier
+}
+
 function setGameSpeedText() {
   if (paused) {
     gameSpeedIcon.texture = Texture.fromImage('images/ui/gamespeed0.png')

@@ -66,6 +66,7 @@ let currentCycleIndex = 0
 let angelBubbleTimer = 0
 let backgroundImage = null
 let levelIndex = null
+let blizzardWinter = null
 
 let scene = null
 let selected = null

@@ -6,7 +6,8 @@ let MAP_CONFIGURATIONS = [
     cycles: [5, 1, 5, 2, 5, 2, 4, 3, 4, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30],
     seeds: 2,
     winterHungerMultiplier: 1,
-    backgroundImage: 'background-summer'
+    backgroundImage: 'background-summer',
+    blizzardWinter: false
   },
   {
     name: 'Level 2 - Green gone cold',
@@ -14,7 +15,8 @@ let MAP_CONFIGURATIONS = [
     cycles: [5, 2, 5, 2, 5, 2, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3],
     seeds: 4,
     winterHungerMultiplier: 1,
-    backgroundImage: 'background-summer-cold'
+    backgroundImage: 'background-summer-cold',
+    blizzardWinter: false
   },
   {
     name: 'Level 3 - Desert haze',
@@ -22,7 +24,8 @@ let MAP_CONFIGURATIONS = [
     cycles: [5, 2, 5, 2, 5, 2, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3],
     seeds: 4,
     winterHungerMultiplier: 1,
-    backgroundImage: 'background-desert'
+    backgroundImage: 'background-desert',
+    blizzardWinter: false
   },
   {
     name: 'Level 4 - Blizzard winter',
@@ -30,7 +33,8 @@ let MAP_CONFIGURATIONS = [
     cycles: [3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1],
     seeds: 2,
     winterHungerMultiplier: 5,
-    backgroundImage: 'background-hurricane'
+    backgroundImage: 'background-hurricane',
+    blizzardWinter: true
   },
   {
     // Give players many many empty hexagons to choose from

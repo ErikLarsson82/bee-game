@@ -165,13 +165,12 @@ function makeHungry(bee) {
   }
 
   bee.eat = () => {
-    if (season === 'winter') {
+    if (season === 'winter' && blizzardWinter) {
       if (bee.isHungry()) {
         bee.hunger += transferTo(bee.HUNGER_CAPACITY).inSeconds(20)
       }
       return
     }
-    //const eatRate = season === 'summer' ? 20 : 800
     bee.hunger += transferTo(bee.HUNGER_CAPACITY).inSeconds(20)
     bee.hunger = cap(0, bee.HUNGER_CAPACITY)(bee.hunger)
   }
@@ -181,7 +180,7 @@ function makeHungry(bee) {
     if (honeyTarget && !bee.isWellFed() && honeyTarget.honey > 0) {
       honeyTarget.claimSlot(bee)
       bee.eat()
-      const honeyRate = season === 'summer' ? 40 : 330
+      const honeyRate = season === 'winter' && blizzardWinter ? 330 : 40
       honeyTarget.honey -= transferTo(honeyTarget.HONEY_HEX_CAPACITY).inSeconds(honeyRate)
       honeyTarget.honey = cap(0, honeyTarget.HONEY_HEX_CAPACITY)(honeyTarget.honey)
       return true
