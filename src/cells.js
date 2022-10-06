@@ -573,6 +573,12 @@ function cellBrood(x, y, parent) {
     const nutrientsBar = ProgressBar2(-20, -26, 'pollen', () => broodSprite.nutrition, broodSprite.NUTRITION_CAPACITY)
     container.addChild(nutrientsBar)
 
+    const buttonDelete = Button(-20, 11, Sprite.fromImage('images/ui/button-large/button-large-content-delete.png'), () => {
+      replaceHex([x, y], 'prepared').instantlyPrepare()
+      setSelected(null)
+    }, null, null, 'large')
+    container.addChild(buttonDelete)
+
     addTicker('ui', () => {
       const isDead = broodSprite.content === 'dead'
       const isEmpty = broodSprite.content === 'empty'
@@ -580,6 +586,7 @@ function cellBrood(x, y, parent) {
       const isLarva = broodSprite.content === 'larvae'
       const isPuppa = broodSprite.content === 'puppa'
 
+      buttonDelete.visible = !isDead
       emptyText.visible = isEmpty
       eggLifecycleBar.visible = isEgg
       larvaLifecycleBar.visible = isLarva
@@ -611,12 +618,6 @@ function cellBrood(x, y, parent) {
       }
 
     })
-
-    const buttonDelete = Button(-20, 11, Sprite.fromImage('images/ui/button-large/button-large-content-delete.png'), () => {
-      replaceHex([x, y], 'prepared').instantlyPrepare()
-      setSelected(null)
-    }, null, null, 'large')
-    container.addChild(buttonDelete)
 
     const button = Button(9, 0, Sprite.fromImage('images/ui/button-large/button-large-content-toggle.png'), broodSprite.togglePause, null, null, 'large')
     container.addChild(button)
