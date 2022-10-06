@@ -138,6 +138,19 @@ function setupWorldMap3() {
   levelText.position.y = 25
   levelSelect.addChild(levelText)
 
+  const levelPreviewTextures = [
+    Texture.fromImage('images/world-map-3/preview-level-1.png'),
+    Texture.fromImage('images/world-map-3/preview-level-2.png'),
+    Texture.fromImage('images/world-map-3/preview-level-3.png'),
+    Texture.fromImage('images/world-map-3/preview-level-4.png'),
+  ]
+  const levelPreview = new Sprite(levelPreviewTextures[beeIsAtIndex])
+  levelPreview.position.x = 10
+  levelPreview.position.y = 40
+  levelPreview.width = 100
+  levelPreview.height = 50
+  levelSelect.addChild(levelPreview)
+
   const callback = () => {
     const map = MAP_CONFIGURATIONS[beeIsAtIndex]
     cycles = Array.from(map.cycles)
@@ -169,6 +182,7 @@ function setupWorldMap3() {
     welcomeBee.texture = welcomeFlapC
     levelSelect.visible = true
     levelLabel.texture = levelTextures[beeIsAtIndex]
+    levelPreview.texture = levelPreviewTextures[beeIsAtIndex]
     levelText.text = levels[beeIsAtIndex].name
     levelSelect.position.x = levels[beeIsAtIndex].placement.x + 30
     levelSelect.position.y = levels[beeIsAtIndex].placement.y - 80
