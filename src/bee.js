@@ -496,14 +496,10 @@ function createBee(parent, type, startPosition) {
 
   function ageBee() {
     bee.age += transferTo(100).inMinutes(70)
-    if (bee.age >= 100) {
-      bee.setType('dead')
-      return true
-    }
   }
 
   function dying() {
-    if (bee.hunger <= 0) {
+    if (bee.hunger <= 0 || bee.age > 100) {
       if (!dyingAgeAnimations[bee.type].isRunning()) dyingAgeAnimations[bee.type].start()
       bee.hideBee()
       shadow.visible = false

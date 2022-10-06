@@ -158,13 +158,6 @@ function makeHungry(bee) {
     }
     
     bee.hunger = cap(0, bee.HUNGER_CAPACITY)(bee.hunger)
-
-    /*
-    if (bee.hunger <= 0) {
-      bee.setType('dead')
-      return true
-    }
-    */
   }
 
   bee.eat = () => {
