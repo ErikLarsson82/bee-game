@@ -8,6 +8,7 @@ function setupGame() {
   document.body.style['background-color'] = '#262b44'
   
   tickers = []
+  bees = []
   
   currentCycleIndex = 0
   gameover = false
@@ -147,7 +148,7 @@ function setupGame() {
     ui.addChild(pauseFrame)
   }
 
-  backgroundScene = Sprite.fromImage('images/scene/background-summer.png')
+  backgroundScene = Sprite.fromImage(`images/scene/${backgroundImage}.png`)
   backgroundScene.interactive = true
   backgroundScene.mouseup = () => setSelected(null)
   background.addChild(backgroundScene)
@@ -387,8 +388,8 @@ function setupGame() {
 
   createGameOverUI()
 
-  app.ticker.add((delta) => gameloop(delta))
-
+  app.ticker.add(gameloop)
+  
   function handleVisibilityChange() {
     if (document.visibilityState === 'hidden') {
       paused = true

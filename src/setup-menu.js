@@ -21,6 +21,8 @@ function setupMenu() {
   MAP_CONFIGURATIONS = MAP_CONFIGURATIONS.map((map, idx) => {
     const callback = () => {
       cycles = Array.from(map.cycles)
+      backgroundImage = map.backgroundImage
+      levelIndex = idx
       currentCycleIndex = 0
       currentCycle = cycles[0]
       currentSeasonLength = cycles[0]
@@ -30,7 +32,7 @@ function setupMenu() {
       app.stage.removeChild(container)
       setupGame()
     }
-    const button = Button(Math.round(WIDTH/2/2/2)-50, 10 + (idx * 20), map.name, callback, null, null, 'huge')
+    const button = Button(Math.round(WIDTH/2/2/2)-50, 10 + (idx * 14), map.name, callback, null, null, 'huge')
     scaler.addChild(button)
 
     return {

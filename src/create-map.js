@@ -1,16 +1,40 @@
 
 let MAP_CONFIGURATIONS = [
   {
-    // The one we've been playing for all this time
-    name: 'Default',
+    name: 'Level 1 - Green fields',
     id: 'default',
     cycles: [5, 1, 5, 2, 5, 2, 4, 3, 4, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30],
     seeds: 2,
-    winterHungerMultiplier: 1
+    winterHungerMultiplier: 1,
+    backgroundImage: 'background-summer'
+  },
+  {
+    name: 'Level 2 - Green gone cold',
+    id: 'generous start',
+    cycles: [5, 2, 5, 2, 5, 2, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3],
+    seeds: 4,
+    winterHungerMultiplier: 1,
+    backgroundImage: 'background-summer-cold'
+  },
+  {
+    name: 'Level 3 - Desert haze',
+    id: 'some-hexes-blocked',
+    cycles: [5, 2, 5, 2, 5, 2, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3],
+    seeds: 4,
+    winterHungerMultiplier: 1,
+    backgroundImage: 'background-desert'
+  },
+  {
+    name: 'Level 4 - Blizzard winter',
+    id: 'corner start',
+    cycles: [3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1],
+    seeds: 2,
+    winterHungerMultiplier: 5,
+    backgroundImage: 'background-hurricane'
   },
   {
     // Give players many many empty hexagons to choose from
-    name: 'Many empty hex',
+    name: 'Experiment: - Many empty hex',
     id: 'many empty',
     cycles: [3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1],
     seeds: 1,
@@ -18,31 +42,15 @@ let MAP_CONFIGURATIONS = [
   },
   {
     // Give players lots of resources at the start, but have winters be pretty punishing
-    name: 'Generous start - punishing',
+    name: 'Experiment: Generous start - punishing',
     id: 'generous start',
     cycles: [5, 2, 5, 2, 5, 2, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3],
     seeds: 4,
     winterHungerMultiplier: 4
   },
   {
-    // Give players lots of resources at the start, but have winters be pretty punishing
-    name: 'Generous start - easy',
-    id: 'generous start',
-    cycles: [5, 2, 5, 2, 5, 2, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3],
-    seeds: 4,
-    winterHungerMultiplier: 1
-  },
-  {
     // Bees are VERY hungry during winter, albeit they are short - this one could be considered a very hard map, especially to get far
-    name: 'Hunger winter - stable',
-    id: 'corner start',
-    cycles: [3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1],
-    seeds: 2,
-    winterHungerMultiplier: 5
-  },
-  {
-    // Bees are VERY hungry during winter, albeit they are short - this one could be considered a very hard map, especially to get far
-    name: 'Hunger winter - escalating',
+    name: 'Experiment: Hunger winter - escalating',
     id: 'corner start',
     cycles: [3, 1, 3, 1, 3, 1, 3, 1, 3, 2, 3, 2, 3, 3, 3, 3, 3, 4, 3, 4, 3, 5, 3, 6, 3, 7, 3, 8, 3, 9, 3, 10, 3, 11],
     seeds: 2,
@@ -50,7 +58,7 @@ let MAP_CONFIGURATIONS = [
   },
   {
     // Not much to start with and winter coming fast
-    name: 'Fast winter',
+    name: 'Experiment: Fast winter',
     id: 'fast winter',
     cycles: [1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1],
     seeds: 1,
@@ -96,6 +104,26 @@ function createMap(m) {
         replaceHex([i, j], 'prepared', 'activate').instantlyPrepare()    
       }
     }
+  }
+
+  if (m === 'some-hexes-blocked') {
+    createBee(beeContainer, 'idle').setHunger(60).setAge(40)
+    createBee(beeContainer, 'idle').setHunger(70).setAge(30)
+    createBee(beeContainer, 'idle').setHunger(80).setAge(20)
+    
+    replaceHex([4, 2], 'blocked', 'no-activation')
+    replaceHex([3, 2], 'blocked', 'no-activation')
+    replaceHex([5, 2], 'blocked', 'no-activation')
+    replaceHex([2, 3], 'blocked', 'no-activation')
+    replaceHex([6, 3], 'blocked', 'no-activation')
+    replaceHex([2, 4], 'blocked', 'no-activation')
+    replaceHex([6, 4], 'blocked', 'no-activation')
+    replaceHex([2, 5], 'blocked', 'no-activation')
+    replaceHex([6, 5], 'blocked', 'no-activation')
+    replaceHex([3, 4], 'honey', 'activate').setHoney(30)
+    replaceHex([5, 4], 'honey', 'activate').setHoney(30)
+    replaceHex([4, 4], 'wax', 'activate')
+    replaceHex([4, 5], 'wax', 'activate')    
   }
 
   if (m === 'mini') {

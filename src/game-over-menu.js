@@ -8,7 +8,8 @@ function createGameOverUI() {
   background.addChild(
   	Button(36, 90, 'Main Menu', () => {
       app.stage.removeChild(container)
-      setupMenu()
+      app.ticker.remove(gameloop)
+      setupWorldMap3()
     })
   )
 
