@@ -22,10 +22,10 @@ function createBee(parent, type, startPosition) {
   }
 
   const eatingAnimations = {
-    idle: animateSprite(bee, 'bee-eating-animation-idle', 17, 13, 8),
-    worker: animateSprite(bee, 'bee-eating-animation-worker', 17, 13, 8),
-    nurser: animateSprite(bee, 'bee-eating-animation-nurser', 17, 13, 8),
-    forager: animateSprite(bee, 'bee-eating-animation-forager', 17, 13, 8),
+    idle: animateSprite(bee, 'bee-eating-animation-idle', 36, 13, 13),
+    worker: animateSprite(bee, 'bee-eating-animation-worker', 36, 13, 13),
+    nurser: animateSprite(bee, 'bee-eating-animation-nurser', 36, 13, 13),
+    forager: animateSprite(bee, 'bee-eating-animation-forager', 36, 13, 13),
   }
 
   const shadow = Sprite.fromImage('images/bee/shadow.png')
