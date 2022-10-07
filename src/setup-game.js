@@ -273,7 +273,7 @@ function setupGame() {
   jobsPanel.addChild(workerText)
   
   addTicker('ui', time => {
-    const aliveBees = bees.filter(b => !b.isDead())
+    const aliveBees = bees.filter(b => !b.isDead() && !b.isDying())
     const idles = aliveBees.filter(b => b.type === 'idle').length
     const foragers = aliveBees.filter(b => b.type === 'forager').length
     const nurses = aliveBees.filter(b => b.type === 'nurser').length

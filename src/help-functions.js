@@ -380,7 +380,7 @@ function typeIdlePos(type, pos) {
 }
 
 function getIdlePosition(type) {
-  const filteredBees = bees.filter(x => x.type === type && !x.isDead())
+  const filteredBees = bees.filter(x => x.type === type && !x.isDead() && !x.isDying())
   let found = false
   let idx = 0
   let comparee = null
@@ -406,7 +406,7 @@ const isForager = b => b.type === 'forager'
 const isIdle = b => b.type === 'idle'
 
 function jobs(addOrRemove, type) {
-  const aliveBees = bees.filter(bee => !bee.isDead())
+  const aliveBees = bees.filter(bee => !bee.isDead() && !bee.isDying())
   const availableBees = aliveBees.filter(addOrRemove === 'add' ? isIdle : x=>x.type===type)
 
   if (availableBees.length > 0) {
