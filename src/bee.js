@@ -36,6 +36,14 @@ function createBee(parent, type, startPosition) {
   }
   Object.values(dyingAgeAnimations).forEach((animation) => animation.pause())
 
+  const dyingHungerAnimations = {
+    idle: animateSprite(bee, 'bee-dying-hunger-animation-idle', 45, 13, 11, false, null, true),
+    worker: animateSprite(bee, 'bee-dying-hunger-animation-worker', 45, 13, 11, false, null, true),
+    nurser: animateSprite(bee, 'bee-dying-hunger-animation-nurser', 45, 13, 11, false, null, true),
+    forager: animateSprite(bee, 'bee-dying-hunger-animation-forager', 45, 13, 11, false, null, true),
+  }
+  Object.values(dyingHungerAnimations).forEach((animation) => animation.pause())
+
   const shadow = Sprite.fromImage('images/bee/shadow.png')
   bee.addChild(shadow)
 
@@ -97,7 +105,7 @@ function createBee(parent, type, startPosition) {
       y: (Math.random() * 2) - 1,
     },
     magnitude: 0.1,
-    duration: 620 
+    duration: null 
   }
   
   bee.roundedPos = { x: 0, y: 0 }
@@ -500,11 +508,24 @@ function createBee(parent, type, startPosition) {
 
   function dying() {
     if (bee.hunger <= 0 || bee.age > 100) {
-      if (!dyingAgeAnimations[bee.type].isRunning()) dyingAgeAnimations[bee.type].start()
+      if (bee.hunger <= 0) {
+        if (!dyingHungerAnimations[bee.type].isRunning()) {
+          dyingHungerAnimations[bee.type].start()
+          bee.dying.duration = 645
+        }
+        dyingHungerAnimations[bee.type].sprite.visible = true
+        beeExclamation.visible = true
+      }
+      if (bee.age > 100) {
+        if (!dyingAgeAnimations[bee.type].isRunning()) {
+          dyingAgeAnimations[bee.type].start()
+          bee.dying.duration = 620
+        }
+        dyingAgeAnimations[bee.type].sprite.visible = true
+        beeExclamation.visible = false
+      }
       bee.hideBee()
       shadow.visible = false
-      beeExclamation.visible = false
-      dyingAgeAnimations[bee.type].sprite.visible = true
       bee.position.x += bee.dying.direction.x * bee.dying.magnitude
       bee.position.y += bee.dying.direction.y * bee.dying.magnitude
       bee.dying.magnitude -= 0.0003
