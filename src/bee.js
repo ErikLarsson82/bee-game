@@ -902,6 +902,12 @@ function createAngel(bee) {
   angelSprite.alpha = 0.6
   container.addChild(angelSprite)
 
+  const beeExclamation = Sprite.fromImage('images/exclamations/exclamation-warning-severe.png')
+  beeExclamation.position.x = 12
+  beeExclamation.position.y = -2
+  beeExclamation.visible = false
+  angelSprite.addChild(beeExclamation)
+
   container.position.x = bee.position.x
   container.position.y = bee.position.y
 
@@ -920,6 +926,8 @@ function createAngel(bee) {
   } else {
     obituary += ' WHO DIED OF AGE'
   }
+
+  beeExclamation.visible = bee.hunger <= 0
 
   angelBubbleText.text = obituary
 
