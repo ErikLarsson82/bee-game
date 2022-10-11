@@ -6,7 +6,8 @@ const cookieGet = Cookies.get(COOKIE_NAME)
 
 if (cookieGet === undefined) {
 	gameStorage = {
-		progress: []
+		progress: [],
+		lastPlayedLevel: -1
 	}
 	persistCookie()
 } else {
@@ -36,6 +37,15 @@ function getLevelProgress(index) {
 		return -1
 	}
 	return level.year
+}
+
+function setLastPlayedLevel(idx) {
+	gameStorage.lastPlayedLevel = idx
+	persistCookie()
+}
+
+function getLastPlayedLevel() {
+	return gameStorage.lastPlayedLevel
 }
 
 function resetCookies() {

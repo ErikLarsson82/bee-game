@@ -20,6 +20,8 @@ function setupGame() {
   seeds = 1
   season = 'summer'
 
+  setLastPlayedLevel(levelIndex)
+
   container = new Container()
   container.scale.x = 2
   container.scale.y = 2

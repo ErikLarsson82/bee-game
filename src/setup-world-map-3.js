@@ -102,7 +102,9 @@ function setupWorldMap3() {
   container.scale.y = DEBUG_MAP_ANIMATION ? 0.4 : 2
   app.stage.addChild(container)
 
-  let startIntroAnimation = levelIndex === null
+  levelIndex = getLastPlayedLevel(levelIndex)
+  let startIntroAnimation = levelIndex === -1
+  if (levelIndex === -1) levelIndex = 0
   let animating = false
   let beeIsAtIndex = null
   let lastPos = 0
@@ -133,10 +135,21 @@ function setupWorldMap3() {
   levelLabel.position.y = 9
   levelSelect.addChild(levelLabel)
 
+  const levelCompleted = Sprite.fromImage('images/world-map-3/checkmark.png')
+  levelCompleted.position.x = 10
+  levelCompleted.position.y = 10
+  levelCompleted.visible = false
+  levelSelect.addChild(levelCompleted)
+
   const levelText = new PIXI.Text('-', { ...fontConfig, ...smallFont, fill: colors.orange })
   levelText.position.x = 21
   levelText.position.y = 25
   levelSelect.addChild(levelText)
+
+  const levelYearLabel = new PIXI.Text('-', { ...fontConfig, ...smallFont, fill: 'white' })
+  levelYearLabel.position.x = 21
+  levelYearLabel.position.y = 34
+  levelSelect.addChild(levelYearLabel)
 
   const levelPreviewTextures = [
     Texture.fromImage('images/world-map-3/preview-level-1.png'),
@@ -176,6 +189,8 @@ function setupWorldMap3() {
     levelLabel.texture = levelTextures[beeIsAtIndex]
     levelPreview.texture = levelPreviewTextures[beeIsAtIndex]
     levelText.text = levels[beeIsAtIndex].name
+    levelYearLabel.text = getLevelProgress(beeIsAtIndex) === -1 ? '' : `Year record: ${ getLevelProgress(beeIsAtIndex) }`
+    levelCompleted.visible = getLevelProgress(beeIsAtIndex) !== -1
     levelSelect.position.x = levels[beeIsAtIndex].placement.x + 30
     levelSelect.position.y = levels[beeIsAtIndex].placement.y - 80
 
@@ -186,7 +201,7 @@ function setupWorldMap3() {
     container.position.y = 0 - levels[beeIsAtIndex].camera.y
   }
   
-  levels.forEach((level, levelIdx) => {
+  levels.forEach((level, idx) => {
     const levelSprite = new Sprite.fromImage('images/world-map-3/placement.png')
     levelSprite.position.x = level.placement.x
     levelSprite.position.y = level.placement.y
@@ -194,12 +209,12 @@ function setupWorldMap3() {
     levelSprite.interactive = true
     levelSprite.buttonMode = true
     levelSprite.mouseover = () => {
-      if (animating || levelIdx === beeIsAtIndex) return
+      if (animating || idx === beeIsAtIndex) return
       levelSprite.alpha = 0.7
     }
     levelSprite.mouseout = () => levelSprite.alpha = 1
     levelSprite.mousedown = () => {
-      if (animating || levelIdx === beeIsAtIndex) return
+      if (animating || idx === beeIsAtIndex) return
       animating = true
 
       const PAN_ANIM_DURATION = 200
@@ -209,8 +224,8 @@ function setupWorldMap3() {
         const beeAnimationPoints = [
           [levels[beeIsAtIndex].placement.x, levels[beeIsAtIndex].placement.y],
           [levels[beeIsAtIndex].placement.x, levels[beeIsAtIndex].placement.y],
-          [levels[levelIdx].placement.x, levels[levelIdx].placement.y],
-          [levels[levelIdx].placement.x, levels[levelIdx].placement.y],
+          [levels[idx].placement.x, levels[idx].placement.y],
+          [levels[idx].placement.x, levels[idx].placement.y],
         ]
         const beeBetweenLevelsAnimation = new Bezier(
           ...beeAnimationPoints.flatMap(p => p)
@@ -228,8 +243,8 @@ function setupWorldMap3() {
         const cameraAnimationPoints = [
           [levels[beeIsAtIndex].camera.x, levels[beeIsAtIndex].camera.y],
           [levels[beeIsAtIndex].camera.x, levels[beeIsAtIndex].camera.y],
-          [levels[levelIdx].camera.x, levels[levelIdx].camera.y],
-          [levels[levelIdx].camera.x, levels[levelIdx].camera.y],
+          [levels[idx].camera.x, levels[idx].camera.y],
+          [levels[idx].camera.x, levels[idx].camera.y],
         ]
         const cameraBetweenLevelsAnimation = new Bezier(
           ...cameraAnimationPoints.flatMap(p => p)
@@ -241,7 +256,7 @@ function setupWorldMap3() {
 
         mapPanAnimationCounter++
         if (mapPanAnimationCounter >= PAN_ANIM_DURATION) {
-          beeIsAtIndex = levelIdx
+          beeIsAtIndex = idx
           clearInterval(mapPanAnimationInterval)
           animating = false
           reset()          
