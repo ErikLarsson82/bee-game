@@ -6,52 +6,52 @@ const levels = [
     name: 'Green fields',
     placement:
       {
-        x: 160,
-        y: 140
+        x: 98,
+        y: 306
       },
     camera:
       {
-        x: 20,
-        y: 74
+        x: 0,
+        y: 157,
       }
   },
   {
     name: 'Green gone cold',
     placement:
       {
-        x: 168,
-        y: 344
+        x: 113,
+        y: 233
       },
     camera:
       {
-        x: 100,
-        y: 264
+        x: 0,
+        y: 135
       }
   },
   {
     name: 'Desert haze',
     placement:
       {
-        x: 398,
-        y: 360
+        x: 155,
+        y: 169
       },
     camera:
       {
-        x: 308,
-        y: 340
+        x: 30,
+        y: 50
       }
   },
   {
     name: 'Blizzard winter',
     placement:
       {
-        x: 504,
-        y: 406
+        x: 212,
+        y: 136
       },
     camera:
       {
-        x: 550,
-        y: 300
+        x: 60,
+        y: 0
       }
   }
 
@@ -110,10 +110,11 @@ function setupWorldMap3() {
   let lastPos = 0
   let speed = false
 
-  const mapImage = Sprite.fromImage('images/world-map-3/sample.png')
+  const mapImage = Sprite.fromImage('images/world-map-3/temp-ref.png')
   mapImage.interactive = true
-  mapImage.mousedown = () => {
+  mapImage.mousedown = (e) => {
     speed = true
+    console.log('Mouse Click Position', e.data.global.x / 2, e.data.global.y / 2);
   }
   mapImage.mouseup = () => {
     speed = false
@@ -177,8 +178,6 @@ function setupWorldMap3() {
   const welcomeFlapB = Texture.fromImage('images/bee/bee-drone-flop.png')
   const welcomeFlapC = Texture.fromImage('images/bee/bee-drone-reference.png')
   const welcomeBee = new Sprite(welcomeFlapA)
-  welcomeBee.scale.x = 2
-  welcomeBee.scale.y = 2
   welcomeBee.position.x = 0
   welcomeBee.position.y = 0
   welcomeBee.anchor.set(0.5, 1)
@@ -191,8 +190,8 @@ function setupWorldMap3() {
     levelText.text = levels[beeIsAtIndex].name
     levelYearLabel.text = getLevelProgress(beeIsAtIndex) === -1 ? '' : `Year record: ${ getLevelProgress(beeIsAtIndex) }`
     levelCompleted.visible = getLevelProgress(beeIsAtIndex) !== -1
-    levelSelect.position.x = levels[beeIsAtIndex].placement.x + 30
-    levelSelect.position.y = levels[beeIsAtIndex].placement.y - 80
+    levelSelect.position.x = levels[beeIsAtIndex].placement.x + 70
+    levelSelect.position.y = levels[beeIsAtIndex].placement.y - 20
 
     welcomeBee.position.x = levels[beeIsAtIndex].placement.x
     welcomeBee.position.y = levels[beeIsAtIndex].placement.y
@@ -202,7 +201,13 @@ function setupWorldMap3() {
   }
   
   levels.forEach((level, idx) => {
-    const levelSprite = new Sprite.fromImage('images/world-map-3/placement.png')
+    const coins = {
+      dim: new Texture.fromImage('images/world-map-3/coin-dim.png'),
+      standard: new Texture.fromImage('images/world-map-3/coin.png'),
+      hover: new Texture.fromImage('images/world-map-3/coin-hover.png'),
+      click: new Texture.fromImage('images/world-map-3/coin-click.png'),
+    }
+    const levelSprite = new Sprite(coins.standard)
     levelSprite.position.x = level.placement.x
     levelSprite.position.y = level.placement.y
     levelSprite.anchor.set(0.5, 0.5)
@@ -210,11 +215,14 @@ function setupWorldMap3() {
     levelSprite.buttonMode = true
     levelSprite.mouseover = () => {
       if (animating || idx === beeIsAtIndex) return
-      levelSprite.alpha = 0.7
+      levelSprite.texture = coins.hover
     }
-    levelSprite.mouseout = () => levelSprite.alpha = 1
+    levelSprite.mouseout = () => {
+      levelSprite.texture = coins.standard
+    }
     levelSprite.mousedown = () => {
       if (animating || idx === beeIsAtIndex) return
+      levelSprite.texture = coins.click
       animating = true
 
       const PAN_ANIM_DURATION = 200
@@ -234,7 +242,7 @@ function setupWorldMap3() {
 
         welcomeBee.texture = mapPanAnimationCounter % 10 < 5 ? welcomeFlapA : welcomeFlapB
         const goingLeft = beeBetweenPositionInterpolation[mapPanAnimationCounter].x > lastPos
-        welcomeBee.scale.x = goingLeft ? 2 : -2
+        welcomeBee.scale.x = goingLeft ? 1 : -1
         lastPos = beeBetweenPositionInterpolation[mapPanAnimationCounter].x
 
         welcomeBee.position.x = beeBetweenPositionInterpolation[mapPanAnimationCounter].x
@@ -251,8 +259,8 @@ function setupWorldMap3() {
         )
         const cameraBetweenPositionInterpolation = generateBezierLUTS(cameraBetweenLevelsAnimation, easeInOutAnimation, PAN_ANIM_DURATION)
 
-        container.position.x = 0 - cameraBetweenPositionInterpolation[mapPanAnimationCounter].x
-        container.position.y = 0 - cameraBetweenPositionInterpolation[mapPanAnimationCounter].y
+        container.position.x = 0 - Math.round(cameraBetweenPositionInterpolation[mapPanAnimationCounter].x)
+        container.position.y = 0 - Math.round(cameraBetweenPositionInterpolation[mapPanAnimationCounter].y)
 
         mapPanAnimationCounter++
         if (mapPanAnimationCounter >= PAN_ANIM_DURATION) {
@@ -268,13 +276,13 @@ function setupWorldMap3() {
 
   container.addChild(welcomeBee) // after level icons
 
-  const ANIM_DURATION = 700
+  const ANIM_DURATION = 500
   
   const points = [
-    [300, 500],
-    [800, 500],
-    [400, 130],
-    [20, 74],
+    [210, 0],
+    [110, 200],
+    [levels[0].camera.x + 50, levels[0].camera.y],
+    [levels[0].camera.x, levels[0].camera.y],
   ]
   const worldMapAnimation = new Bezier(
     ...points.flatMap(p => p)
@@ -282,10 +290,10 @@ function setupWorldMap3() {
   const mapPositionInterpolation = generateBezierLUTS(worldMapAnimation, easeInOutAnimation, ANIM_DURATION)
 
   const points2 = [
-    [120, 400],
-    [800, 500],
-    [400, 130],
-    [160, 140],
+    [300, 100],
+    [150, 20],
+    [levels[0].placement.x + 100, levels[0].placement.y],
+    [levels[0].placement.x, levels[0].placement.y],    
   ]
   const beeAnimation = new Bezier(
     ...points2.flatMap(p => p)
@@ -320,7 +328,7 @@ function setupWorldMap3() {
     points2.forEach(point => {
       const [x, y] = point
       const p = new Graphics()
-      p.beginFill(0xfc0000)
+      p.beginFill(0x440000)
       p.drawRect(x, y, 10, 10)
       container.addChild(p)
     })
@@ -351,12 +359,13 @@ function setupWorldMap3() {
   let counter = 0
   
   if (startIntroAnimation) {
+    if (DEBUG_MAP_ANIMATION) return
     const interval = setInterval(() => {
       levelSelect.visible = false
       const cappedCounter = Math.min(counter, ANIM_DURATION)
       welcomeBee.texture = cappedCounter % 10 < 5 ? welcomeFlapA : welcomeFlapB
       const goingLeft = beePositionInterpolation[cappedCounter].x > lastPos
-      welcomeBee.scale.x = goingLeft ? 2 : -2
+      welcomeBee.scale.x = goingLeft ? 1 : -1
       lastPos = beePositionInterpolation[cappedCounter].x
       welcomeBee.position.x = beePositionInterpolation[cappedCounter].x
       welcomeBee.position.y = beePositionInterpolation[cappedCounter].y
