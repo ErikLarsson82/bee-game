@@ -208,20 +208,25 @@ function setupWorldMap3() {
       click: new Texture.fromImage('images/world-map-3/coin-click.png'),
     }
     const levelSprite = new Sprite(coins.standard)
+    const isLocked = idx > 0 && getLevelProgress(idx-1) === -1
+    if (isLocked) {
+      levelSprite.texture = coins.dim
+    }
     levelSprite.position.x = level.placement.x
     levelSprite.position.y = level.placement.y
     levelSprite.anchor.set(0.5, 0.5)
-    levelSprite.interactive = true
-    levelSprite.buttonMode = true
+    levelSprite.interactive = !isLocked
+    levelSprite.buttonMode = !isLocked
     levelSprite.mouseover = () => {
-      if (animating || idx === beeIsAtIndex) return
+      if (animating || isLocked || idx === beeIsAtIndex) return
       levelSprite.texture = coins.hover
     }
     levelSprite.mouseout = () => {
+      if (isLocked) return
       levelSprite.texture = coins.standard
     }
     levelSprite.mousedown = () => {
-      if (animating || idx === beeIsAtIndex) return
+      if (animating || isLocked || idx === beeIsAtIndex) return
       levelSprite.texture = coins.click
       animating = true
 

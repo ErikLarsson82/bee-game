@@ -39,6 +39,17 @@ function getLevelProgress(index) {
 	return level.year
 }
 
+function fullyUnlockGame() {
+	if (gameStorage.lastPlayedLevel === -1) gameStorage.lastPlayedLevel = 0
+	gameStorage.progress = new Array(MAP_CONFIGURATIONS.length).fill().map((_, idx) => {
+		return {	
+			levelIdx: idx,
+			year: 10
+		}
+	})
+	persistCookie()
+}
+
 function setLastPlayedLevel(idx) {
 	gameStorage.lastPlayedLevel = idx
 	persistCookie()
