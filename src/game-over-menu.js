@@ -6,6 +6,14 @@ function createGameOverUI() {
   background.visible = false
 
   background.addChild(
+    Button(36, 120, 'DEBUG I FINISHED THE LEVEL', () => {
+      app.stage.removeChild(container)
+      app.ticker.remove(gameloop)
+      setupWorldMap3(true)
+    })
+  )
+
+  background.addChild(
   	Button(36, 90, 'Main Menu', () => {
       app.stage.removeChild(container)
       app.ticker.remove(gameloop)
