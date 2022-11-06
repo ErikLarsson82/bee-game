@@ -31,12 +31,12 @@ function setupSplash() {
   const welcomeFlapA = Texture.fromImage('images/bee/bee-drone-flap.png')
   const welcomeFlapB = Texture.fromImage('images/bee/bee-drone-flop.png')
   const welcomeFlapC = Texture.fromImage('images/bee/bee-drone-reference.png')
-  const welcomeBee = new Sprite(welcomeFlapA)
-  welcomeBee.scale.x = 2
-  welcomeBee.scale.y = 2
-  welcomeBee.position.x = 0
-  welcomeBee.position.y = 0
-  container.addChild(welcomeBee)
+  const welcomeSplashBee = new Sprite(welcomeFlapA)
+  welcomeSplashBee.scale.x = 2
+  welcomeSplashBee.scale.y = 2
+  welcomeSplashBee.position.x = 0
+  welcomeSplashBee.position.y = 0
+  container.addChild(welcomeSplashBee)
 
   const targetX = Math.round(WIDTH / 2 / 2) - 25
   const targetY = Math.round(HEIGHT / 2 / 2) - 7
@@ -69,15 +69,15 @@ function setupSplash() {
 
   const interval = setInterval(() => {
     const target = Math.round(fadeoutLUT[counter].y * LUT_MAX)
-    welcomeBee.position.x = luts[target].x
-    welcomeBee.position.y = luts[target].y
+    welcomeSplashBee.position.x = luts[target].x
+    welcomeSplashBee.position.y = luts[target].y
     counter++
 
-    welcomeBee.texture = counter % 10 < 5 ? welcomeFlapA : welcomeFlapB
+    welcomeSplashBee.texture = counter % 10 < 5 ? welcomeFlapA : welcomeFlapB
     
     if (counter >= LUT_MAX) {
       clearInterval(interval)
-      welcomeBee.texture = welcomeFlapC
+      welcomeSplashBee.texture = welcomeFlapC
     }
   }, 16.66)
 

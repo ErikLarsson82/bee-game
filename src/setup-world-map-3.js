@@ -30,8 +30,8 @@ const levels = [
     name: 'Green gone cold',
     placement:
       {
-        x: 144,
-        y: 251
+        x: 145,
+        y: 252
       },
     camera:
       {
@@ -39,7 +39,11 @@ const levels = [
         y: 135
       },
     shitcoins: [
-      { x: 100, y: 100 },
+      { x: 140, y: 239 },
+      { x: 138, y: 227 },
+      { x: 142, y: 216 },
+      { x: 145, y: 204 },
+      { x: 152, y: 192 },
     ]
   },
   {
@@ -55,7 +59,12 @@ const levels = [
         y: 50
       },
     shitcoins: [
-      { x: 150, y: 150 },
+      { x: 169, y: 168 },
+      { x: 178, y: 159 },
+      { x: 183, y: 148 },
+      { x: 189, y: 138 },
+      { x: 197, y: 128 },
+      { x: 204, y: 118 },
     ]
   },
   {
@@ -70,9 +79,7 @@ const levels = [
         x: 60,
         y: 0
       },
-    shitcoins: [
-      { x: 200, y: 200 },
-    ]
+    shitcoins: []
   }
 
 ]
@@ -112,6 +119,8 @@ const easeInOutButFasterAnimation = new Bezier(
     [1, 1],
   ].flatMap(p => p)
 )
+
+const litTexture = new Texture.fromImage('images/world-map-3/shitcoin.png')
 
 const coinTextures = {
   dim: new Texture.fromImage('images/world-map-3/coin-dim.png'),
@@ -159,10 +168,20 @@ function setupWorldMap3(levelFinished) {
   }
   worldMapContainer.addChild(mapImage)
 
-  const deadLandImage = Sprite.fromImage('images/world-map-3/dead_land_0.png')
-  deadLandImage.alpha = 1
-  worldMapContainer.addChild(deadLandImage)
+  const deadLandSprites = []
 
+  for (var i = 1; i <= 4; i++) {
+    const deadLand = Sprite.fromImage(`images/world-map-3/beegame_map_${i}.png`)
+    deadLand.alpha = 0
+    worldMapContainer.addChild(deadLand)
+
+    if (getLevelProgress(i-1) !== -1) {
+      deadLand.alpha = 1
+    }
+
+    deadLandSprites.push(deadLand)
+  }
+  
   levelSelect = Sprite.fromImage('images/world-map-3/level-select.png')
   levelSelect.visible = false
   worldMapContainer.addChild(levelSelect)
@@ -230,16 +249,20 @@ function setupWorldMap3(levelFinished) {
   welcomeBee = new Sprite(flapTextures.a)
   welcomeBee.position.x = 0
   welcomeBee.position.y = 0
-  // welcomeBee.anchor.set(0.5, 1)
+  welcomeBee.anchor.set(0.5, 1)
 
   const shitcoins = []
 
   const coins = levels.map((level, idx) => {
     shitcoins.push(
-      level.shitcoins.map((shit) => {
+      level.shitcoins.map(shit => {
         const shitSprite = new Sprite.fromImage('images/world-map-3/shitcoin-dim.png')
         shitSprite.position.x = shit.x
         shitSprite.position.y = shit.y
+        shitSprite.anchor.set(0.5, 0.5)
+        if (getLevelProgress(idx) !== -1) {
+          shitSprite.texture = litTexture
+        }
         worldMapContainer.addChild(shitSprite)
 
         return shitSprite
@@ -248,7 +271,7 @@ function setupWorldMap3(levelFinished) {
     const levelSprite = new Sprite.fromImage('images/world-map-3/coin.png')
     levelSprite.position.x = level.placement.x
     levelSprite.position.y = level.placement.y
-    // levelSprite.anchor.set(0.5, 0.5)
+    levelSprite.anchor.set(0.5, 0.5)
 
     levelSprite.levelData = level
     levelSprite.levelIdx = idx
@@ -417,7 +440,19 @@ function setupWorldMap3(levelFinished) {
     }
     if (e.keyCode === 57) {
       // animate unlock 1
-      animateAwayDeadLand(deadLandImage, shitcoins[0], () => activateLevel(coins[1], 1, true))
+      animateAwayDeadLand(deadLandSprites[0], shitcoins[0], () => activateLevel(coins[1], 1, true))
+    }
+    if (e.keyCode === 48) {
+      // animate unlock 2
+      animateAwayDeadLand(deadLandSprites[1], shitcoins[1], () => activateLevel(coins[2], 2, true))
+    }
+    if (e.keyCode === 187) {
+      // animate unlock 3
+      animateAwayDeadLand(deadLandSprites[2], shitcoins[2], () => activateLevel(coins[3], 3, true))
+    }
+    if (e.keyCode === 219) {
+      // animate unlock 4
+      animateAwayDeadLand(deadLandSprites[3], shitcoins[3], () => {})
     }
   })
   window.addEventListener('keyup', e => {
@@ -440,7 +475,16 @@ function setupWorldMap3(levelFinished) {
 
   // Trigger animations
   if (levelIndex === 0 && levelFinished) {
-    animateAwayDeadLand(deadLandImage, shitcoins[0], () => activateLevel(coins[1], 1, true))
+    animateAwayDeadLand(deadLandSprites[0], shitcoins[0], () => activateLevel(coins[1], 1, true))
+  }
+  if (levelIndex === 1 && levelFinished) {
+    animateAwayDeadLand(deadLandSprites[1], shitcoins[1], () => activateLevel(coins[2], 2, true))
+  }
+  if (levelIndex === 2 && levelFinished) {
+    animateAwayDeadLand(deadLandSprites[2], shitcoins[2], () => activateLevel(coins[3], 3, true))
+  }
+  if (levelIndex === 3 && levelFinished) {
+    animateAwayDeadLand(deadLandSprites[3], shitcoins[3], () => {})
   }
 }
 
@@ -484,10 +528,9 @@ function activateLevel(coinSprite, idx, force) {
 }
 
 function animateAwayDeadLand(sprite, shitcoins, callback) {
-  sprite.alpha = 1
+  sprite.alpha = 0
   let counter = 0
-  const litTexture = new Texture.fromImage('images/world-map-3/shitcoin.png')
-
+  
   const interval = setInterval(() => {
     counter++
 
@@ -497,8 +540,8 @@ function animateAwayDeadLand(sprite, shitcoins, callback) {
       }
     })
 
-    if (sprite.alpha >= 0) {
-      sprite.alpha -= 0.01
+    if (sprite.alpha <= 1) {
+      sprite.alpha += 0.01
     } else {
       callback()
       clearInterval(interval)
@@ -527,8 +570,8 @@ function flyToLevel(targetLevelData, targetLevelIdx) {
       welcomeBee.scale.x = goingLeft ? 1 : -1
       lastPos = beeBetweenPositionInterpolation[mapPanAnimationCounter].x
 
-      welcomeBee.position.x = beeBetweenPositionInterpolation[mapPanAnimationCounter].x
-      welcomeBee.position.y = beeBetweenPositionInterpolation[mapPanAnimationCounter].y
+      welcomeBee.position.x = Math.round(beeBetweenPositionInterpolation[mapPanAnimationCounter].x)
+      welcomeBee.position.y = Math.round(beeBetweenPositionInterpolation[mapPanAnimationCounter].y)
 
       const cameraAnimationPoints = [
         [levels[beeIsAtIndex].camera.x, levels[beeIsAtIndex].camera.y],

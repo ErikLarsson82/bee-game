@@ -9,6 +9,7 @@ function createGameOverUI() {
     Button(36, 120, 'DEBUG I FINISHED THE LEVEL', () => {
       app.stage.removeChild(container)
       app.ticker.remove(gameloop)
+      saveProgress(levelIndex, 10)
       setupWorldMap3(true)
     })
   )
