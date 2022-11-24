@@ -260,7 +260,9 @@ function setupWorldMap3(levelFinished) {
         shitSprite.position.x = shit.x
         shitSprite.position.y = shit.y
         shitSprite.anchor.set(0.5, 0.5)
-        if (getLevelProgress(idx) !== -1) {
+
+        // If these coins have been unlocked and was not just now unlocked, show as lit (otherwise, some other code will animate the unlocking)
+        if (getLevelProgress(idx) !== -1 && !(levelFinished && beeIsAtIndex === idx)) {
           shitSprite.texture = litTexture
         }
         worldMapContainer.addChild(shitSprite)
