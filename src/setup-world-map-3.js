@@ -140,7 +140,7 @@ let beeIsAtIndex = null
 let welcomeBee = null
 let lastPos = null
 let worldMapContainer = null
-let levelSelect = null
+let playButtonContainer = null
 
 function setupWorldMap3(levelFinished) {
   scene = 'world-map-3'
@@ -182,68 +182,30 @@ function setupWorldMap3(levelFinished) {
     deadLandSprites.push(deadLand)
   }
   
-  levelSelect = Sprite.fromImage('images/world-map-3/level-select.png')
-  levelSelect.visible = false
-  worldMapContainer.addChild(levelSelect)
-
-  const levelTextures = [
-    Texture.fromImage('images/world-map-3/level-1-label.png'),
-    Texture.fromImage('images/world-map-3/level-2-label.png'),
-    Texture.fromImage('images/world-map-3/level-3-label.png'),
-    Texture.fromImage('images/world-map-3/level-4-label.png'),
-  ]
-  const levelLabel = new Sprite(levelTextures[beeIsAtIndex])
-  levelLabel.position.x = 31
-  levelLabel.position.y = 9
-  levelSelect.addChild(levelLabel)
-
-  const levelCompleted = Sprite.fromImage('images/world-map-3/checkmark.png')
-  levelCompleted.position.x = 10
-  levelCompleted.position.y = 10
-  levelCompleted.visible = false
-  levelSelect.addChild(levelCompleted)
-
-  const levelText = new PIXI.Text('-', { ...fontConfig, ...smallFont, fill: colors.orange })
-  levelText.position.x = 21
-  levelText.position.y = 25
-  levelSelect.addChild(levelText)
-
-  const levelYearLabel = new PIXI.Text('-', { ...fontConfig, ...smallFont, fill: 'white' })
-  levelYearLabel.position.x = 21
-  levelYearLabel.position.y = 34
-  levelSelect.addChild(levelYearLabel)
-
-  const levelPreviewTextures = [
-    Texture.fromImage('images/world-map-3/preview-level-1.png'),
-    Texture.fromImage('images/world-map-3/preview-level-2.png'),
-    Texture.fromImage('images/world-map-3/preview-level-3.png'),
-    Texture.fromImage('images/world-map-3/preview-level-4.png'),
-  ]
-  const levelPreview = new Sprite(levelPreviewTextures[beeIsAtIndex])
-  levelPreview.position.x = 10
-  levelPreview.position.y = 40
-  levelPreview.width = 100
-  levelPreview.height = 50
-  levelSelect.addChild(levelPreview)
-
   const callback = () => {
     const map = MAP_CONFIGURATIONS[beeIsAtIndex]
     loadMapParameters(map, beeIsAtIndex)
     app.stage.removeChild(worldMapContainer)
     setupGame()
   }
-  const button = Button(39, 91, 'Play', callback)
-  levelSelect.addChild(button)
+  
+  playButtonContainer = new Container()
+  playButtonContainer.visible = true
+  worldMapContainer.addChild(playButtonContainer)
 
-  levelSelect.setSelect = () => {
-    levelSelect.visible = true
-    levelLabel.texture = levelTextures[beeIsAtIndex]
-    levelPreview.texture = levelPreviewTextures[beeIsAtIndex]
-    levelText.text = levels[beeIsAtIndex].name
-    levelYearLabel.text = getLevelProgress(beeIsAtIndex) === -1 ? '' : `Year record: ${ getLevelProgress(beeIsAtIndex) }`
-    levelCompleted.visible = getLevelProgress(beeIsAtIndex) !== -1
-    levelSelect.position.x = levels[beeIsAtIndex].placement.x + 70
-    levelSelect.position.y = levels[beeIsAtIndex].placement.y - 20
+  const playButton = Button(0, 0, 'Play', callback)
+  playButtonContainer.addChild(playButton)
+
+  const checkmark = Sprite.fromImage(`images/world-map-3/checkmark.png`)
+  checkmark.position.x = 30
+  checkmark.visible = true
+  playButtonContainer.addChild(checkmark)
+  
+  playButtonContainer.setSelect = () => {
+    playButtonContainer.visible = true
+    checkmark.visible = getLevelProgress(beeIsAtIndex) !== -1
+    playButtonContainer.position.x = levels[beeIsAtIndex].placement.x + 10
+    playButtonContainer.position.y = levels[beeIsAtIndex].placement.y - 5
   }
 
   welcomeBee = new Sprite(flapTextures.a)
@@ -372,7 +334,7 @@ function setupWorldMap3(levelFinished) {
   if (startIntroAnimation) {
     if (DEBUG_MAP_ANIMATION) return
     const interval = setInterval(() => {
-      levelSelect.visible = false
+      playButtonContainer.visible = false
       const cappedCounter = Math.min(counter, ANIM_DURATION)
       welcomeBee.texture = cappedCounter % 10 < 5 ? flapTextures.a : flapTextures.b
       const goingLeft = beePositionInterpolation[cappedCounter].x > lastPos
@@ -492,7 +454,7 @@ function setupWorldMap3(levelFinished) {
 
 
 function reset() {
-  levelSelect.setSelect()
+  playButtonContainer.setSelect()
   welcomeBee.texture = flapTextures.c
   
   welcomeBee.position.x = levels[beeIsAtIndex].placement.x
@@ -555,7 +517,7 @@ function flyToLevel(targetLevelData, targetLevelIdx) {
     const PAN_ANIM_DURATION = 200
     let mapPanAnimationCounter = 0
     const mapPanAnimationInterval = setInterval(() => {
-      levelSelect.visible = false
+      playButtonContainer.visible = false
       const beeAnimationPoints = [
         [levels[beeIsAtIndex].placement.x, levels[beeIsAtIndex].placement.y],
         [levels[beeIsAtIndex].placement.x, levels[beeIsAtIndex].placement.y],
