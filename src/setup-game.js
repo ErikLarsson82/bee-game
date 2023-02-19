@@ -17,7 +17,6 @@ function setupGame() {
   hour = 0
   day = 1
   year = 1
-  seeds = 1
   season = 'summer'
 
   setLastPlayedLevel(levelIndex)

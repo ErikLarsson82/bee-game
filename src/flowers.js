@@ -1,7 +1,7 @@
 
 function createFlowers() {
   const positions = [10, -50, 60, -110, 120, -160, 170]
-  for (var f = 0; f < seeds; f++) {
+  for (var f = 0; f <= seeds; f++) {
     const flower = Sprite.fromImage('images/scene/flower.png')
 
     const flipped = Math.random() < 0.5
@@ -22,7 +22,7 @@ function createFlowers() {
     flower.scale.x = flipped ? -1 : 1
     flower.anchor.set(flipped ? 0.6 : 0.2, 0.2)
     flower.position.x = Math.round((WIDTH / 4) + (positions[f] ? positions[f] : f))
-    flower.position.y = 280
+    flower.position.y = 280 - Math.round(Math.random() * 10)
     flowerBed.addChild(flower)
 
     flower.panelLabel = () => false
