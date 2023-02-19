@@ -109,6 +109,7 @@ function setupSplash() {
   scaler.scale.y = 2
   container.addChild(scaler)
 
+  /*
   const buttonA = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 0), '  Play', callbackA)
   scaler.addChild(buttonA)
 
@@ -117,7 +118,8 @@ function setupSplash() {
 
   const buttonC = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 2), 'World Map 2', callbackC)
   scaler.addChild(buttonC)
+  */
 
-  const buttonD = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 3), 'World Map 3', callbackD)
+  const buttonD = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 0), 'Play', callbackD)
   scaler.addChild(buttonD)
 }
