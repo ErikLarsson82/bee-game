@@ -147,8 +147,8 @@ function setupWorldMap3(levelFinished) {
   document.body.style['background-color'] = '#fff6c5'
   
   worldMapContainer = new Container()
-  worldMapContainer.scale.x = DEBUG_MAP_ANIMATION ? 0.4 : 2
-  worldMapContainer.scale.y = DEBUG_MAP_ANIMATION ? 0.4 : 2
+  worldMapContainer.scale.x = DEBUG_MAP_ANIMATION ? 0.4 : 2.3
+  worldMapContainer.scale.y = DEBUG_MAP_ANIMATION ? 0.4 : 1.9
   app.stage.addChild(worldMapContainer)
 
   levelIndex = getLastPlayedLevel(levelIndex)
@@ -342,8 +342,8 @@ function setupWorldMap3(levelFinished) {
       lastPos = beePositionInterpolation[cappedCounter].x
       welcomeBee.position.x = beePositionInterpolation[cappedCounter].x
       welcomeBee.position.y = beePositionInterpolation[cappedCounter].y
-      worldMapContainer.position.x = 0 - Math.round(mapPositionInterpolation[cappedCounter].x)
-      worldMapContainer.position.y = 0 - Math.round(mapPositionInterpolation[cappedCounter].y)
+      //worldMapContainer.position.x = 0 - Math.round(mapPositionInterpolation[cappedCounter].x)
+      //worldMapContainer.position.y = 0 - Math.round(mapPositionInterpolation[cappedCounter].y)
       counter++
       if (counter >= ANIM_DURATION) {
         clearInterval(interval)
@@ -460,8 +460,8 @@ function reset() {
   welcomeBee.position.x = levels[beeIsAtIndex].placement.x
   welcomeBee.position.y = levels[beeIsAtIndex].placement.y
 
-  worldMapContainer.position.x = 0 - levels[beeIsAtIndex].camera.x
-  worldMapContainer.position.y = 0 - levels[beeIsAtIndex].camera.y
+  //worldMapContainer.position.x = 0 - levels[beeIsAtIndex].camera.x
+  //worldMapContainer.position.y = 0 - levels[beeIsAtIndex].camera.y
 }
 
 function activateLevel(coinSprite, idx, force) {
@@ -548,8 +548,8 @@ function flyToLevel(targetLevelData, targetLevelIdx) {
       )
       const cameraBetweenPositionInterpolation = generateBezierLUTS(cameraBetweenLevelsAnimation, easeInOutAnimation, PAN_ANIM_DURATION)
 
-      worldMapContainer.position.x = 0 - Math.round(cameraBetweenPositionInterpolation[mapPanAnimationCounter].x)
-      worldMapContainer.position.y = 0 - Math.round(cameraBetweenPositionInterpolation[mapPanAnimationCounter].y)
+      //worldMapContainer.position.x = 0 - Math.round(cameraBetweenPositionInterpolation[mapPanAnimationCounter].x)
+      //worldMapContainer.position.y = 0 - Math.round(cameraBetweenPositionInterpolation[mapPanAnimationCounter].y)
 
       mapPanAnimationCounter++
       if (mapPanAnimationCounter >= PAN_ANIM_DURATION) {
