@@ -1,3 +1,4 @@
+const DEBUG_BUTTON = false
 
 function createGameOverUI() {
   const background = Sprite.fromImage('images/ui/game-over-background.png')
@@ -5,14 +6,16 @@ function createGameOverUI() {
   background.position.y = 98
   background.visible = false
 
-  background.addChild(
-    Button(36, 120, 'DEBUG I FINISHED THE LEVEL', () => {
-      app.stage.removeChild(container)
-      app.ticker.remove(gameloop)
-      saveProgress(levelIndex, 10)
-      setupWorldMap3(true)
-    })
-  )
+  if (DEBUG_BUTTON) {
+    background.addChild(
+      Button(36, 120, 'DEBUG I FINISHED THE LEVEL', () => {
+        app.stage.removeChild(container)
+        app.ticker.remove(gameloop)
+        saveProgress(levelIndex, 10)
+        setupWorldMap3(true)
+      })
+    )
+  }
 
   background.addChild(
   	Button(36, 90, 'Main Menu', () => {
