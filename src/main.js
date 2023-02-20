@@ -41,6 +41,7 @@ const speeds = {
 let cycles = null
 
 let gameover = null
+let keepPlaying = null
 let gameSpeed = null
 let paused = null
 let hour = null

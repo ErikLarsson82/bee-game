@@ -19,10 +19,18 @@ function createGameOverUI() {
   }
 
   background.addChild(
-  	Button(36, 90, 'Main Menu', () => {
+  	Button(5, 90, 'Main Menu', () => {
       app.stage.removeChild(container)
       app.ticker.remove(gameloop)
       setupWorldMap3()
+    })
+  )
+
+  background.addChild(
+    Button(66, 90, 'Continue', () => {
+      keepPlaying = true
+      gameover = false
+      background.visible = false
     })
   )
 
@@ -31,6 +39,7 @@ function createGameOverUI() {
     	background.visible = true
 
       if (levelCompleteCriteria(currentCycleIndex)) {
+        saveProgress(levelIndex, year)
         background.texture = successTexture
       }
     }

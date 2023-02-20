@@ -12,6 +12,7 @@ function setupGame() {
   
   currentCycleIndex = 0
   gameover = false
+  keepPlaying = false
   paused = false
   gameSpeed = 1
   hour = 0
@@ -372,9 +373,7 @@ function setupGame() {
   blocker.mouseover = () => {}
   clickblocker.addChild(blocker)
   addTicker('ui', () => {
-    if (gameover) {
-      blocker.visible = true
-    }
+    blocker.visible = gameover
   })
 
   panel = new Container()

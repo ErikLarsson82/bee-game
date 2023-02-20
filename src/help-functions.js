@@ -438,5 +438,5 @@ function isGameOver(currentCycleIndex, aliveBees) {
 }
 
 function levelCompleteCriteria(currentCycleIndex) {
-  return currentCycleIndex === 6
+  return currentCycleIndex === 6 && keepPlaying === false
 }
