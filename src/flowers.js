@@ -61,18 +61,7 @@ function createFlowers() {
     addTicker('game-stuff', () => {
       flowerExclamation.visible = isDayBeforeWinter() && !flower.isPollinated()
       if (flower.isPollinated()) {
-        flower.texture = Texture.fromImage('images/scene/flower-pollinated.png')        
-
-        if (!flower.pollinationAnimationSprite) {
-
-          const doneCallback = () => {
-            flower.removeChild(flower.pollinationAnimationSprite)
-            flower.pollinationAnimationSprite = 'no not animate again'
-          }
-          const { sprite } = animateSprite(flower, 'flower-is-pollinated', 7, 46, 50, false, doneCallback, true)
-          sprite.anchor.set(flipped ? 0.6 : 0.2, 0.2)
-          flower.pollinationAnimationSprite = sprite
-        }
+        flower.texture = Texture.fromImage('images/scene/flower-pollinated.png')
       }
     })
 
