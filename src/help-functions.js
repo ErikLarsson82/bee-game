@@ -429,3 +429,14 @@ function decreaseForagers() {
     foragerBees[0].type = 'idle'
   }
 }
+
+function isGameOver(currentCycleIndex, aliveBees) {
+  if (aliveBees.length === 0) return true
+  if (levelCompleteCriteria(currentCycleIndex)) return true
+
+  return false
+}
+
+function levelCompleteCriteria(currentCycleIndex) {
+  return currentCycleIndex === 6
+}

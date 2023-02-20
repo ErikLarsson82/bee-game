@@ -1,7 +1,8 @@
 const DEBUG_BUTTON = false
 
 function createGameOverUI() {
-  const background = Sprite.fromImage('images/ui/game-over-background.png')
+  const background = Sprite.fromImage('images/ui/game-over-background-failed.png')
+  const successTexture = Texture.fromImage('images/ui/game-over-background-success.png')
   background.position.x = 146
   background.position.y = 98
   background.visible = false
@@ -28,6 +29,10 @@ function createGameOverUI() {
   addTicker('ui', () => {
     if (gameover) {
     	background.visible = true
+
+      if (levelCompleteCriteria(currentCycleIndex)) {
+        background.texture = successTexture
+      }
     }
   })
   ui.addChild(background)

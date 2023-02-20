@@ -15,9 +15,7 @@ function gameloop(delta, manualTick) {
 
   const aliveBees = bees.filter(bee => !bee.isDead() && bee.type !== 'bookie')
 
-  if (aliveBees.length === 0) {
-    gameover = true
-  }
+  gameover = isGameOver(currentCycleIndex, aliveBees)
 
   if (gameover) {
     paused = true
