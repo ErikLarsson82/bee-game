@@ -39,6 +39,7 @@ function gameloop(delta, manualTick) {
         currentCycleIndex++
         currentCycle = cycles[currentCycleIndex]
         currentSeasonLength = currentCycle
+        previousSeasonLength = cycles[currentCycleIndex-1]
         season = season === 'summer' ? 'winter' : 'summer'
         sun.mouseup()
         if (season === 'summer') {

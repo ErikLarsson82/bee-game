@@ -383,6 +383,7 @@ function setupGame() {
   addJobsButtons(jobsPanel)
 
   createWarningSign()
+  createSeasonTracker()
 
   createMap(MAP_SELECTION)
   createFlowers()

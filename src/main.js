@@ -50,6 +50,7 @@ let seeds = null
 let season = null 
 let winterHungerMultiplier = null
 let currentSeasonLength = 0
+let previousSeasonLength = null
 let currentCycle = 0
 let currentCycleIndex = 0
 let angelBubbleTimer = 0
@@ -117,4 +118,4 @@ loader.add('bee-dying-hunger-animation-idle', 'images/sprite-sheets/bee/idle/dyi
 loader.add('flower-is-pollinated', 'images/sprite-sheets/flower-is-pollinated/animation-spritesheet-flower.png')
 loader.load(setupSplash)
 
-// loader.load(setupMenu)
+//loader.load(setupMenu)
