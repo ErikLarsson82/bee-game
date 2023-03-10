@@ -216,18 +216,32 @@ function addJobsButtons(jobsPanel) {
   for (var i = 0; i < 3; i++) {
     for (var j = 0; j < 2; j++) {
       {
-        const button = Sprite.fromImage(j === 0 ? 'images/ui/minus.png' : 'images/ui/plus.png')
-        button.position.x = 54 + (j * 12)
-        button.position.y = 41 + (i * 38)
+        const button = new Sprite()
+        const textureA = Texture.fromImage(j === 0 ? 'images/ui/button-jobs/button-plus.png' : 'images/ui/button-jobs/button-minus.png')
+        const textureB = Texture.fromImage(j === 0 ? 'images/ui/button-jobs/button-active-plus.png' : 'images/ui/button-jobs/button-active-minus.png')
+        const textureC = Texture.fromImage(j === 0 ? 'images/ui/button-jobs/button-hover-plus.png' : 'images/ui/button-jobs/button-hover-minus.png')
+        button.texture = textureA
+
+        button.position.x = 76
+        button.position.y = 36 + (i * 38) + (j * 10)
         button.interactive = true
         button.buttonMode = true
-        button.alpha = 1
-        button.mouseover = () => button.alpha = 0.7
-        button.mouseout = () => button.alpha = 1
         const idx = ['forager', 'nurser', 'worker']
         const type = idx[i]
-        const action = j === 0 ? 'remove' : 'add'
-        button.mousedown = () => jobs(action, type)
+        const action = j === 0 ? 'add' : 'remove'
+        button.mouseover = () => {
+          button.texture = textureC
+        }
+        button.mouseout = () => {
+          button.texture = textureA
+        }
+        button.mouseup = () => {
+          jobs(action, type)
+          button.texture = textureA
+        }
+        button.mousedown = () => {
+          button.texture = textureB
+        }
         jobsPanel.addChild(button)
       }
     }

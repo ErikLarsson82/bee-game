@@ -249,41 +249,32 @@ function setupGame() {
   jobsPanel.position.x = 20
   jobsPanel.position.y = 25
   background.addChild(jobsPanel)
+  
+  addJobsButtons(jobsPanel)
 
-  const unassignedText = new PIXI.Text('-', { ...fontConfig, ...smallFont })
-  unassignedText.anchor.set(1, 0)
-  unassignedText.position.x = 73
-  unassignedText.position.y = 3
-  jobsPanel.addChild(unassignedText)
+  const jobs = ['idle', 'forager', 'nurser', 'worker']
+  
+  jobs.forEach((type, idx) => {
+    const jobCounterHex = new Sprite.fromImage('images/ui/button-jobs/button-alt.png')
+    jobCounterHex.position.x = 63
+    jobCounterHex.position.y = (idx * 38) + 3
+    jobsPanel.addChild(jobCounterHex)
 
-  const foragerText = new PIXI.Text('-', { ...fontConfig, ...smallFont })
-  foragerText.anchor.set(1, 0)
-  foragerText.position.x = 52
-  foragerText.position.y = 41.5
-  jobsPanel.addChild(foragerText)
+    const textLabel = new PIXI.Text('-', { ...fontConfig, ...smallFont, fill: '#4b0b12' })
+    textLabel.position.x = 12
+    textLabel.position.y = 3
+    textLabel.anchor.set(1, 0)
+    
+    addTicker('ui', time => {
+      const aliveBees = bees.filter(b => !b.isDead() && !b.isDying())
+      textLabel.text = aliveBees.filter(b => b.type === type).length
+    })
 
-  const nurserText = new PIXI.Text('-', { ...fontConfig, ...smallFont })
-  nurserText.anchor.set(1, 0)
-  nurserText.position.x = 50
-  nurserText.position.y = 79.5
-  jobsPanel.addChild(nurserText)
-
-  const workerText = new PIXI.Text('-', { ...fontConfig, ...smallFont })
-  workerText.anchor.set(1, 0)
-  workerText.position.x = 53
-  workerText.position.y = 117.5
-  jobsPanel.addChild(workerText)
+    jobCounterHex.addChild(textLabel)
+  })
   
   addTicker('ui', time => {
     const aliveBees = bees.filter(b => !b.isDead() && !b.isDying())
-    const idles = aliveBees.filter(b => b.type === 'idle').length
-    const foragers = aliveBees.filter(b => b.type === 'forager').length
-    const nurses = aliveBees.filter(b => b.type === 'nurser').length
-    const workers = aliveBees.filter(b => b.type === 'worker').length
-    unassignedText.text = idles
-    foragerText.text = foragers
-    nurserText.text = nurses
-    workerText.text = workers
     populationText.text = aliveBees.length + 1
   })
   
@@ -378,8 +369,6 @@ function setupGame() {
 
   panel = new Container()
   ui.addChild(panel)
-
-  addJobsButtons(jobsPanel)
 
   createWarningSign()
   createSeasonTracker()
