@@ -90,7 +90,7 @@ function setupSplash() {
 
   const callbackA = () => {
     app.stage.removeChild(container)
-    setupMenu()
+    setupDebugMenu()
   }
   const callbackB = () => {
     app.stage.removeChild(container)
@@ -101,6 +101,7 @@ function setupSplash() {
     setupWorldMap2()
   }
   const callbackD = () => {
+    // This is the "official" one
     app.stage.removeChild(container)
     setupWorldMap3()
   }

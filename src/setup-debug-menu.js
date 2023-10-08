@@ -1,5 +1,5 @@
 
-function setupMenu() {
+function setupDebugMenu() {
   scene = 'menu'
   document.body.style['background-color'] = '#fff6c5'
   
@@ -33,5 +33,5 @@ function setupMenu() {
     }
   })
   
-  //MAP_CONFIGURATIONS[4].callback()
+  // MAP_CONFIGURATIONS[4].callback()
 }

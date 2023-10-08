@@ -119,4 +119,4 @@ loader.add('bee-dying-hunger-animation-idle', 'images/sprite-sheets/bee/idle/dyi
 loader.add('flower-is-pollinated', 'images/sprite-sheets/flower-is-pollinated/animation-spritesheet-flower.png')
 loader.load(setupSplash)
 
-//loader.load(setupMenu)
+// loader.load(setupDebugMenu)
