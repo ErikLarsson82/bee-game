@@ -33,5 +33,6 @@ function setupDebugMenu() {
     }
   })
   
-  // MAP_CONFIGURATIONS[4].callback()
+  if (window.debugMap !== undefined)
+    MAP_CONFIGURATIONS[0].callback()
 }

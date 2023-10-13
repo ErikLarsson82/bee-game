@@ -51,6 +51,7 @@ function gameloop(delta, manualTick) {
           backgroundScene.texture = Texture.fromImage('images/scene/background-winter.png')
           killFlowers()
           killBroodlings()
+          freezeNectar()
           sun.winterSun.visible = true
           sun.summerSun.visible = false
         }

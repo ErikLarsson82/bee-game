@@ -1,5 +1,4 @@
 
-let MAP_SELECTION = 'default'
 let DEBUG = false
 
 // Works on PC =  "PICO-8 mono Regular"'
@@ -54,6 +53,7 @@ let currentSeasonLength = 0
 let previousSeasonLength = null
 let currentCycle = 0
 let currentCycleIndex = 0
+let currentMapInit = null
 let angelBubbleTimer = 0
 let backgroundImage = null
 let levelIndex = null
@@ -117,6 +117,6 @@ loader.add('bee-dying-age-animation-idle', 'images/sprite-sheets/bee/idle/dying-
 loader.add('bee-dying-hunger-animation-idle', 'images/sprite-sheets/bee/idle/dying-hunger.png')
 
 loader.add('flower-is-pollinated', 'images/sprite-sheets/flower-is-pollinated/animation-spritesheet-flower.png')
-loader.load(setupSplash)
 
-// loader.load(setupDebugMenu)
+loader.load(setupDebugMenu)  
+// loader.load(setupSplash)

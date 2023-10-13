@@ -24,6 +24,7 @@ function createQueen(parent) {
   makeHexDetectable(queenSprite)
 
   queenSprite.setShadowPosition = () => {}
+  queenSprite.isOverburdened = () => false
 
   const helperText = () => {
     if (season === 'winter') return 'Does not\nlay eggs\nin winter'
