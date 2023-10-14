@@ -95,6 +95,7 @@ function createBee(parent, type, startPosition) {
   bee.POLLEN_SACK_CAPACITY = 20
   bee.HONEY_SACK_CAPACITY = 10
   bee.WAX_SACK_CAPACITY = 10
+  bee.DEAD_AT_AGE = Math.round(80 + (Math.random() * 40))
 
   bee.dying = {
     direction: {
@@ -257,7 +258,7 @@ function createBee(parent, type, startPosition) {
     container.addChild(ProgressBar(106, p[2], 'nectar', () => bee.nectarSack, bee.NECTAR_SACK_CAPACITY))
     container.addChild(ProgressBar(106, p[3], 'wax', () => bee.waxSack, bee.WAX_SACK_CAPACITY))
     container.addChild(ProgressBar(106, p[4], 'pollen', () => bee.pollenSack, bee.POLLEN_SACK_CAPACITY))
-    container.addChild(ProgressBar(106, p[5], 'age', () => bee.age, 100))
+    container.addChild(ProgressBar(106, p[5], 'age', () => bee.age, bee.DEAD_AT_AGE))
     
     const textHeading = new PIXI.Text('BEE', { ...fontConfig })
     textHeading.scale.set(0.15, 0.15)
@@ -512,11 +513,11 @@ function createBee(parent, type, startPosition) {
   }
 
   function ageBee() {
-    bee.age += transferTo(100).inMinutes(70)
+    bee.age += transferTo(200).inMinutes(200)
   }
 
   function dying() {
-    if (bee.hunger <= 0 || bee.age > 100) {
+    if (bee.hunger <= 0 || bee.age > bee.DEAD_AT_AGE) {
       if (bee.hunger <= 0) {
         if (!dyingHungerAnimations[bee.type].isRunning()) {
           dyingHungerAnimations[bee.type].start()
@@ -525,7 +526,7 @@ function createBee(parent, type, startPosition) {
         dyingHungerAnimations[bee.type].sprite.visible = true
         beeExclamation.visible = true
       }
-      if (bee.age > 100) {
+      if (bee.age > bee.DEAD_AT_AGE) {
         if (!dyingAgeAnimations[bee.type].isRunning()) {
           dyingAgeAnimations[bee.type].start()
           bee.dying.duration = 620

@@ -9,13 +9,13 @@ let MAP_CONFIGURATIONS = [
     backgroundColor: 0x2ce8f5,
     init: (parent) => {
       // I enjoy this one (pro level)
-      createBee(parent, 'idle').setHunger(40).setAge(80)
-      createBee(parent, 'idle').setHunger(42).setAge(60)
-      createBee(parent, 'idle').setHunger(50).setAge(20)
-      createBee(parent, 'idle').setHunger(80).setAge(10)
-      createBee(parent, 'idle').setHunger(100).setAge(6)
-      createBee(parent, 'idle').setHunger(100).setAge(5)
-      createBee(parent, 'idle').setHunger(100).setAge(0)
+      createBee(parent, 'idle').setHunger(40)
+      createBee(parent, 'idle').setHunger(42)
+      createBee(parent, 'idle').setHunger(50)
+      createBee(parent, 'idle').setHunger(80)
+      createBee(parent, 'idle').setHunger(100)
+      createBee(parent, 'idle').setHunger(100)
+      createBee(parent, 'idle').setHunger(100)
 
       replaceHex([5, 7], 'prepared', 'activate').instantlyPrepare()
       replaceHex([6, 7], 'prepared', 'activate').instantlyPrepare()
@@ -37,17 +37,17 @@ let MAP_CONFIGURATIONS = [
     blizzardWinter: false,
     backgroundColor: 0x2ce8f5,
     init: (parent) => {
-      createBee(parent, 'idle').setHunger(40).setAge(80)
-      createBee(parent, 'idle').setHunger(42).setAge(60)
-      createBee(parent, 'idle').setHunger(50).setAge(20)
-      createBee(parent, 'idle').setHunger(80).setAge(10)
-      createBee(parent, 'idle').setHunger(100).setAge(6)
-      createBee(parent, 'idle').setHunger(100).setAge(5)
-      createBee(parent, 'idle').setHunger(100).setAge(0)
-      createBee(parent, 'idle').setHunger(100).setAge(0)
-      createBee(parent, 'idle').setHunger(100).setAge(0)
-      createBee(parent, 'idle').setHunger(100).setAge(0)
-      createBee(parent, 'idle').setHunger(100).setAge(0)
+      createBee(parent, 'idle').setHunger(40)
+      createBee(parent, 'idle').setHunger(42)
+      createBee(parent, 'idle').setHunger(50)
+      createBee(parent, 'idle').setHunger(80)
+      createBee(parent, 'idle').setHunger(100)
+      createBee(parent, 'idle').setHunger(100)
+      createBee(parent, 'idle').setHunger(100)
+      createBee(parent, 'idle').setHunger(100)
+      createBee(parent, 'idle').setHunger(100)
+      createBee(parent, 'idle').setHunger(100)
+      createBee(parent, 'idle').setHunger(100)
 
       replaceHex([2, 3], 'pollen', 'activate').setPollen(60)
       replaceHex([2, 2], 'pollen', 'activate').setPollen(60)
@@ -76,9 +76,9 @@ let MAP_CONFIGURATIONS = [
     blizzardWinter: false,
     backgroundColor: 0x2ce8f5,
     init: (parent) => {
-      createBee(parent, 'idle').setHunger(60).setAge(40)
-      createBee(parent, 'idle').setHunger(70).setAge(30)
-      createBee(parent, 'idle').setHunger(80).setAge(20)
+      createBee(parent, 'idle').setHunger(60)
+      createBee(parent, 'idle').setHunger(70)
+      createBee(parent, 'idle').setHunger(80)
       
       replaceHex([4, 2], 'blocked', 'no-activation')
       replaceHex([3, 2], 'blocked', 'no-activation')
@@ -170,13 +170,13 @@ let MAP_CONFIGURATIONS = [
 
       if (m === 'test brood') {
         // I want this to be the beginner level
-        createBee(parent, 'idle').setHunger(40).setAge(80)
-        createBee(parent, 'idle').setHunger(42).setAge(60)
-        createBee(parent, 'idle').setHunger(50).setAge(20)
-        createBee(parent, 'idle').setHunger(80).setAge(10)
-        createBee(parent, 'idle').setHunger(100).setAge(6)
-        createBee(parent, 'idle').setHunger(100).setAge(5)
-        createBee(parent, 'idle').setHunger(100).setAge(0)
+        createBee(parent, 'idle').setHunger(40)
+        createBee(parent, 'idle').setHunger(42)
+        createBee(parent, 'idle').setHunger(50)
+        createBee(parent, 'idle').setHunger(80)
+        createBee(parent, 'idle').setHunger(100)
+        createBee(parent, 'idle').setHunger(100)
+        createBee(parent, 'idle').setHunger(100)
 
         for (let i = 0; i < hexGrid.length-2; i++) {
           for (let j = 0; j < hexGrid[0].length; j++) {
@@ -190,11 +190,13 @@ let MAP_CONFIGURATIONS = [
           }
         }
 
+        /*
         for (let i = 10; i < 12; i++) {
           for (let j = 5; j < 10; j++) {
             replaceHex([i, j], 'honey', 'activate').setHoney(30)
           }
         }
+        */
 
         for (let i = 2; i < 4; i++) {
           for (let j = 8; j < 12; j++) {
@@ -203,10 +205,12 @@ let MAP_CONFIGURATIONS = [
         }
         // replaceHex([7, 7], 'brood', 'activate').setContents('puppa')
 
+        /*
         replaceHex([2, 2], 'honey', 'activate').setHoney(45)
         replaceHex([2, 3], 'honey', 'activate').setHoney(45)
         replaceHex([3, 2], 'honey', 'activate').setHoney(45)
         replaceHex([3, 3], 'honey', 'activate').setHoney(45)
+        */
 
         replaceHex([2+4, 2], 'nectar', 'activate').setNectar(30)
         replaceHex([2+4, 3], 'nectar', 'activate').setNectar(30)
