@@ -416,6 +416,10 @@ function cellNectar(x, y, parent) {
   }
 
   addTicker('game-stuff', time => {
+    if (season === 'winter') {
+      nectarSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-ice.png')
+      return
+    }
     if (nectarSprite.nectar > nectarSprite.NECTAR_CAPACITY * 0.9) {
       nectarSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-full.png')
     } else if (nectarSprite.nectar > nectarSprite.NECTAR_CAPACITY * 0.72) {
@@ -528,7 +532,7 @@ function cellBrood(x, y, parent) {
       broodSprite.setContents('larvae')      
     } else if (broodSprite.lifecycle > eggDuration + larvaeDuration && broodSprite.content === 'larvae') {
       broodSprite.setContents('puppa')
-    } else if (broodSprite.lifecycle > eggDuration + larvaeDuration + puppaDuration && broodSprite.content === 'puppa' && season === 'summer') {
+    } else if (broodSprite.lifecycle > eggDuration + larvaeDuration + puppaDuration && broodSprite.content === 'puppa' && season === 'summer' && day === 1) {
       broodSprite.setContents('empty')
       createBee(beeContainer, 'idle', { x: broodSprite.position.x, y: broodSprite.position.y - 5 })
     }

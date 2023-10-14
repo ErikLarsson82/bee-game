@@ -7,7 +7,7 @@ function loadMapParameters(map, idx) {
   currentCycleIndex = 0
   currentCycle = cycles[0]
   currentSeasonLength = cycles[0]
-  MAP_SELECTION = map.id
+  currentMapInit = map.init
   seeds = map.seeds
   winterHungerMultiplier = map.winterHungerMultiplier
 }
@@ -88,6 +88,15 @@ function killBroodlings() {
   forEachHexagon(hexGrid, hex => {
     if (hex.type === 'brood' && ['egg', 'larvae'].includes(hex.content)) {
       hex.kill()
+    }
+  })
+}
+
+function freezeNectar() {
+  bees.forEach(b => b.nectarSack = 0)
+  forEachHexagon(hexGrid, hex => {
+    if (hex.type === 'nectar') {
+      hex.setNectar(0)
     }
   })
 }

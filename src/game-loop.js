@@ -13,6 +13,8 @@ function gameloop(delta, manualTick) {
     panel.position.y = y
   }
 
+  dimmer.ref.alpha = season === 'summer' && hour < 3 && day === 1 ? 0 : 1 - (Math.sin(Math.PI * ((hour) % 24 / 24)) * 1.5) - 0.7
+  
   const aliveBees = bees.filter(bee => !bee.isDead() && bee.type !== 'bookie')
 
   gameover = isGameOver(currentCycleIndex, aliveBees)
@@ -38,9 +40,10 @@ function gameloop(delta, manualTick) {
         currentCycle = cycles[currentCycleIndex]
         currentSeasonLength = currentCycle
         previousSeasonLength = cycles[currentCycleIndex-1]
-        season = season === 'summer' ? 'winter' : 'summer'
+        season = season === 'summer' ? 'winter' : 'summer'        
         sun.mouseup()
         if (season === 'summer') {
+          gameSpeed = 1
           backgroundScene.texture = Texture.fromImage('images/scene/background-summer.png')        
           year++
           day = 1
@@ -51,6 +54,7 @@ function gameloop(delta, manualTick) {
           backgroundScene.texture = Texture.fromImage('images/scene/background-winter.png')
           killFlowers()
           killBroodlings()
+          freezeNectar()
           sun.winterSun.visible = true
           sun.summerSun.visible = false
         }

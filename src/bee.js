@@ -184,6 +184,17 @@ function createBee(parent, type, startPosition) {
   const isWaxSackFull = () => bee.waxSack >= bee.WAX_SACK_CAPACITY
   const isWaxSackEmpty = () => !(bee.waxSack > 0)
 
+  bee.isOverburdened = () => bee.type === 'forager' && (isNectarSackFull() || isPollenSackFull())
+
+  bee.isPollenSackFull = isPollenSackFull
+  bee.isNectarSackFull = isNectarSackFull
+  bee.isHoneySackFull = isHoneySackFull
+  bee.isWaxSackFull = isWaxSackFull
+  bee.isPollenSackEmpty = isPollenSackEmpty
+  bee.isNectarSackEmpty = isNectarSackEmpty
+  bee.isHoneySackEmpty = isHoneySackEmpty
+  bee.isWaxSackEmpty = isWaxSackEmpty
+
   const helperText = () => {
     if (bee.type === 'worker' && bee.isHungry()) {
       return '  Bee is\nhungry\n\nWorkers\neat when\nmaking honey'
@@ -194,7 +205,7 @@ function createBee(parent, type, startPosition) {
     if (bee.type === 'forager' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y && isPollenSackFull()) {
       return 'Cannot find\nunoccupied\npollen hexagon'
     }
-    if (bee.type === 'forager' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) {
+    if (bee.type === 'forager' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) {      
       return 'Cannot find\nunoccupied\nflower'
     }
     if (bee.type === 'nurser' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) {
@@ -784,7 +795,7 @@ function createBee(parent, type, startPosition) {
 
     // Is eating
     const honeyTarget = bee.isAtType('honey')
-    const isEating = honeyTarget && !bee.isWellFed() && honeyTarget.honey > 0 && (bee.type === 'worker' && season !== 'summer')
+    const isEating = honeyTarget && bee.isHoneySackEmpty() // && !bee.isWellFed() && honeyTarget.honey > 0 //  && (bee.type === 'worker' && season !== 'summer')
     
     if (isEating) {
       eatingAnimations[bee.type].sprite.visible = true

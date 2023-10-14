@@ -35,6 +35,12 @@ function setupGame() {
 
   dimmer = new Container()
   container.addChild(dimmer)
+  const dimmerSquare = new Graphics()
+  dimmerSquare.beginFill(0x000000)
+  dimmerSquare.drawRect(0, 0, WIDTH, HEIGHT)
+  dimmerSquare.alpha = 0
+  dimmer.ref = dimmerSquare
+  dimmer.addChild(dimmerSquare)
 
   flowerBed = new Container()
   container.addChild(flowerBed)
@@ -84,7 +90,7 @@ function setupGame() {
     populationText.position.y = topBarContentOffsetY
     uiTopBar.addChild(populationText)
 
-    const timelineText = new PIXI.Text('Year   Day', { ...fontConfig, ...smallFont, fill: 'gray' })
+    const timelineText = new PIXI.Text('Year   Day   Hour', { ...fontConfig, ...smallFont, fill: 'gray' })
     timelineText.position.x = 110
     timelineText.position.y = topBarContentOffsetY
     uiTopBar.addChild(timelineText)
@@ -100,10 +106,17 @@ function setupGame() {
     dayLabel.position.x = 158
     dayLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(dayLabel)
+
+    const hourLabel = new PIXI.Text('-', { ...fontConfig, ...smallFont })
+    hourLabel.anchor.set(1, 0)
+    hourLabel.position.x = 184
+    hourLabel.position.y = topBarContentOffsetY
+    uiTopBar.addChild(hourLabel)
     
     addTicker('ui', time => {
       yearLabel.text = year
       dayLabel.text = day
+      hourLabel.text = Math.round(hour)
     })
 
     function summaryLabel(type, y, color, funcA, funcB) {
@@ -204,15 +217,8 @@ function setupGame() {
   addTicker('ui', time => {
     setGameSpeedText()
 
-    let x
-    if (season === 'winter') {
-      x = Math.round(20 + ((380 / (currentSeasonLength * 24)) * (((day - cycles[currentCycleIndex - 1]) - 1) * 24 + hour)))
-    } else if (season === 'summer') {
-      x = Math.round(20 + ((380 / (currentSeasonLength * 24)) * ((day - 1) * 24 + hour)))
-    }
-
-    sun.position.x = x
-    sun.position.y = 228
+    sun.position.x = 260
+    sun.position.y = 290 - (Math.sin((hour / 24) * Math.PI) * 45)
 
     if (sunBubble.visible) {
       sunBubble.position.x = sun.position.x - 6
@@ -317,12 +323,13 @@ function setupGame() {
   })
   ui.addChild(hoverCellSprite)
 
+  
   hiveHole = Sprite.fromImage('images/scene/hive-hole.png')
   hiveHole.position.x = 200
   hiveHole.position.y = 214
   hiveHole.anchor.x = 0.5
   hiveHole.anchor.y = 1
-  foreground.addChild(hiveHole)
+  // foreground.addChild(hiveHole) // don't add it
 
   {
     const haveFoodContainer = new Container()
@@ -373,7 +380,8 @@ function setupGame() {
   createWarningSign()
   createSeasonTracker()
 
-  createMap(MAP_SELECTION)
+  createQueen(beeContainer)
+  currentMapInit(beeContainer)
   createFlowers()
 
   createGameOverUI()
