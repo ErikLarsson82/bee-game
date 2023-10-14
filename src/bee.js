@@ -44,6 +44,9 @@ function createBee(parent, type, startPosition) {
   }
   Object.values(dyingHungerAnimations).forEach((animation) => animation.pause())
 
+  const convertingNectarAnimation = animateSprite(bee, 'bee-converting-nectar-animation-worker', 32, 19, 13)
+  convertingNectarAnimation.sprite.position.y = -2
+  
   const shadow = Sprite.fromImage('images/bee/shadow.png')
   bee.addChild(shadow)
 
@@ -64,12 +67,6 @@ function createBee(parent, type, startPosition) {
   droneHand.position.y = 5
   droneHand.visible = false
   bee.addChild(droneHand)  
-  
-  const animationSprite = Sprite.fromImage('images/bee/cell-conversion-animation-a.png')
-  animationSprite.position.y = -4
-  animationSprite.visible = true
-  animationSprite.delay = 0
-  bee.addChild(animationSprite)
   
   const beeAddon = Sprite.fromImage('images/bee/bee-drone-legs.png')
   beeAddon.position.x = -1
@@ -770,7 +767,7 @@ function createBee(parent, type, startPosition) {
     Object.values(unloadingAnimations).forEach((animation) => animation.sprite.visible = false)
     Object.values(eatingAnimations).forEach((animation) => animation.sprite.visible = false)
     Object.values(dyingAgeAnimations).forEach((animation) => animation.sprite.visible = false)
-    animationSprite.visible = false
+    convertingNectarAnimation.sprite.visible = false
   }
 
   bee.removeTicker = () => bee.ticker.remove = true
@@ -780,17 +777,14 @@ function createBee(parent, type, startPosition) {
     bee.hideAllAnimations()
 
     {
-      // Specifically conversion animation only
-      animationSprite.delay++
-      animationSprite.delay = animationSprite.delay < 12 ? animationSprite.delay : 0
+      // Nectar to honey conversion
       const isConverting = bee.isAtType('nectar') && bee.type === 'worker'
       if (isConverting) {
-        animationSprite.visible = true
-        animationSprite.texture = animationSprite.delay > 6
-          ? Texture.fromImage('images/bee/cell-conversion-animation-a.png')
-          : Texture.fromImage('images/bee/cell-conversion-animation-b.png')
+        if (!convertingNectarAnimation.isRunning()) convertingNectarAnimation.restart()
+        convertingNectarAnimation.sprite.visible = true
         return
       }
+      convertingNectarAnimation.pause()
     }
 
     // Is eating

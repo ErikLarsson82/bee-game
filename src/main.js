@@ -120,6 +120,8 @@ loader.add('bee-unloading-animation-idle', 'images/sprite-sheets/bee/idle/unload
 loader.add('bee-dying-age-animation-idle', 'images/sprite-sheets/bee/idle/dying-age.png')
 loader.add('bee-dying-hunger-animation-idle', 'images/sprite-sheets/bee/idle/dying-hunger.png')
 
+loader.add('bee-converting-nectar-animation-worker', 'images/sprite-sheets/bee/worker/converting-nectar.png')
+
 loader.add('hex-hatching', 'images/sprite-sheets/hex/hatching.png')
 
 loader.add('flower-is-pollinated', 'images/sprite-sheets/flower-is-pollinated/animation-spritesheet-flower.png')

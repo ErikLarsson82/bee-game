@@ -201,6 +201,11 @@ let MAP_CONFIGURATIONS = [
         replaceHex([2, 3], 'honey', 'activate').setHoney(30)
         replaceHex([3, 2], 'honey', 'activate').setHoney(30)
         replaceHex([3, 3], 'honey', 'activate').setHoney(30)
+
+        replaceHex([2+4, 2], 'nectar', 'activate').setNectar(30)
+        replaceHex([2+4, 3], 'nectar', 'activate').setNectar(30)
+        replaceHex([3+4, 2], 'nectar', 'activate').setNectar(30)
+        replaceHex([3+4, 3], 'nectar', 'activate').setNectar(30)
         
         return
       }

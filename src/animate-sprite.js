@@ -22,6 +22,7 @@ function animateSprite(sprite, resource, amount, w, h, _loop, callback, _timeloc
         sprite: frame,
         restart: () => {
             delay = 0
+            pause = false
             return handler
         },
         start: () => {
