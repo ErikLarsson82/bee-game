@@ -97,15 +97,19 @@ function cellPrepared(x, y, parent) {
     preparedCellSprite.completeness = 100
   }
 
-  const isThereWaxInTheHive = () => {
-    let found = false
+  const prepareWarning = () => {
+    let waxInBeesHandsFound = bees.filter(({ type }) => type === 'worker').filter(bee => !bee.isWaxSackEmpty()).length > 0
+    let isAnyWorkers = bees.filter(({ type }) => type === 'worker').length > 0
+    
+    let waxInHexagonsFound = false
     forEachHexagon(hexGrid, hex => {
-      if (hex.type === 'wax' && !hex.isWaxEmpty()) found = true
+      if (hex.type === 'wax' && !hex.isWaxEmpty()) waxInHexagonsFound = true
     })
-    return found
+
+    return (waxInHexagonsFound || waxInBeesHandsFound) && isAnyWorkers 
   }
   
-  const needsHelp = () => preparedCellSprite.completeness <= 100 && (bees.filter(({ type }) => type === 'worker').length === 0 || !isThereWaxInTheHive())
+  const needsHelp = () => preparedCellSprite.completeness <= 100 && !prepareWarning()
   
   preparedCellSprite.panelLabel = () => false
   preparedCellSprite.panelPosition = () => ({ x: pixelCoordinate.x - (preparedCellSprite.done ? 0 : 50), y: pixelCoordinate.y})

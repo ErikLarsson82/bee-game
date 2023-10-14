@@ -170,7 +170,7 @@ let MAP_CONFIGURATIONS = [
 
       if (m === 'test brood') {
         // I want this to be the beginner level
-        createBee(parent, 'idle').setHunger(40)
+        createBee(parent, 'idle').setHunger(40).setWax(100)
         createBee(parent, 'idle').setHunger(42)
         createBee(parent, 'idle').setHunger(50)
         createBee(parent, 'idle').setHunger(80)
@@ -209,8 +209,8 @@ let MAP_CONFIGURATIONS = [
         replaceHex([2, 2], 'honey', 'activate').setHoney(45)
         replaceHex([2, 3], 'honey', 'activate').setHoney(45)
         replaceHex([3, 2], 'honey', 'activate').setHoney(45)
-        replaceHex([3, 3], 'honey', 'activate').setHoney(45)
         */
+        replaceHex([3, 3], 'wax', 'activate').setWax(1)
 
         replaceHex([2+4, 2], 'nectar', 'activate').setNectar(30)
         replaceHex([2+4, 3], 'nectar', 'activate').setNectar(30)
