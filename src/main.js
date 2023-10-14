@@ -76,6 +76,7 @@ let beeContainer = null
 let backgroundScene = null
 let hexBackground = null
 let hexForeground = null
+let dimmer = null
 let flowerBed = null
 let pausedText = null
 let pauseFrame = null

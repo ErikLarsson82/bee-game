@@ -35,6 +35,12 @@ function setupGame() {
 
   dimmer = new Container()
   container.addChild(dimmer)
+  const dimmerSquare = new Graphics()
+  dimmerSquare.beginFill(0x000000)
+  dimmerSquare.drawRect(0, 0, WIDTH, HEIGHT)
+  dimmerSquare.alpha = 0
+  dimmer.ref = dimmerSquare
+  dimmer.addChild(dimmerSquare)
 
   flowerBed = new Container()
   container.addChild(flowerBed)
@@ -317,12 +323,13 @@ function setupGame() {
   })
   ui.addChild(hoverCellSprite)
 
+  
   hiveHole = Sprite.fromImage('images/scene/hive-hole.png')
   hiveHole.position.x = 200
   hiveHole.position.y = 214
   hiveHole.anchor.x = 0.5
   hiveHole.anchor.y = 1
-  foreground.addChild(hiveHole)
+  // foreground.addChild(hiveHole) // don't add it
 
   {
     const haveFoodContainer = new Container()
