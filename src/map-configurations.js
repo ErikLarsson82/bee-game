@@ -155,13 +155,50 @@ let MAP_CONFIGURATIONS = [
   {
     // Give players many many empty hexagons to choose from
     name: 'Playground',
-    cycles: [5, 2, 5, 2, 5, 2, 4, 3, 4, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30],
+    cycles: [1, 1, 5, 2, 5, 2, 4, 3, 4, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30],
     seeds: 1,
     winterHungerMultiplier: 4,
     backgroundImage: 'background-unknown',
     blizzardWinter: false,
     init: (parent) => {
-      const m = 'brooder scenario' //    <------ here
+      const m = 'test brood' //    <------ here
+
+      if (m === 'test brood') {
+        // I want this to be the beginner level
+        createBee(parent, 'idle').setHunger(40).setAge(80)
+        createBee(parent, 'idle').setHunger(42).setAge(60)
+        createBee(parent, 'idle').setHunger(50).setAge(20)
+        createBee(parent, 'idle').setHunger(80).setAge(10)
+        createBee(parent, 'idle').setHunger(100).setAge(6)
+        createBee(parent, 'idle').setHunger(100).setAge(5)
+        createBee(parent, 'idle').setHunger(100).setAge(0)
+
+        for (let i = 0; i < hexGrid.length; i++) {
+          for (let j = 0; j < hexGrid[0].length; j++) {
+            replaceHex([j, i], 'prepared', 'activate').instantlyPrepare()
+          }
+        }
+
+        for (let i = 5; i < 10; i++) {
+          for (let j = 5; j < 10; j++) {
+            replaceHex([i, j], 'brood', 'activate').setContents('puppa')
+          }
+        }
+
+        for (let i = 10; i < 12; i++) {
+          for (let j = 5; j < 10; j++) {
+            replaceHex([i, j], 'honey', 'activate').setHoney(30)
+          }
+        }
+        // replaceHex([7, 7], 'brood', 'activate').setContents('puppa')
+
+        replaceHex([2, 2], 'honey', 'activate').setHoney(30)
+        replaceHex([2, 3], 'honey', 'activate').setHoney(30)
+        replaceHex([3, 2], 'honey', 'activate').setHoney(30)
+        replaceHex([3, 3], 'honey', 'activate').setHoney(30)
+        
+        return
+      }
 
       if (m === 'beginner') {
         // I want this to be the beginner level

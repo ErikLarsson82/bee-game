@@ -463,6 +463,17 @@ function cellBrood(x, y, parent) {
   broodSprite.position.x = pixelCoordinate.x
   broodSprite.position.y = pixelCoordinate.y
 
+  const hatchingCompleteCallback = () => {
+    broodSprite.setContents('empty')
+    createBee(beeContainer, 'idle', { x: broodSprite.position.x, y: broodSprite.position.y - 12 })
+    hatchingAnimation.pause()
+  }
+  const hatchingAnimation = animateSprite(hatchContainer, 'hex-hatching', 35, 19, 24, false, hatchingCompleteCallback, false)
+  hatchingAnimation.pause()
+  hatchingAnimation.sprite.position.x = pixelCoordinate.x
+  hatchingAnimation.sprite.position.y = pixelCoordinate.y - 11
+  hatchingAnimation.sprite.visible = true
+
   broodSprite.paused = false
   
   // Stored in seconds for easy transitions
@@ -533,8 +544,9 @@ function cellBrood(x, y, parent) {
     } else if (broodSprite.lifecycle > eggDuration + larvaeDuration && broodSprite.content === 'larvae') {
       broodSprite.setContents('puppa')
     } else if (broodSprite.lifecycle > eggDuration + larvaeDuration + puppaDuration && broodSprite.content === 'puppa' && season === 'summer' && day === 1) {
-      broodSprite.setContents('empty')
-      createBee(beeContainer, 'idle', { x: broodSprite.position.x, y: broodSprite.position.y - 5 })
+      // broodSprite.setContents('empty')
+      //createBee(beeContainer, 'idle', { x: broodSprite.position.x, y: broodSprite.position.y - 5 })
+      hatchingAnimation.start()
     }
 
     // States

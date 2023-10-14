@@ -76,6 +76,7 @@ let hiveHole = null
 let beeContainer = null
 let backgroundScene = null
 let hexBackground = null
+let hatchContainer = null
 let hexForeground = null
 let dimmer = null
 let flowerBed = null
@@ -117,6 +118,8 @@ loader.add('bee-eating-animation-idle', 'images/sprite-sheets/bee/idle/eating.pn
 loader.add('bee-unloading-animation-idle', 'images/sprite-sheets/bee/idle/unloading.png')
 loader.add('bee-dying-age-animation-idle', 'images/sprite-sheets/bee/idle/dying-age.png')
 loader.add('bee-dying-hunger-animation-idle', 'images/sprite-sheets/bee/idle/dying-hunger.png')
+
+loader.add('hex-hatching', 'images/sprite-sheets/hex/hatching.png')
 
 loader.add('flower-is-pollinated', 'images/sprite-sheets/flower-is-pollinated/animation-spritesheet-flower.png')
 

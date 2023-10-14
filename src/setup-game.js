@@ -50,6 +50,9 @@ function setupGame() {
   hexForeground = new Container()
   container.addChild(hexForeground)
 
+  hatchContainer = new Container()
+  container.addChild(hatchContainer)
+
   beeContainer = new Container()
   container.addChild(beeContainer)
 

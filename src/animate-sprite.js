@@ -1,8 +1,8 @@
 
-function animateSprite(sprite, res, amount, w, h, _loop, callback, _timelocked) {
+function animateSprite(sprite, resource, amount, w, h, _loop, callback, _timelocked) {
 	const frame = new Sprite()
 
-    const spritesheet = new PIXI.BaseTexture.from(resources[res].url)
+    const spritesheet = new PIXI.BaseTexture.from(resources[resource].url)
 	const frames = []
 
     for (let i = 0; i < amount; i++) {
