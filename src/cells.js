@@ -108,7 +108,7 @@ function cellPrepared(x, y, parent) {
   const needsHelp = () => preparedCellSprite.completeness <= 100 && (bees.filter(({ type }) => type === 'worker').length === 0 || !isThereWaxInTheHive())
   
   preparedCellSprite.panelLabel = () => false
-  preparedCellSprite.panelPosition = () => ({ x: pixelCoordinate.x - 50, y: pixelCoordinate.y})
+  preparedCellSprite.panelPosition = () => ({ x: pixelCoordinate.x - (preparedCellSprite.done ? 0 : 50), y: pixelCoordinate.y})
 
   preparedCellSprite.panelContent = () => {
     const container = new Container()
