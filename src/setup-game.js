@@ -92,7 +92,12 @@ function setupGame() {
     populationText.position.y = topBarContentOffsetY
     uiTopBar.addChild(populationText)
 
-    const timelineText = new PIXI.Text('Year   Day   Hour', { ...fontConfig, ...smallFont, fill: 'gray' })
+    seasonText = new PIXI.Text('-', { ...fontConfig, ...smallFont, fill: 'white' })
+    seasonText.position.x = 236
+    seasonText.position.y = topBarContentOffsetY + 8
+    uiTopBar.addChild(seasonText)
+
+    const timelineText = new PIXI.Text('Year   Day   Hour', { ...fontConfig, ...smallFont, fill: '#8b9bb4' })
     timelineText.position.x = 110
     timelineText.position.y = topBarContentOffsetY
     uiTopBar.addChild(timelineText)
@@ -111,7 +116,7 @@ function setupGame() {
 
     const hourLabel = new PIXI.Text('-', { ...fontConfig, ...smallFont })
     hourLabel.anchor.set(1, 0)
-    hourLabel.position.x = 184
+    hourLabel.position.x = 188
     hourLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(hourLabel)
     
@@ -119,6 +124,10 @@ function setupGame() {
       yearLabel.text = year
       dayLabel.text = day
       hourLabel.text = Math.round(hour)
+
+      const label = season === 'summer' ? 'Summer' : 'Winter'
+      const count = season === 'summer' ? currentSeasonLength + 1 - day : currentSeasonLength + previousSeasonLength + 1 - day
+      seasonText.text = `${label} - ${count} days left`
     })
 
     function summaryLabel(type, y, color, funcA, funcB) {

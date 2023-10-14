@@ -69,6 +69,7 @@ let background = null
 let ui = null
 let uiTopBar = null
 let populationText = null
+let seasonText = null
 let selectedSprite = null
 let hoverCellSprite = null
 let hiveHole = null
