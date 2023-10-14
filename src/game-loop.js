@@ -12,8 +12,6 @@ function gameloop(delta, manualTick) {
     panel.position.x = x
     panel.position.y = y
   }
-
-  dimmer.ref.alpha = season === 'summer' && hour < 3 && day === 1 ? 0 : 1 - (Math.sin(Math.PI * ((hour) % 24 / 24)) * 1.5) - 0.7
   
   const aliveBees = bees.filter(bee => !bee.isDead() && bee.type !== 'bookie')
 

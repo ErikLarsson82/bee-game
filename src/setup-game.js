@@ -39,8 +39,10 @@ function setupGame() {
   dimmerSquare.beginFill(0x000000)
   dimmerSquare.drawRect(0, 0, WIDTH, HEIGHT)
   dimmerSquare.alpha = 0
-  dimmer.ref = dimmerSquare
   dimmer.addChild(dimmerSquare)
+  addTicker('ui', () => {
+    dimmerSquare.alpha = season === 'summer' && hour < 3 && day === 1 ? 0 : 1 - (Math.sin(Math.PI * ((hour) % 24 / 24)) * 1.5) - 0.7
+  })
 
   flowerBed = new Container()
   container.addChild(flowerBed)
