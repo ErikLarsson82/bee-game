@@ -77,6 +77,7 @@ let hiveHole = null
 let beeContainer = null
 let backgroundScene = null
 let hexBackground = null
+let uiHangarComponents = null
 let hatchContainer = null
 let hexForeground = null
 let dimmer = null

@@ -51,6 +51,9 @@ function setupGame() {
     dimmerSquare.alpha = season === 'summer' && hour < 3 && day === 1 ? 0 : 1 - (Math.sin(Math.PI * ((hour) % 24 / 24)) * 1.5) - 0.7
   })
 
+  uiHangarComponents = new Container()
+  container.addChild(uiHangarComponents)
+
   flowerBed = new Container()
   container.addChild(flowerBed)
   
@@ -235,7 +238,7 @@ function setupGame() {
   const jobsPanel = Sprite.fromImage('images/ui/ui-jobs-panel.png')
   jobsPanel.position.x = 20
   jobsPanel.position.y = 25
-  background.addChild(jobsPanel)
+  uiHangarComponents.addChild(jobsPanel)
   
   addJobsButtons(jobsPanel)
 
