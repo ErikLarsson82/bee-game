@@ -159,7 +159,7 @@ let MAP_CONFIGURATIONS = [
   {
     // Give players many many empty hexagons to choose from
     name: 'Playground',
-    cycles: [1, 1, 5, 2, 5, 2, 4, 3, 4, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30],
+    cycles: [2, 1, 5, 2, 5, 2, 4, 3, 4, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],
     seeds: 1,
     winterHungerMultiplier: 4,
     backgroundImage: 'background-unknown',
@@ -193,6 +193,12 @@ let MAP_CONFIGURATIONS = [
         for (let i = 10; i < 12; i++) {
           for (let j = 5; j < 10; j++) {
             replaceHex([i, j], 'honey', 'activate').setHoney(30)
+          }
+        }
+
+        for (let i = 2; i < 4; i++) {
+          for (let j = 8; j < 12; j++) {
+            replaceHex([i, j], 'pollen', 'activate').setPollen(100)
           }
         }
         // replaceHex([7, 7], 'brood', 'activate').setContents('puppa')

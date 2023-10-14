@@ -551,10 +551,8 @@ function cellBrood(x, y, parent) {
       broodSprite.setContents('larvae')      
     } else if (broodSprite.lifecycle > eggDuration + larvaeDuration && broodSprite.content === 'larvae') {
       broodSprite.setContents('puppa')
-    } else if (broodSprite.lifecycle > eggDuration + larvaeDuration + puppaDuration && broodSprite.content === 'puppa' && season === 'summer' && day === 1) {
-      // broodSprite.setContents('empty')
-      //createBee(beeContainer, 'idle', { x: broodSprite.position.x, y: broodSprite.position.y - 5 })
-      hatchingAnimation.start()
+    } else if (broodSprite.lifecycle > eggDuration + larvaeDuration + puppaDuration && broodSprite.content === 'puppa' && season === 'summer' && day === 1 && !hatchingAnimation.isRunning()) {
+      hatchingAnimation.restart()
     }
 
     // States
