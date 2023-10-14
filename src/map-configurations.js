@@ -178,7 +178,7 @@ let MAP_CONFIGURATIONS = [
         createBee(parent, 'idle').setHunger(100).setAge(5)
         createBee(parent, 'idle').setHunger(100).setAge(0)
 
-        for (let i = 0; i < hexGrid.length; i++) {
+        for (let i = 0; i < hexGrid.length-2; i++) {
           for (let j = 0; j < hexGrid[0].length; j++) {
             replaceHex([j, i], 'prepared', 'activate').instantlyPrepare()
           }
@@ -197,10 +197,10 @@ let MAP_CONFIGURATIONS = [
         }
         // replaceHex([7, 7], 'brood', 'activate').setContents('puppa')
 
-        replaceHex([2, 2], 'honey', 'activate').setHoney(30)
-        replaceHex([2, 3], 'honey', 'activate').setHoney(30)
-        replaceHex([3, 2], 'honey', 'activate').setHoney(30)
-        replaceHex([3, 3], 'honey', 'activate').setHoney(30)
+        replaceHex([2, 2], 'honey', 'activate').setHoney(45)
+        replaceHex([2, 3], 'honey', 'activate').setHoney(45)
+        replaceHex([3, 2], 'honey', 'activate').setHoney(45)
+        replaceHex([3, 3], 'honey', 'activate').setHoney(45)
 
         replaceHex([2+4, 2], 'nectar', 'activate').setNectar(30)
         replaceHex([2+4, 3], 'nectar', 'activate').setNectar(30)

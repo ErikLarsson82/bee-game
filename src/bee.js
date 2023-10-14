@@ -789,7 +789,7 @@ function createBee(parent, type, startPosition) {
 
     // Is eating
     const honeyTarget = bee.isAtType('honey')
-    const isEating = honeyTarget && bee.isHoneySackEmpty() // && !bee.isWellFed() && honeyTarget.honey > 0 //  && (bee.type === 'worker' && season !== 'summer')
+    const isEating = honeyTarget && bee.isHoneySackEmpty()
     
     if (isEating) {
       eatingAnimations[bee.type].sprite.visible = true

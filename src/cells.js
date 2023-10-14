@@ -78,7 +78,7 @@ function cellPrepared(x, y, parent) {
   const preparedCellSprite = Sprite.fromImage('images/hex/prepared/cell-prepared-partial1.png')
   makeHexagon(preparedCellSprite, x, y, 'prepared')
   
-  const spriteExclamation = Sprite.fromImage('images/exclamations/exclamation-warning-severe.png')
+  const spriteExclamation = Sprite.fromImage('images/exclamations/exclamation-warning-mild.png')
   spriteExclamation.position.x = 14
   spriteExclamation.position.y = -6
   spriteExclamation.visible = false
@@ -97,10 +97,18 @@ function cellPrepared(x, y, parent) {
     preparedCellSprite.completeness = 100
   }
 
-  const needsHelp = () => preparedCellSprite.completeness <= 100 && bees.filter(({ type }) => type === 'worker').length === 0
+  const isThereWaxInTheHive = () => {
+    let found = false
+    forEachHexagon(hexGrid, hex => {
+      if (hex.type === 'wax' && !hex.isWaxEmpty()) found = true
+    })
+    return found
+  }
+  
+  const needsHelp = () => preparedCellSprite.completeness <= 100 && (bees.filter(({ type }) => type === 'worker').length === 0 || !isThereWaxInTheHive())
   
   preparedCellSprite.panelLabel = () => false
-  preparedCellSprite.panelPosition = () => ({ x: pixelCoordinate.x, y: pixelCoordinate.y})
+  preparedCellSprite.panelPosition = () => ({ x: pixelCoordinate.x - 50, y: pixelCoordinate.y})
 
   preparedCellSprite.panelContent = () => {
     const container = new Container()
