@@ -122,12 +122,12 @@ function setupGame() {
     })
 
     function summaryLabel(type, y, color, funcA, funcB) {
-      const descriptionLabel = new PIXI.Text(`Total ${type}`, { ...fontConfig, ...smallFont, fill: 'gray' })
-      descriptionLabel.position.x = 292
+      const descriptionLabel = new PIXI.Text(type, { ...fontConfig, ...smallFont, fill: '#8b9bb4' })
+      descriptionLabel.position.x = 322
       descriptionLabel.position.y = y
       uiTopBar.addChild(descriptionLabel)
 
-      const divider = new PIXI.Text('/', { ...fontConfig, ...smallFont, fill: 'gray' })
+      const divider = new PIXI.Text('/', { ...fontConfig, ...smallFont, fill: '#8b9bb4' })
       divider.position.x = 370
       divider.position.y = y
       uiTopBar.addChild(divider)
