@@ -202,8 +202,6 @@ function setSelected(item) {
   panel.removeChildren()
 
   angelBubbleTimer = 0
-  sunBubble.visible = false
-
   selected = item || null
 
   if (!item) {

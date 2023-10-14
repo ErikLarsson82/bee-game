@@ -195,53 +195,13 @@ function setupGame() {
   sun.addChild(summerSunSprite)
   sun.addChild(winterSunSprite)
 
-  const getSunBubbleText = () => {
-    const nextSeasonLength = cycles[currentCycleIndex + 1]
-    return `${ season === 'summer' ? 'WINTER' : 'SUMMER' } WILL BE ${ nextSeasonLength } ${ nextSeasonLength === 1 ? 'DAY' : 'DAYS' } LONG`
-  }
-
-  sun.interactive = true
-  sun.buttonMode = true
-  sun.mouseover = () => sun.alpha = 0.8
-  sun.mouseout = () => sun.alpha = 1
-  sun.mouseup = () => {
-    sunBubbleTimer = FPS * 5
-    sunBubble.visible = true
-    sunBubbleText.text = getSunBubbleText()
-  }
   background.addChild(sun)
-  
-  sunBubble = Sprite.fromImage('images/scene/sun-bubble.png')
-  sunBubble.visible = true
-
-  const sunBubbleText = new PIXI.Text(getSunBubbleText(), {
-    ...fontConfig, 
-    ...smallFont,
-    fill: colors.darkGray
-  })
-
-  sunBubbleText.position.x = 9
-  sunBubbleText.position.y = 6
-  sunBubble.addChild(sunBubbleText)
-  
-  let sunBubbleTimer = FPS * 5
-
-  background.addChild(sunBubble)
   
   addTicker('ui', time => {
     setGameSpeedText()
 
-    sun.position.x = 260
+    sun.position.x = 290
     sun.position.y = 290 - (Math.sin((hour / 24) * Math.PI) * 45)
-
-    if (sunBubble.visible) {
-      sunBubble.position.x = sun.position.x - 6
-      sunBubble.position.y = sun.position.y + 18
-      sunBubbleTimer -= 1
-      if (sunBubbleTimer <= 0) {
-        sunBubble.visible = false
-      }
-    }
   })
 
   // angel bubble
