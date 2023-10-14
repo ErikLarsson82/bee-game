@@ -1,9 +1,9 @@
 
 const OFFSET_X = 120
-const OFFSET_Y = 46
+const OFFSET_Y = 56
 
 const HEX_AMOUNT_WIDTH = 14
-const HEX_AMOUNT_HEIGHT = 14
+const HEX_AMOUNT_HEIGHT = 13
 const HEX_COLUMN_WIDTH = 13
 const HEX_ROW_HEIGHT = 10
 const HEX_ODD_ROW_OFFSET = 5
