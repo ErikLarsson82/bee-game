@@ -166,6 +166,7 @@ function createBee(parent, type, startPosition) {
     bee.removeUiTicker()
     bee.removeTicker()
     bee.removeParticleTicker()
+    bee.removeChild(beeExclamation)
     parent.removeChild(bee)
   }
   
