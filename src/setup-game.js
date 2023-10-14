@@ -27,6 +27,13 @@ function setupGame() {
   container.scale.y = 2
   app.stage.addChild(container)
 
+  const colorBackground = new Container()
+  container.addChild(colorBackground)
+  const fullColorBackground = new Graphics()
+  fullColorBackground.beginFill(backgroundColor)
+  fullColorBackground.drawRect(0, 0, WIDTH, HEIGHT)
+  colorBackground.addChild(fullColorBackground)
+
   background = new Container()
   container.addChild(background)
 
@@ -177,11 +184,6 @@ function setupGame() {
     ui.addChild(pauseFrame)
   }
 
-  backgroundScene = Sprite.fromImage(`images/scene/${backgroundImage}.png`)
-  backgroundScene.interactive = true
-  backgroundScene.mouseup = () => setSelected(null)
-  background.addChild(backgroundScene)
-
   // sun
   sun = new Container()
   const summerSunSprite = Sprite.fromImage('images/scene/summer-sun.png')
@@ -203,6 +205,11 @@ function setupGame() {
     sun.position.x = 290
     sun.position.y = 290 - (Math.sin((hour / 24) * Math.PI) * 45)
   })
+
+  backgroundScene = Sprite.fromImage(`images/scene/${backgroundImage}.png`)
+  backgroundScene.interactive = true
+  backgroundScene.mouseup = () => setSelected(null)
+  background.addChild(backgroundScene)
 
   // angel bubble
   angelBubble = Sprite.fromImage('images/scene/sun-bubble.png')

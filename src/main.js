@@ -56,6 +56,7 @@ let currentCycleIndex = 0
 let currentMapInit = null
 let angelBubbleTimer = 0
 let backgroundImage = null
+let backgroundColor = null
 let levelIndex = null
 let blizzardWinter = null
 

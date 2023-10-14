@@ -6,6 +6,7 @@ let MAP_CONFIGURATIONS = [
     winterHungerMultiplier: 1,
     backgroundImage: 'background-summer',
     blizzardWinter: false,
+    backgroundColor: 0x2ce8f5,
     init: (parent) => {
       // I enjoy this one (pro level)
       createBee(parent, 'idle').setHunger(40).setAge(80)
@@ -34,6 +35,7 @@ let MAP_CONFIGURATIONS = [
     winterHungerMultiplier: 1,
     backgroundImage: 'background-summer-cold',
     blizzardWinter: false,
+    backgroundColor: 0x2ce8f5,
     init: (parent) => {
       createBee(parent, 'idle').setHunger(40).setAge(80)
       createBee(parent, 'idle').setHunger(42).setAge(60)
@@ -72,6 +74,7 @@ let MAP_CONFIGURATIONS = [
     winterHungerMultiplier: 1,
     backgroundImage: 'background-desert',
     blizzardWinter: false,
+    backgroundColor: 0x2ce8f5,
     init: (parent) => {
       createBee(parent, 'idle').setHunger(60).setAge(40)
       createBee(parent, 'idle').setHunger(70).setAge(30)
@@ -100,6 +103,7 @@ let MAP_CONFIGURATIONS = [
     winterHungerMultiplier: 5,
     backgroundImage: 'background-hurricane',
     blizzardWinter: true,
+    backgroundColor: 0x2ce8f5,
     init: (parent) => {
       for (let i = 0; i < 6; i++) {
         createBee(parent, 'idle').setAge(0)
@@ -160,6 +164,7 @@ let MAP_CONFIGURATIONS = [
     winterHungerMultiplier: 4,
     backgroundImage: 'background-unknown',
     blizzardWinter: false,
+    backgroundColor: 0x2ce8f5,
     init: (parent) => {
       const m = 'test brood' //    <------ here
 
