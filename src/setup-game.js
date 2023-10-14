@@ -298,8 +298,8 @@ function setupGame() {
     populationText.text = aliveBees.length + 1
   })
   
-  hexGrid = new Array(20).fill().map((_, y) => 
-    new Array(13).fill().map((_, x) => cellDisabled(x, y, hexForeground))
+  hexGrid = new Array(HEX_AMOUNT_HEIGHT).fill().map((_, y) => 
+    new Array(HEX_AMOUNT_WIDTH).fill().map((_, x) => cellDisabled(x, y, hexForeground))
   )
   
   selectedSprite = new Container()
