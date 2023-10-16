@@ -178,17 +178,27 @@ let MAP_CONFIGURATIONS = [
         createBee(parent, 'idle').setHunger(100)
         createBee(parent, 'idle').setHunger(100)
 
+        /*
         for (let i = 0; i < hexGrid.length-2; i++) {
           for (let j = 0; j < hexGrid[0].length; j++) {
             replaceHex([j, i], 'prepared', 'activate').instantlyPrepare()
           }
         }
+        */
 
+        for (let i = 0; i < 5; i++) {
+          for (let j = 0; j < 5; j++) {
+            replaceHex([j, i], 'prepared', 'activate').instantlyPrepare()
+          }
+        }
+
+        /*
         for (let i = 5; i < 10; i++) {
           for (let j = 5; j < 10; j++) {
             replaceHex([i, j], 'brood', 'activate').setContents('puppa')
           }
         }
+        */
 
         /*
         for (let i = 10; i < 12; i++) {
@@ -198,11 +208,13 @@ let MAP_CONFIGURATIONS = [
         }
         */
 
+        /*
         for (let i = 2; i < 4; i++) {
           for (let j = 8; j < 12; j++) {
             replaceHex([i, j], 'pollen', 'activate').setPollen(100)
           }
         }
+        */
         // replaceHex([7, 7], 'brood', 'activate').setContents('puppa')
 
         /*

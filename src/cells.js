@@ -248,6 +248,12 @@ function cellHoney(x, y, parent) {
 
     container.addChild(ProgressBar2(-20, -26, 'honey', () => honeySprite.honey, honeySprite.HONEY_HEX_CAPACITY)) 
 
+    const textContent = new PIXI.Text('-', { ...fontConfig })
+    textContent.scale.set(0.15, 0.15)
+    textContent.position.x = 13
+    textContent.position.y = -33
+    container.addChild(textContent)
+
     const textBonus = new PIXI.Text('-', { ...fontConfig })
     textBonus.scale.set(0.15, 0.15)
     textBonus.position.x = -22
@@ -255,6 +261,9 @@ function cellHoney(x, y, parent) {
     container.addChild(textBonus)
 
     addTicker('ui', () => {
+      textContent.text = Math.round(honeySprite.honey)
+      textContent.position.x = Math.round(honeySprite.honey) > 9 ? 9 : 13
+      
       const buff = honeySprite.bonuses.find(isHoneyBuff)
       textBonus.text = buff ? `Adjacency bonus: +${((buff.modifier - 1) * 100).toFixed(0)}%` : 'No bonuses'
     })
@@ -406,6 +415,12 @@ function cellNectar(x, y, parent) {
     upgradesText.position.y = -4
     container.addChild(upgradesText)
 
+    const textContent = new PIXI.Text('-', { ...fontConfig })
+    textContent.scale.set(0.15, 0.15)
+    textContent.position.x = 13
+    textContent.position.y = -33
+    container.addChild(textContent)
+
     const textBonus = new PIXI.Text('-', { ...fontConfig })
     textBonus.scale.set(0.15, 0.15)
     textBonus.position.x = -22
@@ -413,6 +428,9 @@ function cellNectar(x, y, parent) {
     container.addChild(textBonus)
 
     addTicker('ui', () => {
+      textContent.text = Math.round(nectarSprite.nectar)
+      textContent.position.x = Math.round(nectarSprite.nectar) > 9 ? 9 : 13
+
       const buff = nectarSprite.bonuses.find(isNectarBuff)
       textBonus.text = buff ? `Adjacency bonus: +${((buff.modifier - 1) * 100).toFixed(0)}%` : 'No bonuses'
 

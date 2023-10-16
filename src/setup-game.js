@@ -363,7 +363,7 @@ function setupGame() {
 
   createWarningSign()
   createSeasonTracker()
-
+  
   createQueen(beeContainer)
   currentMapInit(beeContainer)
   createFlowers()

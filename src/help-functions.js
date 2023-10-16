@@ -134,8 +134,10 @@ function isPollenFeederBuff(hex) {
 
 function calculateAdjacencyBonuses() {
   forEachHexagon(hexGrid, hex => {
+
+    const previousBonuses = [...hex.bonuses]
     // Recaulculate all from scratch
-    hex.bonuses = []    
+    hex.bonuses = []
 
     const { x, y } = hex.index
     const adjacentHexagons = adjacent(x, y)
@@ -155,6 +157,18 @@ function calculateAdjacencyBonuses() {
       } else {
         hex.HONEY_HEX_CAPACITY = hex.HONEY_HEX_CAPACITY_BASELINE
       }
+      
+      const previousHoneyBonus = previousBonuses.find(isHoneyBuff)
+      const currentHoneyBonus = hex.bonuses.find(isHoneyBuff)
+
+      const modifierFrom = previousHoneyBonus && previousHoneyBonus.modifier || 1
+      const modifierTo = currentHoneyBonus && currentHoneyBonus.modifier || 1
+      
+      if (modifierFrom > modifierTo) {
+        spawnBonusMinus(hex.position.x, hex.position.y)
+      } else if (modifierFrom < modifierTo) {
+        spawnBonusPlus(hex.position.x, hex.position.y)
+      }      
     }
 
     // Nectar bonus
@@ -169,8 +183,21 @@ function calculateAdjacencyBonuses() {
       } else {
         hex.NECTAR_CAPACITY = hex.NECTAR_CAPACITY_BASELINE
       }
+
+      const previousNectarBonus = previousBonuses.find(isNectarBuff)
+      const currentNectarBonus = hex.bonuses.find(isNectarBuff)
+
+      const modifierFrom = previousNectarBonus && previousNectarBonus.modifier || 1
+      const modifierTo = currentNectarBonus && currentNectarBonus.modifier || 1
+      
+      if (modifierFrom > modifierTo) {
+        spawnBonusMinus(hex.position.x, hex.position.y)
+      } else if (modifierFrom < modifierTo) {
+        spawnBonusPlus(hex.position.x, hex.position.y)
+      }
     }
   })
+
 }
 
 function activateAdjacent(_x, _y) {
@@ -240,6 +267,35 @@ function addJobsButtons(jobsPanel) {
       }
     }
   }
+}
+
+function spawnBonusIcon(x, y, img) {
+  if (day === 1 && hour === 0) return
+  const sprite = Sprite.fromImage(img)
+  sprite.position.x = x + 6
+  sprite.position.y = y + 2
+  foreground.addChild(sprite)
+
+  let counter = 0
+  addTicker('ui', () => {
+    if (counter > 201) return
+    counter++
+    sprite.position.y -= 0.1
+
+    if (counter > 100) sprite.alpha -= 0.01
+
+    if (counter > 200) {
+      foreground.removeChild(sprite)
+    }
+  })
+}
+
+function spawnBonusPlus(x, y) {
+  spawnBonusIcon(x, y, 'images/ui/bonus-plus.png')
+}
+
+function spawnBonusMinus(x, y) {
+  spawnBonusIcon(x, y, 'images/ui/bonus-minus.png')
 }
 
 function goIdle(bee) {
@@ -370,7 +426,6 @@ function typeIdlePos(type, pos) {
   const beesPerRow = 8
   const baseline = 38
   if (type === 'unassigned') {
-    console.log('wat');
     debugger;
   }
   const y = {
