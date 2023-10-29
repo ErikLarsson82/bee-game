@@ -1,4 +1,6 @@
 
+const version = '0.5.0'
+
 let DEBUG = false
 
 // Works on PC =  "PICO-8 mono Regular"'

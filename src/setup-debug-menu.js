@@ -18,6 +18,11 @@ function setupDebugMenu() {
   scaler.scale.y = 2
   container.addChild(scaler)
 
+  const versionLabel = new PIXI.Text(version, { ...fontConfig, ...smallFont, fill: 'black' })
+  versionLabel.position.x = 375
+  versionLabel.position.y = 310
+  container.addChild(versionLabel)
+
   MAP_CONFIGURATIONS = MAP_CONFIGURATIONS.map((map, idx) => {
     const callback = () => {
       loadMapParameters(map, idx)
