@@ -73,8 +73,6 @@ function setupDebugMenu() {
     }
   })
 
-  debugger
-
   // preload in game assets
   loader.add('images/ui/button-jobs/button-plus.png')
   loader.add('images/ui/button-jobs/button-active-plus.png')
