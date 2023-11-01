@@ -31,7 +31,8 @@ function makeFlyable(sprite) {
 
     let maxSpeed = 0.28
 
-    const overburdenedFactor = sprite.isOverburdened() ? 0.3 : 1
+    const overburdenedFactor = sprite.isOverburdened() && !sprite.isBoosted() ? 0.3 : 1
+    const boostFactor = sprite.isBoosted() ? 1.5 : 1
 
     if (distFactor < 12) maxSpeed = 0.17
     if (distFactor < 9) maxSpeed = 0.12
@@ -40,8 +41,10 @@ function makeFlyable(sprite) {
 
     let velocity = new PIXI.Point(sprite.vx, sprite.vy)
 
-    if (velocity.magnitude() > maxSpeed * gameSpeed * overburdenedFactor) {
-      velocity = new PIXI.Point(velocity.normalize().x * maxSpeed * gameSpeed * overburdenedFactor, velocity.normalize().y * maxSpeed * gameSpeed * overburdenedFactor)
+    const sum = maxSpeed * gameSpeed * overburdenedFactor * boostFactor
+    
+    if (velocity.magnitude() > sum) {
+      velocity = new PIXI.Point(velocity.normalize().x * sum, velocity.normalize().y * sum)
     }
     sprite.vx = velocity.x
     sprite.vy = velocity.y

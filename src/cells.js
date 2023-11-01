@@ -200,6 +200,26 @@ function cellPrepared(x, y, parent) {
   return preparedCellSprite
 }
 
+function cellExperiment1(x, y, parent) {
+  const pixelCoordinate = toLocalCoordinateFlat({ x, y })
+  const experimentOneSprite = Sprite.fromImage('images/hex/bread/cell-bee-bread.png')
+  makeHexagon(experimentOneSprite, x, y, 'experiment-1')
+  experimentOneSprite.position.x = pixelCoordinate.x
+  experimentOneSprite.position.y = pixelCoordinate.y
+
+  experimentOneSprite.boostAmount = 3
+  experimentOneSprite.hasBoostLeft = () => experimentOneSprite.boostAmount > 0
+  experimentOneSprite.consumeOneBoost = () => {
+    experimentOneSprite.boostAmount -= 1
+    if (!experimentOneSprite.hasBoostLeft()) {
+      replaceHex([x, y], 'pollen')
+    }
+  }
+  
+  parent.addChild(experimentOneSprite)
+  return experimentOneSprite
+}
+
 function cellHoney(x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const honeySprite = Sprite.fromImage('images/hex/honey/cell-honey-empty.png')
@@ -729,15 +749,18 @@ function cellPollen(x, y, parent) {
     container.addChild(buttonDelete)
 
     const buttonUpgrade = Button(9, 0, Sprite.fromImage('images/ui/button-large/button-large-content-upgrade-b.png'), () => {
-      pollenSprite.addUpgrade('pollen-feeder')
+      replaceHex([x, y], 'experiment-1')
+      setSelected(null)
     }, null, null, 'large')
     container.addChild(buttonUpgrade)
 
+    /*
     const buttonUpgrade2 = Button(-49, 0, Sprite.fromImage('images/ui/button-large/button-large-content-forager-resting-place.png'), () => {
       replaceHex([x, y], 'forager-resting-place')
       setSelected(null)
     }, null, null, 'large')
     container.addChild(buttonUpgrade2)
+    */
 
     const upgradesText = new PIXI.Text('-', { ...fontConfig })
     upgradesText.scale.set(0.15, 0.15)

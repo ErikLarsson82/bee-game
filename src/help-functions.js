@@ -343,6 +343,7 @@ const nameToFunction = (input) => {
 	  prepared: cellPrepared,
     empty: cellEmpty,
     blocked: cellBlocked,
+    ['experiment-1']: cellExperiment1,
     ['forager-resting-place']: cellForagerRestingPlace,
 	}[input] 
 }
