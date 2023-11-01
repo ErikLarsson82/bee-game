@@ -22,7 +22,7 @@ function createGameOverUI() {
   const buttonA = Button(5, 90, 'Main Menu', () => {
     app.stage.removeChild(container)
     app.ticker.remove(gameloop)
-    setupWorldMap3()
+    setupDebugMenu()
   })
   background.addChild(buttonA)
 
