@@ -1,12 +1,51 @@
 let MAP_CONFIGURATIONS = [
   {
-    name: 'Level 1 - Green fields',
+    name: 'Level 1 - Green fields - EASY',
+    cycles: [6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1],
+    seeds: 4,
+    winterHungerMultiplier: 1,
+    backgroundImage: 'background-summer',
+    blizzardWinter: false,
+    backgroundColor: 0x2ce8f5,
+    // winConditions: [makeOneHoney, hatchOneBee, surviveOneWinter],
+    init: (parent) => {
+      // The most beginner level i can think of
+      createBee(parent, 'idle').setHunger(40)
+      createBee(parent, 'idle').setHunger(42)
+      createBee(parent, 'idle').setHunger(50)
+      createBee(parent, 'idle').setHunger(80)
+      createBee(parent, 'idle').setHunger(100)
+      createBee(parent, 'idle').setHunger(100)
+      createBee(parent, 'idle').setHunger(100)
+      createBee(parent, 'idle').setHunger(100)
+      createBee(parent, 'idle').setHunger(100)
+      createBee(parent, 'idle').setHunger(100)
+
+      replaceHex([5, 7], 'prepared', 'activate').instantlyPrepare()
+      replaceHex([6, 7], 'prepared', 'activate').instantlyPrepare()
+      replaceHex([6, 10], 'prepared', 'activate').instantlyPrepare()
+      replaceHex([7, 9], 'prepared', 'activate').instantlyPrepare()
+      
+      replaceHex([4, 4], 'honey', 'activate').setHoney(30)
+      replaceHex([4, 5], 'honey', 'activate').setHoney(30)
+      replaceHex([5, 4], 'honey', 'activate').setHoney(30)
+      replaceHex([5, 5], 'honey', 'activate').setHoney(30)
+
+      replaceHex([5, 8], 'prepared', 'activate').instantlyPrepare()
+      replaceHex([6, 8], 'wax', 'activate')
+      replaceHex([6, 9], 'wax', 'activate')
+      replaceHex([7, 8], 'prepared', 'activate').instantlyPrepare()
+    }
+  },
+  {
+    name: 'Level 1 - Green fields - MEDIUM',
     cycles: [5, 2, 5, 2, 5, 2, 4, 3, 4, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],
     seeds: 1,
     winterHungerMultiplier: 1,
     backgroundImage: 'background-summer',
     blizzardWinter: false,
     backgroundColor: 0x2ce8f5,
+    // winConditions: [surviveToYear(5)],
     init: (parent) => {
       // I enjoy this one (pro level)
       createBee(parent, 'idle').setHunger(40)
@@ -178,6 +217,12 @@ let MAP_CONFIGURATIONS = [
         createBee(parent, 'idle').setHunger(100)
         createBee(parent, 'idle').setHunger(100)
 
+        replaceHex([8, 8], 'experiment-1', 'activate')
+        replaceHex([8, 9], 'experiment-1', 'activate')
+        replaceHex([9, 9], 'experiment-1', 'activate')
+
+        // replaceHex([10, 10], 'honey', 'activate').honey = 30
+
         /*
         for (let i = 0; i < hexGrid.length-2; i++) {
           for (let j = 0; j < hexGrid[0].length; j++) {
@@ -188,7 +233,7 @@ let MAP_CONFIGURATIONS = [
 
         for (let i = 0; i < 5; i++) {
           for (let j = 0; j < 5; j++) {
-            replaceHex([j, i], 'prepared', 'activate').instantlyPrepare()
+            replaceHex([j, i], 'honey', 'activate')
           }
         }
 
@@ -222,12 +267,17 @@ let MAP_CONFIGURATIONS = [
         replaceHex([2, 3], 'honey', 'activate').setHoney(45)
         replaceHex([3, 2], 'honey', 'activate').setHoney(45)
         */
-        replaceHex([3, 3], 'wax', 'activate').setWax(1)
+        // replaceHex([3, 3], 'wax', 'activate').setWax(1)
 
-        replaceHex([2+4, 2], 'nectar', 'activate').setNectar(30)
-        replaceHex([2+4, 3], 'nectar', 'activate').setNectar(30)
-        replaceHex([3+4, 2], 'nectar', 'activate').setNectar(30)
-        replaceHex([3+4, 3], 'nectar', 'activate').setNectar(30)
+        replaceHex([2+4, 2], 'nectar', 'activate').nectar = 15
+        replaceHex([2+4, 3], 'nectar', 'activate')
+        replaceHex([3+4, 2], 'nectar', 'activate')
+        replaceHex([3+4, 3], 'nectar', 'activate')
+
+        replaceHex([2+4, 2+4], 'pollen', 'activate')
+        replaceHex([2+4, 3+4], 'pollen', 'activate')
+        replaceHex([3+4, 2+4], 'pollen', 'activate')
+        replaceHex([3+4, 3+4], 'pollen', 'activate')
         
         return
       }
