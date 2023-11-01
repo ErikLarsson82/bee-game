@@ -1,3 +1,4 @@
+let loadingDone = false
 
 function setupDebugMenu() {
   scene = 'menu'
@@ -44,7 +45,7 @@ function setupDebugMenu() {
       scaler.alpha = 0
       hasClickedIdx = idx
       hasClickedMap = map
-      if (loading) {
+      if (loading && !loadingDone) {
         loadingSecondLabel.alpha = 1
         return
       }
@@ -68,12 +69,19 @@ function setupDebugMenu() {
   })
   loader.on('complete', function(e) {
     loading = false
+    loadingDone = true
     if (hasClickedIdx !== -1) {
       startGame()
     }
   })
 
+  if (loadingDone) {
+    // We've already been here once, so don't load more assets
+    return
+  }
   // preload in game assets
+  loader.add('images/hex/bread/cell-bee-bread.png')
+  loader.add('images/hex/experiment/experiment1.png')
   loader.add('images/ui/button-jobs/button-plus.png')
   loader.add('images/ui/button-jobs/button-active-plus.png')
   loader.add('images/ui/button-jobs/button-hover-plus.png')
