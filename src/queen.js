@@ -25,6 +25,7 @@ function createQueen(parent) {
 
   queenSprite.setShadowPosition = () => {}
   queenSprite.isOverburdened = () => false
+  queenSprite.isBoosted = () => false
 
   const helperText = () => {
     if (season === 'winter') return 'Does not\nlay eggs\nin winter'
