@@ -214,6 +214,7 @@ function setupDebugMenu() {
   loader.add('images/exclamations/exclamation-warning-mild.png')
   loader.add('images/ui/content-flower.png')
   loader.add('images/scene/flower-pollinated.png')
+  loader.add('images/scene/flower-dead.png')
   loader.add('images/scene/background-winter.png')
   loader.add('images/ui/game-over-background-failed.png')
   loader.add('images/ui/game-over-background-success.png')

@@ -6,6 +6,7 @@ let MAP_CONFIGURATIONS = [
     winterHungerMultiplier: 1,
     backgroundImage: 'background-summer',
     blizzardWinter: false,
+    killNonPollinatedFlowers: false,
     backgroundColor: 0x2ce8f5,
     // winConditions: [makeOneHoney, hatchOneBee, surviveOneWinter],
     init: (parent) => {
@@ -44,6 +45,7 @@ let MAP_CONFIGURATIONS = [
     winterHungerMultiplier: 1,
     backgroundImage: 'background-summer',
     blizzardWinter: false,
+    killNonPollinatedFlowers: true,
     backgroundColor: 0x2ce8f5,
     // winConditions: [surviveToYear(5)],
     init: (parent) => {
@@ -74,6 +76,7 @@ let MAP_CONFIGURATIONS = [
     winterHungerMultiplier: 1,
     backgroundImage: 'background-summer-cold',
     blizzardWinter: false,
+    killNonPollinatedFlowers: true,
     backgroundColor: 0x2ce8f5,
     init: (parent) => {
       createBee(parent, 'idle').setHunger(40)
@@ -113,6 +116,7 @@ let MAP_CONFIGURATIONS = [
     winterHungerMultiplier: 1,
     backgroundImage: 'background-desert',
     blizzardWinter: false,
+    killNonPollinatedFlowers: true,
     backgroundColor: 0x2ce8f5,
     init: (parent) => {
       createBee(parent, 'idle').setHunger(60)
@@ -142,6 +146,7 @@ let MAP_CONFIGURATIONS = [
     winterHungerMultiplier: 5,
     backgroundImage: 'background-hurricane',
     blizzardWinter: true,
+    killNonPollinatedFlowers: true,
     backgroundColor: 0x2ce8f5,
     init: (parent) => {
       for (let i = 0; i < 6; i++) {
@@ -199,10 +204,11 @@ let MAP_CONFIGURATIONS = [
     // Give players many many empty hexagons to choose from
     name: 'Playground',
     cycles: [2, 1, 5, 2, 5, 2, 4, 3, 4, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],
-    seeds: 1,
+    seeds: 2,
     winterHungerMultiplier: 4,
     backgroundImage: 'background-unknown',
     blizzardWinter: false,
+    killNonPollinatedFlowers: true,
     backgroundColor: 0x2ce8f5,
     init: (parent) => {
       const m = 'test brood' //    <------ here
@@ -217,9 +223,9 @@ let MAP_CONFIGURATIONS = [
         createBee(parent, 'idle').setHunger(100)
         createBee(parent, 'idle').setHunger(100)
 
-        replaceHex([8, 8], 'experiment-1', 'activate')
-        replaceHex([8, 9], 'experiment-1', 'activate')
-        replaceHex([9, 9], 'experiment-1', 'activate')
+        // replaceHex([8, 8], 'experiment-1', 'activate')
+        // replaceHex([8, 9], 'experiment-1', 'activate')
+        // replaceHex([9, 9], 'experiment-1', 'activate')
 
         // replaceHex([10, 10], 'honey', 'activate').honey = 30
 
@@ -233,7 +239,7 @@ let MAP_CONFIGURATIONS = [
 
         for (let i = 0; i < 5; i++) {
           for (let j = 0; j < 5; j++) {
-            replaceHex([j, i], 'honey', 'activate')
+            replaceHex([j, i], 'honey', 'activate').honey = 100
           }
         }
 
@@ -274,10 +280,10 @@ let MAP_CONFIGURATIONS = [
         replaceHex([3+4, 2], 'nectar', 'activate')
         replaceHex([3+4, 3], 'nectar', 'activate')
 
-        replaceHex([2+4, 2+4], 'pollen', 'activate')
-        replaceHex([2+4, 3+4], 'pollen', 'activate')
-        replaceHex([3+4, 2+4], 'pollen', 'activate')
-        replaceHex([3+4, 3+4], 'pollen', 'activate')
+        replaceHex([2+4, 2+4], 'pollen', 'activate').pollen = 100
+        replaceHex([2+4, 3+4], 'pollen', 'activate').pollen = 30
+        replaceHex([3+4, 2+4], 'pollen', 'activate').pollen = 30
+        replaceHex([3+4, 3+4], 'pollen', 'activate').pollen = 30
         
         return
       }

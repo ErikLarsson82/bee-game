@@ -49,6 +49,7 @@ let backgroundImage = null
 let backgroundColor = null
 let levelIndex = null
 let blizzardWinter = null
+let killNonPollinatedFlowers = null
 
 let scene = null
 let selected = null

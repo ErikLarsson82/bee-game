@@ -10,5 +10,6 @@ function loadMapParameters(map, idx) {
   currentSeasonLength = cycles[0]
   currentMapInit = map.init
   seeds = map.seeds
-  winterHungerMultiplier = map.winterHungerMultiplier
+  winterHungerMultiplier = map.winterHungerMultiplier  
+  killNonPollinatedFlowers = map.killNonPollinatedFlowers
 }
