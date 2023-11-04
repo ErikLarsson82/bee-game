@@ -600,7 +600,7 @@ function createBee(parent, type, startPosition) {
 
   function broodsAreDoneForTheSeason() {
     const isDone = hex => ['dead', 'puppa'].includes(hex.content)
-    const unfinishedHexes = filterHexagon(hexGrid, hex => hex.type === 'brood' && !isDone(hex))
+    const unfinishedHexes = filterHexagon(hexGrid, hex => hex.type === 'brood' && !isDone(hex) && hex.paused === false)
 
     return unfinishedHexes.length === 0
   }
