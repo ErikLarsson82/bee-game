@@ -64,8 +64,12 @@ function makeFlyable(sprite) {
 function makeHungry(bee) {
   bee.HUNGER_CAPACITY = 100
   bee.hunger = bee.HUNGER_CAPACITY
-  bee.isDead = () => (bee.hunger <= 0 || bee.age >= bee.DEAD_AT_AGE) && (bee.dying.duration !== null && bee.dying.duration <= 0)
-  bee.isDying = () => bee.dying.duration !== null && bee.dying.duration > 0
+  bee._dead = false
+  bee._dying = false
+  bee.isDead = () => bee._dead
+  bee.isDying = () => bee._dying
+  bee.setDead = input => bee._dead = input
+  bee.setDying = input => bee._dying = input
   bee.isWellFed = () => bee.hunger >= bee.HUNGER_CAPACITY
   bee.isHungry = () => bee.hunger < 30
   bee.isWinterHungry = () => bee.hunger < 80

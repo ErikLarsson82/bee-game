@@ -28,19 +28,31 @@ function createBee(parent, type, startPosition) {
     forager: animateSprite(bee, 'bee-eating-animation-forager', 36, 13, 13),
   }
 
+  const dyingAgeAnimationCallback = () => {
+    bee.setType('dead')
+    bee.setDead(true)
+    bee.setDying(false)
+  }
+
   const dyingAgeAnimations = {
-    idle: animateSprite(bee, 'bee-dying-age-animation-idle', 44, 13, 9, false, null, true),
-    worker: animateSprite(bee, 'bee-dying-age-animation-worker', 44, 13, 9, false, null, true),
-    nurser: animateSprite(bee, 'bee-dying-age-animation-nurser', 44, 13, 9, false, null, true),
-    forager: animateSprite(bee, 'bee-dying-age-animation-forager', 44, 13, 9, false, null, true),
+    idle: animateSprite(bee, 'bee-dying-age-animation-idle', 44, 13, 9, false, dyingAgeAnimationCallback, true),
+    worker: animateSprite(bee, 'bee-dying-age-animation-worker', 44, 13, 9, false, dyingAgeAnimationCallback, true),
+    nurser: animateSprite(bee, 'bee-dying-age-animation-nurser', 44, 13, 9, false, dyingAgeAnimationCallback, true),
+    forager: animateSprite(bee, 'bee-dying-age-animation-forager', 44, 13, 9, false, dyingAgeAnimationCallback, true),
   }
   Object.values(dyingAgeAnimations).forEach((animation) => animation.pause())
 
+  const dyingHungerAnimationCallback = () => {
+    bee.setType('dead')
+    bee.setDead(true)
+    bee.setDying(false)
+  }
+
   const dyingHungerAnimations = {
-    idle: animateSprite(bee, 'bee-dying-hunger-animation-idle', 45, 13, 11, false, null, true),
-    worker: animateSprite(bee, 'bee-dying-hunger-animation-worker', 45, 13, 11, false, null, true),
-    nurser: animateSprite(bee, 'bee-dying-hunger-animation-nurser', 45, 13, 11, false, null, true),
-    forager: animateSprite(bee, 'bee-dying-hunger-animation-forager', 45, 13, 11, false, null, true),
+    idle: animateSprite(bee, 'bee-dying-hunger-animation-idle', 45, 13, 11, false, dyingHungerAnimationCallback, true),
+    worker: animateSprite(bee, 'bee-dying-hunger-animation-worker', 45, 13, 11, false, dyingHungerAnimationCallback, true),
+    nurser: animateSprite(bee, 'bee-dying-hunger-animation-nurser', 45, 13, 11, false, dyingHungerAnimationCallback, true),
+    forager: animateSprite(bee, 'bee-dying-hunger-animation-forager', 45, 13, 11, false, dyingHungerAnimationCallback, true),
   }
   Object.values(dyingHungerAnimations).forEach((animation) => animation.pause())
 
@@ -102,8 +114,7 @@ function createBee(parent, type, startPosition) {
       x: (Math.random() * 2) - 1,
       y: (Math.random() * 2) - 1,
     },
-    magnitude: 0.1,
-    duration: null 
+    magnitude: 0.1
   }
   
   bee.roundedPos = { x: 0, y: 0 }
@@ -171,6 +182,14 @@ function createBee(parent, type, startPosition) {
   }
 
   bee.destroy = () => {
+    honeyBucket.visible = false
+    nectarBucket.visible = false
+    waxBucket.visible = false
+    pollenBucket.visible = false
+    beeAddon.visible = false
+    beeExclamation.visible = false
+    bee.hideAllAnimations()
+    bee.disableParticle()
     bee.removeUiTicker()
     bee.removeTicker()
     bee.removeParticleTicker()
@@ -548,35 +567,37 @@ function createBee(parent, type, startPosition) {
   }
 
   function dying() {
-    if (bee.hunger <= 0 || bee.age > bee.DEAD_AT_AGE) {
-      if (bee.hunger <= 0) {
-        if (!dyingHungerAnimations[bee.type].isRunning()) {
-          dyingHungerAnimations[bee.type].start()
-          bee.dying.duration = 645
+    if (bee.isDead()) return
+    if (dyingHungerAnimations[bee.type].isRunning() || dyingAgeAnimations[bee.type].isRunning()) {  
+        bee.hideBee()
+        shadow.visible = false
+        bee.position.x += bee.dying.direction.x * bee.dying.magnitude
+        bee.position.y += bee.dying.direction.y * bee.dying.magnitude
+        bee.dying.magnitude -= 0.0003
+        bee.dying.magnitude = Math.max(0, bee.dying.magnitude)
+        
+        if (bee.hunger <= 0) {
+          dyingHungerAnimations[bee.type].sprite.visible = true
+          beeExclamation.visible = true
+        } else if (bee.age > bee.DEAD_AT_AGE) {
+          dyingAgeAnimations[bee.type].sprite.visible = true
+          beeExclamation.visible = false
         }
-        dyingHungerAnimations[bee.type].sprite.visible = true
-        beeExclamation.visible = true
-      }
-      if (bee.age > bee.DEAD_AT_AGE) {
-        if (!dyingAgeAnimations[bee.type].isRunning()) {
-          dyingAgeAnimations[bee.type].start()
-          bee.dying.duration = 620
-        }
-        dyingAgeAnimations[bee.type].sprite.visible = true
-        beeExclamation.visible = false
-      }
-      bee.hideBee()
-      shadow.visible = false
-      bee.position.x += bee.dying.direction.x * bee.dying.magnitude
-      bee.position.y += bee.dying.direction.y * bee.dying.magnitude
-      bee.dying.magnitude -= 0.0003
-      bee.dying.magnitude = Math.max(0, bee.dying.magnitude)
-      bee.dying.duration -= 1
-      if (bee.dying.duration <= 0) {
-        bee.setType('dead')
-      }
-      return true
+
+        return true
     }
+
+    if (bee.hunger <= 0) {
+        dyingHungerAnimations[bee.type].start()
+        bee.setDying(true)
+        return true
+    } else if (bee.age > bee.DEAD_AT_AGE) {
+        dyingAgeAnimations[bee.type].start()
+        bee.setDying(true)
+        return true
+    }
+    
+    return false
   }
 
   function boost() {
@@ -897,27 +918,6 @@ function createBee(parent, type, startPosition) {
     bee.setShadowPosition()
     
     bee.handleAnimations()
-
-    const deadPosition = 32
-    if (bee.position.y === deadPosition) return
-
-    if (bee.isDead()) {
-      bee.texture = Texture.fromImage('images/bee/bee-drone-dead.png')
-      honeyBucket.visible = false
-      nectarBucket.visible = false
-      waxBucket.visible = false
-      pollenBucket.visible = false
-      beeAddon.visible = false
-      beeExclamation.visible = false
-      bee.hideAllAnimations()
-      bee.disableParticle()
-      if (bee.position.y !== deadPosition) {
-        bee.position.x = 65 + (Math.random() * 100)
-        bee.position.y = deadPosition
-      }
-      bee.destroy()
-      return
-    }
 
     beeExclamation.visible = bee.isHungry()
     
