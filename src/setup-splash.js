@@ -1,8 +1,9 @@
+import { Sprite, Container, Texture, Graphics } from 'pixi.js'
 
-function setupSplash() {
+function setupSplash(app) {
   scene = 'splash'
   document.body.style['background-color'] = '#fff6c5'
-    
+
   const container = new Container()
   container.scale.x = 2
   container.scale.y = 2
@@ -40,7 +41,7 @@ function setupSplash() {
     [targetX, targetY],
   ]
   points.forEach(point => {
-    return
+    // return
     const [x, y] = point
     const p = new Graphics()
     p.beginFill(0xff0000)
@@ -57,7 +58,7 @@ function setupSplash() {
   const fadeoutLUT = fadeout.getLUT(LUT_MAX)
 
   const luts = beeBezier.getLUT(LUT_MAX)
-  
+
   let counter = 0
 
   const interval = setInterval(() => {
@@ -67,7 +68,7 @@ function setupSplash() {
     counter++
 
     welcomeSplashBee.texture = counter % 10 < 5 ? welcomeFlapA : welcomeFlapB
-    
+
     if (counter >= LUT_MAX) {
       clearInterval(interval)
       welcomeSplashBee.texture = welcomeFlapC
@@ -81,39 +82,22 @@ function setupSplash() {
   welcomeHoney.position.y = Math.round(HEIGHT / 2 / 2) - 1
   container.addChild(welcomeHoney)
 
-  const callbackA = () => {
+  const callbackPlay = () => {
+    app.stage.removeChild(container)
+    setupSelectLevel()
+  }
+  const callbackDebug = () => {
     app.stage.removeChild(container)
     setupDebugMenu()
-  }
-  const callbackB = () => {
-    app.stage.removeChild(container)
-    setupWorldMap()
-  }
-  const callbackC = () => {
-    app.stage.removeChild(container)
-    setupWorldMap2()
-  }
-  const callbackD = () => {
-    // This is the "official" one
-    app.stage.removeChild(container)
-    setupWorldMap3()
   }
   const scaler = new Container()
   scaler.scale.x = 2
   scaler.scale.y = 2
   container.addChild(scaler)
 
-  
-  // const buttonA = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 0), '  Play', callbackA)
-  // scaler.addChild(buttonA)
+  const buttonA = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 1), '  Play', callbackPlay)
+  scaler.addChild(buttonA)
 
-  const buttonB = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 0), 'World Map', setupWorldMap3)
+  const buttonB = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 2), 'Debug menu', callbackDebug)
   scaler.addChild(buttonB)
-  
-  // const buttonC = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 2), 'World Map 2', callbackC)
-  // scaler.addChild(buttonC)
-  
-  // const buttonD = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 1), 'World Map 1', callbackB)
-  // scaler.addChild(buttonD)
-
 }
