@@ -1,3 +1,6 @@
+import foo from './test-import'
+
+console.log(foo + ' test again')
 
 function setGameSpeedText() {
   if (paused) {
