@@ -1,6 +1,6 @@
-import { Sprite, Container, Texture, Graphics } from 'pixi.js'
+// import { Sprite, Container, Texture, Graphics } from 'pixi.js'
 
-function setupSplash(app) {
+function setupSplash() {
   scene = 'splash'
   document.body.style['background-color'] = '#fff6c5'
 
