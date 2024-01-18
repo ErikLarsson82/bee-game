@@ -15,5 +15,8 @@
     "pixi-display": "^1.1.1",
     "pixi-picture": "^1.1.0",
     "pixi.js": "^4.3.4"
+  },
+  "engine": {
+    "node": "v12.18.1"
   }
 }
