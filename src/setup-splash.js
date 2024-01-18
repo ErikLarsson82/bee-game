@@ -107,7 +107,7 @@ function setupSplash() {
   // const buttonA = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 0), '  Play', callbackA)
   // scaler.addChild(buttonA)
 
-  const buttonB = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 0), 'Debug menu', callbackA)
+  const buttonB = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 0), 'World Map', setupWorldMap3)
   scaler.addChild(buttonB)
   
   // const buttonC = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 2), 'World Map 2', callbackC)
