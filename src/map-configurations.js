@@ -1,4 +1,9 @@
-let MAP_CONFIGURATIONS = [
+import { createBee } from './bee'
+import { set as setSeed } from './seeds'
+
+const replaceHex = window.replaceHex
+
+const MAP_CONFIGURATIONS = [
   {
     name: 'Level 1 - Green fields - EASY',
     cycles: [6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1],
@@ -26,7 +31,7 @@ let MAP_CONFIGURATIONS = [
       replaceHex([6, 7], 'prepared', 'activate').instantlyPrepare()
       replaceHex([6, 10], 'prepared', 'activate').instantlyPrepare()
       replaceHex([7, 9], 'prepared', 'activate').instantlyPrepare()
-      
+
       replaceHex([4, 4], 'honey', 'activate').setHoney(30)
       replaceHex([4, 5], 'honey', 'activate').setHoney(30)
       replaceHex([5, 4], 'honey', 'activate').setHoney(30)
@@ -62,7 +67,7 @@ let MAP_CONFIGURATIONS = [
       replaceHex([6, 7], 'prepared', 'activate').instantlyPrepare()
       replaceHex([6, 10], 'prepared', 'activate').instantlyPrepare()
       replaceHex([7, 9], 'prepared', 'activate').instantlyPrepare()
-      
+
       replaceHex([5, 8], 'honey', 'activate').setHoney(30)
       replaceHex([6, 8], 'wax', 'activate')
       replaceHex([6, 9], 'wax', 'activate')
@@ -93,13 +98,13 @@ let MAP_CONFIGURATIONS = [
 
       replaceHex([2, 3], 'pollen', 'activate').setPollen(60)
       replaceHex([2, 2], 'pollen', 'activate').setPollen(60)
-      
+
       replaceHex([6, 6], 'nectar', 'activate')
       replaceHex([6, 7], 'nectar', 'activate')
 
       replaceHex([4, 4], 'wax', 'activate')
       replaceHex([4, 5], 'wax', 'activate')
-      
+
       replaceHex([5, 4], 'honey', 'activate').setHoney(30)
       replaceHex([3, 4], 'honey', 'activate').setHoney(30)
 
@@ -122,7 +127,7 @@ let MAP_CONFIGURATIONS = [
       createBee(parent, 'idle').setHunger(60)
       createBee(parent, 'idle').setHunger(70)
       createBee(parent, 'idle').setHunger(80)
-      
+
       replaceHex([4, 2], 'blocked', 'no-activation')
       replaceHex([3, 2], 'blocked', 'no-activation')
       replaceHex([5, 2], 'blocked', 'no-activation')
@@ -135,7 +140,7 @@ let MAP_CONFIGURATIONS = [
       replaceHex([3, 4], 'honey', 'activate').setHoney(30)
       replaceHex([5, 4], 'honey', 'activate').setHoney(30)
       replaceHex([4, 4], 'wax', 'activate')
-      replaceHex([4, 5], 'wax', 'activate')    
+      replaceHex([4, 5], 'wax', 'activate')
     }
   },
   {
@@ -275,16 +280,16 @@ let MAP_CONFIGURATIONS = [
         */
         // replaceHex([3, 3], 'wax', 'activate').setWax(1)
 
-        replaceHex([2+4, 2], 'nectar', 'activate').nectar = 15
-        replaceHex([2+4, 3], 'nectar', 'activate')
-        replaceHex([3+4, 2], 'nectar', 'activate')
-        replaceHex([3+4, 3], 'nectar', 'activate')
+        replaceHex([2 + 4, 2], 'nectar', 'activate').nectar = 15
+        replaceHex([2 + 4, 3], 'nectar', 'activate')
+        replaceHex([3 + 4, 2], 'nectar', 'activate')
+        replaceHex([3 + 4, 3], 'nectar', 'activate')
 
-        replaceHex([2+4, 2+4], 'pollen', 'activate').pollen = 100
-        replaceHex([2+4, 3+4], 'pollen', 'activate').pollen = 30
-        replaceHex([3+4, 2+4], 'pollen', 'activate').pollen = 30
-        replaceHex([3+4, 3+4], 'pollen', 'activate').pollen = 30
-        
+        replaceHex([2 + 4, 2 + 4], 'pollen', 'activate').pollen = 100
+        replaceHex([2 + 4, 3 + 4], 'pollen', 'activate').pollen = 30
+        replaceHex([3 + 4, 2 + 4], 'pollen', 'activate').pollen = 30
+        replaceHex([3 + 4, 3 + 4], 'pollen', 'activate').pollen = 30
+
         return
       }
 
@@ -302,7 +307,7 @@ let MAP_CONFIGURATIONS = [
         replaceHex([6, 7], 'prepared', 'activate').instantlyPrepare()
         replaceHex([6, 10], 'prepared', 'activate').instantlyPrepare()
         replaceHex([7, 9], 'prepared', 'activate').instantlyPrepare()
-        
+
         replaceHex([5, 8], 'honey', 'activate').setHoney(30)
         replaceHex([6, 8], 'wax', 'activate')
         replaceHex([6, 9], 'wax', 'activate')
@@ -323,7 +328,7 @@ let MAP_CONFIGURATIONS = [
         replaceHex([0, 8], 'prepared', 'activate').instantlyPrepare()
         replaceHex([8, 0], 'prepared', 'activate').instantlyPrepare()
         replaceHex([8, 8], 'prepared', 'activate').instantlyPrepare()
-        
+
         replaceHex([5, 4], 'honey', 'activate').setHoney(30)
         replaceHex([3, 4], 'honey', 'activate').setHoney(30)
         replaceHex([4, 4], 'wax', 'activate')
@@ -337,9 +342,9 @@ let MAP_CONFIGURATIONS = [
         createBee(parent, 'idle').setHunger(80).setAge(20)
         createBee(parent, 'idle').setHunger(90).setAge(10)
         createBee(parent, 'idle').setHunger(100).setAge(0)
-        
+
         for (let i = 2; i <= 10; i++) {
-          for (var j = 3; j <= 12; j++) {
+          for (let j = 3; j <= 12; j++) {
             replaceHex([i, j], 'prepared', 'activate').instantlyPrepare()
           }
         }
@@ -347,8 +352,8 @@ let MAP_CONFIGURATIONS = [
       }
 
       if (m === 'mini') {
-        createBee(parent, 'idle').setHunger(20).setAge(80).setNectar(60).setPollen(30) //.setHoney(30)
-        
+        createBee(parent, 'idle').setHunger(20).setAge(80).setNectar(60).setPollen(30)
+
         replaceHex([4, 5], 'nectar', 'activate')
         replaceHex([4, 6], 'pollen', 'activate')
         replaceHex([4, 7], 'honey', 'activate')
@@ -368,7 +373,7 @@ let MAP_CONFIGURATIONS = [
         replaceHex([0, 8], 'prepared', 'activate').instantlyPrepare()
         replaceHex([8, 0], 'prepared', 'activate').instantlyPrepare()
         replaceHex([8, 8], 'prepared', 'activate').instantlyPrepare()
-        
+
         replaceHex([4, 4], 'wax', 'activate')
         replaceHex([4, 5], 'wax', 'activate')
         replaceHex([5, 4], 'honey', 'activate').setHoney(30)
@@ -390,7 +395,7 @@ let MAP_CONFIGURATIONS = [
         createBee(parent, 'idle').setHunger(100).setAge(6)
         createBee(parent, 'idle').setHunger(100).setAge(5)
         createBee(parent, 'idle').setHunger(100).setAge(0)
-        
+
         replaceHex([4, 7], 'prepared', 'activate').instantlyPrepare()
         replaceHex([5, 7], 'prepared', 'activate').instantlyPrepare()
         replaceHex([5, 8], 'prepared', 'activate').instantlyPrepare()
@@ -399,25 +404,25 @@ let MAP_CONFIGURATIONS = [
       }
 
       if (m === 'all') {
-        seeds = 2
+        setSeed(2)
         createBee(parent, 'idle').setHunger(40).setAge(80)
-        
-        for (let i = 0; i < hexGrid.length; i++) {
-          for (let j = 0; j < hexGrid[0].length; j++) {
-            replaceHex([j, i], 'prepared', 'activate').instantlyPrepare()
-          }
-        }
+
+        // for (let i = 0; i < hexGrid.length; i++) {
+        //   for (let j = 0; j < hexGrid[0].length; j++) {
+        //     replaceHex([j, i], 'prepared', 'activate').instantlyPrepare()
+        //   }
+        // }
         return
       }
 
       if (m === 'die') {
-        seeds = 2
+        setSeed(2)
         createBee(parent, 'idle').setHunger(1).setPollen(60)
         return
       }
 
       if (m === 'loe') {
-        seeds = 2
+        setSeed(2)
         createBee(parent, 'idle').setHunger(40).setAge(80).setWax(10)
         createBee(parent, 'idle').setHunger(42).setAge(60).setWax(10)
         createBee(parent, 'idle').setHunger(50).setAge(20).setWax(10)
@@ -439,31 +444,31 @@ let MAP_CONFIGURATIONS = [
         createBee(parent, 'idle').setHunger(60).setAge(99.8)
         createBee(parent, 'idle').setHunger(60).setAge(99.7)
         createBee(parent, 'idle').setHunger(40).setAge(70 - 20)
-        
+
         replaceHex([2, 2], 'wax', 'activate')
         replaceHex([2, 3], 'honey', 'activate').setHoney(30)
         return
       }
 
       if (m === 'stress') {
-        seeds = 100
+        setSeed(100)
 
-        for (let i = 0; i <100; i++) {
-          createBee(parent, 'forager') //.setPollen(30)
+        for (let i = 0; i < 100; i++) {
+          createBee(parent, 'forager')
         }
-        for (let i = 0; i <100; i++) {
+        for (let i = 0; i < 100; i++) {
           createBee(parent, 'nurser')
         }
-        for (let i = 0; i <100; i++) {
+        for (let i = 0; i < 100; i++) {
           createBee(parent, 'worker')
         }
-        
+
         for (let x = 0; x < 5; x++) {
           for (let y = 0; y < 5; y++) {
-            const type = ['pollen', 'honey', 'wax', 'brood', 'nectar'][Math.floor(Math.random()*5)]
+            const type = ['pollen', 'honey', 'wax', 'brood', 'nectar'][Math.floor(Math.random() * 5)]
             replaceHex([x, y], type, 'activate')
             // replaceSelectedHex(type)
-            //activateAdjacent(x, y)  
+            // activateAdjacent(x, y)
           }
         }
         return
@@ -473,10 +478,10 @@ let MAP_CONFIGURATIONS = [
         createBee(parent, 'nurser')
         createBee(parent, 'nurser')
         createBee(parent, 'nurser')
-        
+
         replaceHex([1, 1], 'nectar', 'activate').setNectar(15)
         replaceHex([1, 2], 'pollen', 'activate').setPollen(120)
-        
+
         replaceHex([2, 2], 'brood', 'activate')
         replaceHex([3, 2], 'brood', 'activate')
         replaceHex([4, 2], 'brood', 'activate')
@@ -512,7 +517,6 @@ let MAP_CONFIGURATIONS = [
         return
       }
 
-
       if (m === 'converter sceanrio') {
         createBee(parent, 'worker').setHunger(20)
 
@@ -525,21 +529,21 @@ let MAP_CONFIGURATIONS = [
         // Things are prepared with pollen so you can breed directly
         createBee(parent, 'nurser').setPollen(20)
         createBee(parent, 'forager').setPollen(20)
-        
+
         replaceHex([0, 0], 'honey', 'activate')
 
-        replaceHex([2, 0], 'pollen', 'activate').setPollen(hexGrid[2][0].POLLEN_HEX_CAPACITY)
-        
-        replaceHex([3, 0], 'pollen', 'activate').setPollen(hexGrid[3][0].POLLEN_HEX_CAPACITY)
-        
-        replaceHex([1, 2], 'brood', 'activate').setContents('egg')
+        // replaceHex([2, 0], 'pollen', 'activate').setPollen(hexGrid[2][0].POLLEN_HEX_CAPACITY)
+
+        // replaceHex([3, 0], 'pollen', 'activate').setPollen(hexGrid[3][0].POLLEN_HEX_CAPACITY)
+
+        // replaceHex([1, 2], 'brood', 'activate').setContents('egg')
         return
       }
 
       // Benchmarks
       if (m === 'brood benchmark') {
         createBee(parent, 'nurser').setHunger(100)
-        
+
         replaceHex([5, 4], 'honey', 'activate').setHoney(30)
         replaceHex([3, 4], 'brood', 'activate')
         replaceHex([4, 4], 'pollen', 'activate').setPollen(100)
@@ -549,7 +553,7 @@ let MAP_CONFIGURATIONS = [
       if (m === 'honey benchmark close') {
         createBee(parent, 'forager').setHunger(100)
         createBee(parent, 'worker').setHunger(100)
-        
+
         replaceHex([0, 7], 'honey', 'activate').setHoney(0)
         replaceHex([0, 8], 'honey', 'activate').setHoney(0)
         replaceHex([1, 7], 'pollen', 'activate').setPollen(0)
@@ -558,15 +562,16 @@ let MAP_CONFIGURATIONS = [
       }
 
       if (m === 'honey benchmark far') {
-        createBee(parent, 'forager').setHunger(100) //.setHoney(200).setNectar(200).setPollen(200).setWax(200)
+        createBee(parent, 'forager').setHunger(100)
         createBee(parent, 'worker').setHunger(100)
-        
+
         replaceHex([9, 0], 'honey', 'activate').setHoney(0)
         replaceHex([11, 0], 'honey', 'activate').setHoney(0)
         replaceHex([10, 0], 'pollen', 'activate').setPollen(0)
         replaceHex([11, 1], 'nectar', 'activate')
-        return
       }
     }
   }
 ]
+
+export default MAP_CONFIGURATIONS

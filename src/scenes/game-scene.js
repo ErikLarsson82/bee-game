@@ -1,15 +1,34 @@
+import { Container, Text } from 'pixi.js'
+import app from './setup-pixi'
+import { setFPS } from './config'
+import { setTickers } from './game/tickers'
+import { setBees } from './game/bees'
 
-function setupGame() {
+class GameScene extends Container {
+  constructor (sceneManager) {
+    super()
 
+    this.sceneManager = sceneManager
+
+    const text = new Text('GameScene', { fill: 0xffffff })
+    text.position.set(50, 50)
+    this.addChild(text)
+  }
+
+  init () {
+    setupGame.bind(this)()
+  }
+}
+
+function setupGame () {
   // Persist framerate detected by PIXI
-  FPS = Math.round(app.ticker.FPS)
-  
-  scene = 'game'
+  setFPS(Math.round(app.ticker.FPS))
+
   document.body.style['background-color'] = '#262b44'
-  
-  tickers = []
-  bees = []
-  
+
+  setTickers([])
+  setBees([])
+
   currentCycleIndex = 0
   gameover = false
   keepPlaying = false
@@ -383,3 +402,6 @@ function setupGame() {
   }
   document.addEventListener('visibilitychange', handleVisibilityChange, false)
 }
+
+
+export default GameScene

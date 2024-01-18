@@ -1,7 +1,7 @@
 const path = require('path')
 
 module.exports = {
-  entry: './src/help-functions.js',
+  entry: './src/main.js',
   mode: 'development',
   output: {
     filename: 'bundle.js',
@@ -17,5 +17,11 @@ module.exports = {
         }
       }
     ]
+  },
+  resolve: {
+    fallback: {
+      url: require.resolve('url/'),
+      path: require.resolve('path-browserify')
+    }
   }
 }

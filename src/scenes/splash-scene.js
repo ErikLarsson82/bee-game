@@ -1,13 +1,34 @@
-// import { Sprite, Container, Texture, Graphics } from 'pixi.js'
+import { WIDTH, HEIGHT } from '../config'
+import { Container, Text, Graphics, Sprite, Texture } from 'pixi.js'
+import Bezier from '../bezier'
+import { Button } from '../ui'
 
-function setupSplash() {
-  scene = 'splash'
+class SplashScene extends Container {
+  constructor (sceneManager) {
+    super()
+
+    this.sceneManager = sceneManager
+
+    const text = new Text('Splash Scene', { fill: 0xffffff })
+    text.position.set(50, 50)
+    this.addChild(text)
+  }
+
+  init () {
+    setup.bind(this)()
+  }
+}
+
+function setup () {
+  const _container = this
+  const sceneManager = this.sceneManager
+
   document.body.style['background-color'] = '#fff6c5'
 
   const container = new Container()
   container.scale.x = 2
   container.scale.y = 2
-  app.stage.addChild(container)
+  _container.addChild(container)
 
   const splashscreen = new Graphics()
   splashscreen.beginFill(0xffd601)
@@ -17,6 +38,7 @@ function setupSplash() {
   const text = new Container()
   container.addChild(text)
 
+  // eslint-disable-next-line new-cap
   const logo = new Sprite.fromImage('images/splash/logo.png')
   logo.position.x = 10
   logo.position.y = 50
@@ -38,16 +60,8 @@ function setupSplash() {
     [-50, -50],
     [10, 90],
     [110, 100],
-    [targetX, targetY],
+    [targetX, targetY]
   ]
-  points.forEach(point => {
-    // return
-    const [x, y] = point
-    const p = new Graphics()
-    p.beginFill(0xff0000)
-    p.drawRect(x, y, 2, 2)
-    container.addChild(p)
-  })
   const beeBezier = new Bezier(
     ...points.flatMap(p => p)
   )
@@ -82,22 +96,16 @@ function setupSplash() {
   welcomeHoney.position.y = Math.round(HEIGHT / 2 / 2) - 1
   container.addChild(welcomeHoney)
 
-  const callbackPlay = () => {
-    app.stage.removeChild(container)
-    setupSelectLevel()
-  }
-  const callbackDebug = () => {
-    app.stage.removeChild(container)
-    setupDebugMenu()
-  }
   const scaler = new Container()
   scaler.scale.x = 2
   scaler.scale.y = 2
   container.addChild(scaler)
 
-  const buttonA = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 1), '  Play', callbackPlay)
+  const buttonA = Button(Math.round(WIDTH / 2 / 2 / 2) - 20, 100 + (12 * 1), '  Play', () => sceneManager.goToScene('level-select'))
   scaler.addChild(buttonA)
 
-  const buttonB = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 2), 'Debug menu', callbackDebug)
+  const buttonB = Button(Math.round(WIDTH / 2 / 2 / 2) - 20, 100 + (12 * 2), 'Debug menu', () => sceneManager.goToScene('debug-menu'))
   scaler.addChild(buttonB)
 }
+
+export default SplashScene

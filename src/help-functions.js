@@ -1,7 +1,4 @@
 /* eslint-disable no-undef */
-import foo from './test-import'
-
-console.log(foo + ' test again')
 
 function setGameSpeedText () {
   if (paused) {
@@ -21,27 +18,6 @@ function singularOrPluralDay (amount) {
 
 function isDayBeforeWinter () {
   return currentCycle === 1 && season === 'summer'
-}
-
-function generateRandomId () {
-  const chars = 'abcdefghijklmnopqrstuvx'
-  let str = ''
-  for (let i = 0; i < 20; i++) {
-    str += chars[Math.floor(Math.random() * (chars.length - 1))]
-  }
-  return str + '_' + Math.random()
-}
-
-function addTicker (type, func) {
-  const id = generateRandomId()
-  const tickerObject = {
-    id,
-    type,
-    func,
-    remove: false
-  }
-  tickers.push(tickerObject)
-  return tickerObject
 }
 
 function removeTicker (id) {
@@ -417,10 +393,6 @@ function replaceSelectedHex (type) {
   return returnHex
 }
 
-function cap (min, max) {
-  return (value) => Math.max(Math.min(max, value), min)
-}
-
 function toGameTick (seconds) {
   return seconds * FPS
 }
@@ -531,8 +503,6 @@ function levelCompleteCriteria (currentCycleIndex) {
 window.setGameSpeedText = setGameSpeedText
 window.singularOrPluralDay = singularOrPluralDay
 window.isDayBeforeWinter = isDayBeforeWinter
-window.generateRandomId = generateRandomId
-window.addTicker = addTicker
 window.removeTicker = removeTicker
 window.updateTotals = updateTotals
 window.isUI = isUI
@@ -562,7 +532,6 @@ window.snapTo = snapTo
 window.sortHexForeground = sortHexForeground
 window.replaceHex = replaceHex
 window.replaceSelectedHex = replaceSelectedHex
-window.cap = cap
 window.toGameTick = toGameTick
 window.fromSeconds = fromSeconds
 window.rate = rate

@@ -1,12 +1,34 @@
+import { loader, Container, Text, Graphics } from 'pixi.js'
+import app from '../setup-pixi'
+import { VERSION, WIDTH, HEIGHT, fontConfig, smallFont } from '../config'
+import MAP_CONFIGURATIONS from '../map-configurations'
+import { Button } from '../ui'
+
+class DebugMenuScene extends Container {
+  constructor (sceneManager) {
+    super()
+
+    this.sceneManager = sceneManager
+
+    const text = new Text('DebugMenuScene', { fill: 0xffffff })
+    text.position.set(50, 50)
+    this.addChild(text)
+  }
+
+  init () {
+    setupDebugMenu.bind(this)()
+  }
+}
+
 let loadingDone = false
 
-function setupDebugMenu() {
-  scene = 'menu'
+function setupDebugMenu () {
+  const sceneManager = this.sceneManager
+
   document.body.style['background-color'] = '#fff6c5'
-  
+
   let loading = true
   let hasClickedIdx = -1
-  let hasClickedMap = null
 
   const container = new Container()
   container.scale.x = 2
@@ -23,51 +45,49 @@ function setupDebugMenu() {
   scaler.scale.y = 2
   container.addChild(scaler)
 
-  const versionLabel = new PIXI.Text(version, { ...fontConfig, ...smallFont, fill: 'black' })
+  const versionLabel = new Text(VERSION, { ...fontConfig, ...smallFont, fill: 'black' })
   versionLabel.position.x = 375
   versionLabel.position.y = 310
   container.addChild(versionLabel)
 
-  const loadingSecondLabel = new PIXI.Text('Loading', { fontFamily: 'verdana', fill: 'black', fontSize: 10 })
+  const loadingSecondLabel = new Text('Loading', { fontFamily: 'verdana', fill: 'black', fontSize: 10 })
   loadingSecondLabel.position.x = 170
   loadingSecondLabel.position.y = 160
   loadingSecondLabel.alpha = 0
   container.addChild(loadingSecondLabel)
 
   const startGame = () => {
-    loadMapParameters(hasClickedMap, hasClickedIdx)
-    app.stage.removeChild(container)
-    setupGame()
+    console.log('hasClickedIdx', hasClickedIdx)
+    sceneManager.goToScene('game')
   }
 
-  MAP_CONFIGURATIONS = MAP_CONFIGURATIONS.map((map, idx) => {
+  const buttons = MAP_CONFIGURATIONS.map((map, idx) => {
     const callback = () => {
       scaler.alpha = 0
       hasClickedIdx = idx
-      hasClickedMap = map
       if (loading && !loadingDone) {
         loadingSecondLabel.alpha = 1
         return
       }
       startGame()
     }
-    const button = Button(Math.round(WIDTH/2/2/2)-50, 10 + (idx * 14), map.name, callback, null, null, 'huge')
+    const button = Button(Math.round(WIDTH / 2 / 2 / 2) - 50, 10 + (idx * 14), map.name, callback, null, null, 'huge')
     scaler.addChild(button)
 
     return {
       callback,
-      ...map,
+      ...map
     }
   })
-  
-  if (window.debugMap !== undefined)
-    MAP_CONFIGURATIONS[0].callback()
 
+  if (window.debugMap !== undefined) {
+    buttons[0].callback()
+  }
 
-  loader.on('progress', function(e) {
+  loader.on('progress', function (e) {
     loadingSecondLabel.text = `Loading ${e.progress.toFixed(0)} %`
   })
-  loader.on('complete', function(e) {
+  loader.on('complete', function (e) {
     loading = false
     loadingDone = true
     if (hasClickedIdx !== -1) {
@@ -183,11 +203,11 @@ function setupDebugMenu() {
   loader.add('images/hex/brood/cell-brood-empty.png')
   loader.add('images/hex/brood/cell-brood-egg.png')
   loader.add('images/hex/brood/cell-brood-disabled.png')
-  loader.add(`images/hex/brood/cell-brood-larvae-fat.png`)
-  loader.add(`images/hex/brood/cell-brood-larvae-medium.png`)
-  loader.add(`images/hex/brood/cell-brood-larvae-starving.png`)
-  loader.add(`images/hex/brood/cell-brood-larvae.png`)
-  loader.add(`images/hex/brood/cell-brood-puppa.png`)
+  loader.add('images/hex/brood/cell-brood-larvae-fat.png')
+  loader.add('images/hex/brood/cell-brood-larvae-medium.png')
+  loader.add('images/hex/brood/cell-brood-larvae-starving.png')
+  loader.add('images/hex/brood/cell-brood-larvae.png')
+  loader.add('images/hex/brood/cell-brood-puppa.png')
   loader.add('images/hex/brood/cell-brood-dead.png')
   loader.add('images/ui/content-brood-empty.png')
   loader.add('images/ui/content-brood-egg.png')
@@ -259,3 +279,5 @@ function setupDebugMenu() {
   loader.add('images/ui/progress-bar/progress-age.png')
   loader.load()
 }
+
+export default DebugMenuScene
