@@ -129,10 +129,11 @@ function step2() {
   loader.add('images/ui/button-huge/button-huge-standard.png')
   loader.add('images/ui/button-huge/button-huge-hover.png')
   loader.add('images/ui/button-huge/button-huge-click.png')
+  loader.add('images/splash/logo.png')
 
   loader.load(() => {
     app.stage.removeChild(loadingContainer)
-    setupDebugMenu()
-    // loader.load(setupSplash)
+    // setupDebugMenu()
+    loader.load(setupSplash)
   })
 }

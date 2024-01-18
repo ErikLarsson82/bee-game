@@ -16,17 +16,10 @@ function setupSplash() {
   const text = new Container()
   container.addChild(text)
 
-  const title = new PIXI.Text('Bee Game', { ...fontConfig, ...hugeFont, fill: '#c96f10' })
-  title.anchor.set(0.5, 0)
-  title.position.x = Math.round(WIDTH / 2 / 2) + 8
-  title.position.y = 30
-  text.addChild(title)
-
-  const catchphrase = new PIXI.Text('No bee puns guaranteed', { ...fontConfig, ...massiveFont, fill: 'black' })
-  catchphrase.anchor.set(0.5, 0)
-  catchphrase.position.x = Math.round(WIDTH / 2 / 2)
-  catchphrase.position.y = 110
-  text.addChild(catchphrase)
+  const logo = new Sprite.fromImage('images/splash/logo.png')
+  logo.position.x = 10
+  logo.position.y = 50
+  container.addChild(logo)
 
   const welcomeFlapA = Texture.fromImage('images/bee/bee-drone-flap.png')
   const welcomeFlapB = Texture.fromImage('images/bee/bee-drone-flop.png')
@@ -110,17 +103,17 @@ function setupSplash() {
   scaler.scale.y = 2
   container.addChild(scaler)
 
-  /*
-  const buttonA = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 0), '  Play', callbackA)
-  scaler.addChild(buttonA)
+  
+  // const buttonA = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 0), '  Play', callbackA)
+  // scaler.addChild(buttonA)
 
-  const buttonB = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 1), 'World Map 1', callbackB)
+  const buttonB = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 0), 'Debug menu', callbackA)
   scaler.addChild(buttonB)
+  
+  // const buttonC = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 2), 'World Map 2', callbackC)
+  // scaler.addChild(buttonC)
+  
+  // const buttonD = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 1), 'World Map 1', callbackB)
+  // scaler.addChild(buttonD)
 
-  const buttonC = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 2), 'World Map 2', callbackC)
-  scaler.addChild(buttonC)
-  */
-
-  const buttonD = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 0), 'Play', callbackD)
-  scaler.addChild(buttonD)
 }
