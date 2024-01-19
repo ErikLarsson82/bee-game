@@ -1,14 +1,15 @@
 import { Container, Text, Graphics, Sprite, Texture } from 'pixi.js'
-import app from './setup-pixi'
-import { WIDTH, HEIGHT, fontConfig, smallFont, colors } from './config'
-import { fps, setFps } from './framerate'
-import { forEachHexagon, hexGrid, setHexGrid, HEX_AMOUNT_HEIGHT, HEX_AMOUNT_WIDTH } from './hex'
-import { cellDisabled } from './cells'
-import { ProgressBar2 } from './ui'
+import app from '../setup-pixi'
+import { WIDTH, HEIGHT, fontConfig, smallFont, colors } from '../config'
+import { fps, setFps } from '../framerate'
+import { forEachHexagon, HEX_AMOUNT_HEIGHT, HEX_AMOUNT_WIDTH } from '../hex'
+import { cellDisabled } from '../cells'
+import { ProgressBar2 } from '../ui'
 import {
   backgroundColor,
   setTickers,
   setBees,
+  setFlowers,
   setCurrentCycleIndex,
   setGameover,
   setKeepPlaying,
@@ -31,33 +32,43 @@ import {
   hoveredCells,
   blizzardWinter,
   gameover,
-  currentMapInit
-} from './game/game-state'
+  currentMapInit,
+  hexGrid,
+  setHexGrid,
+  setHoveredCells
+} from '../game/game-state'
 import {
   updateSelected,
   updateGameSpeedText,
   addTicker,
   updateTotals,
   addJobsButtons
-} from './exported-help-functions'
+} from '../exported-help-functions'
 
-import { createWarningSign } from './single-function-files/create-warning-sign'
-import { createSeasonTracker } from './single-function-files/create-season-tracker'
-import { createQueen } from './single-function-files/createQueen'
-import { createFlowers } from './single-function-files/createFlowers'
-import { createGameOverUI } from './single-function-files/createGameOverUI'
+import { createWarningSign } from '../single-function-files/create-warning-sign'
+import { createSeasonTracker } from '../single-function-files/create-season-tracker'
+import { createQueen } from '../single-function-files/create-queen'
+import { createFlowers } from '../single-function-files/create-flowers'
+import { createGameOverUI } from '../single-function-files/create-game-over-menu'
 
-import { colorToHex } from './pure-help-functions'
+import { colorToHex } from '../pure-help-functions'
 import {
+  setBeeContainer,
+  setHatchContainer,
   setGameSpeedIcon,
   setPauseFrame,
   backgroundImage,
   setHexBackground,
   setPanel,
   setBackgroundScene,
-  setSun
-} from './game/pixi-elements'
-import { gameloop } from './game-loop'
+  setSun,
+  setAngelBubble,
+  setAngelBubbleText,
+  setHiveHole,
+  setForeground,
+  setHexForeground
+} from '../game/pixi-elements'
+import { gameloop } from '../game-loop'
 
 class GameScene extends Container {
   constructor (sceneManager) {
@@ -90,6 +101,8 @@ function setupGame () {
 
   setTickers([])
   setBees([])
+  setFlowers([])
+  setHoveredCells([])
 
   setCurrentCycleIndex(0)
   setGameover(false)
@@ -139,15 +152,19 @@ function setupGame () {
 
   const hexForeground = new Container()
   container.addChild(hexForeground)
+  setHexForeground(hexForeground)
 
   const hatchContainer = new Container()
   container.addChild(hatchContainer)
+  setHatchContainer(hatchContainer)
 
   const beeContainer = new Container()
   container.addChild(beeContainer)
+  setBeeContainer(beeContainer)
 
   const foreground = new Container()
   container.addChild(foreground)
+  setForeground(foreground)
 
   const ui = new Container()
   container.addChild(ui)
@@ -304,11 +321,13 @@ function setupGame () {
   const angelBubble = Sprite.fromImage('images/scene/sun-bubble.png')
   angelBubble.position.x = -7
   angelBubble.position.y = 18
+  setAngelBubble(angelBubble)
 
   const angelBubbleText = new Text('', { ...fontConfig, ...smallFont, fill: colors.darkGray })
   angelBubbleText.position.x = 9
   angelBubbleText.position.y = 6
   angelBubble.addChild(angelBubbleText)
+  setAngelBubbleText(angelBubbleText)
 
   setAngelBubbleTimer(fps * 5)
 
@@ -401,6 +420,7 @@ function setupGame () {
   hiveHole.position.y = 214
   hiveHole.anchor.x = 0.5
   hiveHole.anchor.y = 1
+  setHiveHole(hiveHole)
   // foreground.addChild(hiveHole) // don't add it
 
   {

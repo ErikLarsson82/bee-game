@@ -4,11 +4,12 @@ import {
   hoveredCells,
   setHoveredCells,
   gameSpeed,
-  flowers
+  flowers,
+  hexGrid
 } from './game/game-state'
 import { addTicker } from './exported-help-functions'
 import { secondsToTicks } from './framerate'
-import { filterHexagon, hexGrid } from './hex'
+import { filterHexagon } from './hex'
 import { samePosition } from './pure-help-functions'
 
 export function makeSelectable (sprite, label, shape) {

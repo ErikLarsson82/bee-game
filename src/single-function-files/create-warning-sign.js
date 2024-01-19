@@ -1,8 +1,8 @@
 import { Sprite, Text } from 'pixi.js'
-import { fontConfig } from './config'
-import { addTicker } from './exported-help-functions'
-import { season, isDayBeforeWinter } from './game/game-state'
-import { foreground, queen } from './game/pixi-elements'
+import { fontConfig } from '../config'
+import { addTicker, isDayBeforeWinter } from '../exported-help-functions'
+import { season } from '../game/game-state'
+import { foreground, queen } from '../game/pixi-elements'
 
 export function createWarningSign () {
   const queenWarning = Sprite.fromImage('images/queen/dialogue.png')

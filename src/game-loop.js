@@ -1,5 +1,5 @@
 import { Texture } from 'pixi.js'
-import { tickers, setTickers, isGameOver, transferTo } from './exported-help-functions'
+import { isGameOver, transferTo, killBroodlings, freezeNectar } from './exported-help-functions'
 import {
   selected,
   bees,
@@ -22,9 +22,12 @@ import {
   cycles,
   setCurrentSeasonLength,
   setPreviousSeasonLength,
-  setGameSpeed
-} from './game-state'
-import { panel, backgroundScene } from './pixi-elements'
+  setGameSpeed,
+  tickers,
+  setTickers
+} from './game/game-state'
+import { panel, backgroundScene, sun } from './game/pixi-elements'
+import { createFlowers, resolveWinterFlowers } from './single-function-files/create-flowers'
 
 function isUI (ticker) {
   return ticker.type === 'ui'
@@ -73,7 +76,7 @@ export function gameloop (delta, manualTick) {
         setCurrentCycleIndex(currentCycleIndex + 1)
         setCurrentCycle(cycles[currentCycleIndex])
         setCurrentSeasonLength(currentCycle)
-        setPreviousSeasonLength(cycles[currentCycleIndex-1])
+        setPreviousSeasonLength(cycles[currentCycleIndex - 1])
         setSeason(season === 'summer' ? 'winter' : 'summer')
         if (season === 'summer') {
           setGameSpeed(1)

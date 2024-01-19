@@ -1,5 +1,6 @@
 import { Container, Sprite, Point, Polygon, Texture, Text } from 'pixi.js'
-import { addTicker, cap } from './exported-help-functions'
+import { addTicker } from './exported-help-functions'
+import { cap } from './pure-help-functions'
 import { fontConfig } from './config'
 
 export function ProgressBar (x, y, type, tickerData, max) {

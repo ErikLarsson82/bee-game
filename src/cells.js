@@ -1,7 +1,14 @@
-import { Polygon, Point, Sprite } from 'pixi.js'
-import { toLocalCoordinateFlat } from './hex'
-import { makeHexagon } from './sprite-factories'
-import { hexBackground } from './pixi-elements'
+import { Container, Polygon, Point, Sprite, Text, Texture } from 'pixi.js'
+import { bees, hexGrid, selected, season } from './game/game-state'
+import { toLocalCoordinateFlat, forEachHexagon } from './hex'
+import { makeHexagon, makeSelectable, makeOccupiable, makeUpgradeable, makeHexDetectable } from './sprite-factories'
+import { replaceSelectedHex, updateSelected, replaceHex, addTicker, transferTo } from './exported-help-functions'
+import { cap, isHoneyBuff, isNectarBuff } from './pure-help-functions'
+import { hexBackground, beeContainer, hatchContainer } from './game/pixi-elements'
+import { fontConfig, smallFont, colors } from './config'
+import { Button, ProgressBar, ProgressBar2 } from './ui'
+import { createBee } from './bee'
+import { animateSprite } from './animate-sprite'
 
 const generateHitArea = () =>
   new Polygon([
@@ -61,18 +68,18 @@ export function cellEmpty (x, y, parent) {
 
     container.addChild(Button(-19, -34, contentPrepare, () => {
       replaceSelectedHex('prepared')
-      setSelected(null)
+      updateSelected(null)
     }, null, null, 'large'))
 
     return container
   }
-  
+
   parent.addChild(emptySprite)
 
   return emptySprite
 }
 
-function cellPrepared(x, y, parent) {
+function cellPrepared (x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
 
   const backgroundSprite = Sprite.fromImage('images/hex/states/cell-background.png')
@@ -82,7 +89,7 @@ function cellPrepared(x, y, parent) {
 
   const preparedCellSprite = Sprite.fromImage('images/hex/prepared/cell-prepared-partial1.png')
   makeHexagon(preparedCellSprite, x, y, 'prepared')
-  
+
   const spriteExclamation = Sprite.fromImage('images/exclamations/exclamation-warning-mild.png')
   spriteExclamation.position.x = 14
   spriteExclamation.position.y = -6
@@ -103,21 +110,21 @@ function cellPrepared(x, y, parent) {
   }
 
   const prepareWarning = () => {
-    let waxInBeesHandsFound = bees.filter(({ type }) => type === 'worker').filter(bee => !bee.isWaxSackEmpty()).length > 0
-    let isAnyWorkers = bees.filter(({ type }) => type === 'worker').length > 0
-    
+    const waxInBeesHandsFound = bees.filter(({ type }) => type === 'worker').filter(bee => !bee.isWaxSackEmpty()).length > 0
+    const isAnyWorkers = bees.filter(({ type }) => type === 'worker').length > 0
+
     let waxInHexagonsFound = false
     forEachHexagon(hexGrid, hex => {
       if (hex.type === 'wax' && !hex.isWaxEmpty()) waxInHexagonsFound = true
     })
 
-    return (waxInHexagonsFound || waxInBeesHandsFound) && isAnyWorkers 
+    return (waxInHexagonsFound || waxInBeesHandsFound) && isAnyWorkers
   }
-  
+
   const needsHelp = () => preparedCellSprite.completeness <= 100 && !prepareWarning()
-  
+
   preparedCellSprite.panelLabel = () => false
-  preparedCellSprite.panelPosition = () => ({ x: pixelCoordinate.x - (preparedCellSprite.done ? 0 : 50), y: pixelCoordinate.y})
+  preparedCellSprite.panelPosition = () => ({ x: pixelCoordinate.x - (preparedCellSprite.done ? 0 : 50), y: pixelCoordinate.y })
 
   preparedCellSprite.panelContent = () => {
     const container = new Container()
@@ -130,21 +137,20 @@ function cellPrepared(x, y, parent) {
 
       container.addChild(Button(-11, -28, contentHoney, () => {
         replaceSelectedHex('honey')
-        setSelected(null)
+        updateSelected(null)
       }, null, null, 'large'))
       container.addChild(Button(18, -17, contentNectar, () => {
         replaceSelectedHex('nectar')
-        setSelected(null)
+        updateSelected(null)
       }, null, null, 'large'))
       container.addChild(Button(18, 5, contentPollen, () => {
         replaceSelectedHex('pollen')
-        setSelected(null)
+        updateSelected(null)
       }, null, null, 'large'))
       container.addChild(Button(-11, 16, contentBrood, () => {
         replaceSelectedHex('brood')
-        setSelected(null)
+        updateSelected(null)
       }, null, null, 'large'))
-
     } else {
       const content = Sprite.fromImage('images/ui/content-prepared.png')
       content.position.x = 72
@@ -152,7 +158,7 @@ function cellPrepared(x, y, parent) {
       container.addChild(content)
 
       const text = '  1.Have wax\n\n  2.Have\n  worker bees'
-      const helperText = new PIXI.Text(text, { ...fontConfig, fill: '#96a5bc' })
+      const helperText = new Text(text, { ...fontConfig, fill: '#96a5bc' })
       helperText.scale.set(0.15, 0.15)
       helperText.position.x = 80
       helperText.position.y = -6
@@ -162,7 +168,7 @@ function cellPrepared(x, y, parent) {
 
       const buttonDelete = Button(84, 54, 'Delete', () => {
         replaceHex([x, y], 'empty')
-        setSelected(null) 
+        updateSelected(null)
       })
       container.addChild(buttonDelete)
 
@@ -184,28 +190,28 @@ function cellPrepared(x, y, parent) {
   addTicker('ui', time => {
     if (preparedCellSprite.done) {
       spriteExclamation.visible = false
-      return;
+      return
     }
     spriteExclamation.visible = needsHelp()
   })
   addTicker('game-stuff', time => {
     if (preparedCellSprite.completeness >= 100) {
       preparedCellSprite.texture = Texture.fromImage('images/hex/prepared/cell-prepared-complete.png')
-      if (selected === preparedCellSprite && !preparedCellSprite.done) setSelected(null)
+      if (selected === preparedCellSprite && !preparedCellSprite.done) updateSelected(null)
       preparedCellSprite.done = true
       return
     }
 
     const partialNumber = Math.ceil(preparedCellSprite.completeness / 100 * 7) + 1
-    preparedCellSprite.texture = Texture.fromImage(`images/hex/prepared/cell-prepared-partial${partialNumber}.png`)       
+    preparedCellSprite.texture = Texture.fromImage(`images/hex/prepared/cell-prepared-partial${partialNumber}.png`)
   })
-  
+
   parent.addChild(preparedCellSprite)
 
   return preparedCellSprite
 }
 
-function cellExperiment1(x, y, parent) {
+function cellExperiment1 (x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const experimentOneSprite = Sprite.fromImage('images/hex/bread/cell-bee-bread.png')
   makeHexagon(experimentOneSprite, x, y, 'experiment-1')
@@ -220,12 +226,12 @@ function cellExperiment1(x, y, parent) {
       replaceHex([x, y], 'pollen')
     }
   }
-  
+
   parent.addChild(experimentOneSprite)
   return experimentOneSprite
 }
 
-function cellHoney(x, y, parent) {
+function cellHoney (x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const honeySprite = Sprite.fromImage('images/hex/honey/cell-honey-empty.png')
   makeHexagon(honeySprite, x, y, 'honey')
@@ -241,7 +247,7 @@ function cellHoney(x, y, parent) {
   honeySprite.setHoney = amount => { honeySprite.honey = cap(0, honeySprite.HONEY_HEX_CAPACITY)(amount); return honeySprite }
   honeySprite.isHoneyFull = () => honeySprite.honey >= honeySprite.HONEY_HEX_CAPACITY
   honeySprite.isHoneyEmpty = () => honeySprite.honey <= 0
-  
+
   addTicker('game-stuff', time => {
     if (honeySprite.honey > honeySprite.HONEY_HEX_CAPACITY * 0.95) {
       honeySprite.texture = Texture.fromImage('images/hex/honey/cell-honey-full.png')
@@ -271,15 +277,15 @@ function cellHoney(x, y, parent) {
     content.position.y = -37
     container.addChild(content)
 
-    container.addChild(ProgressBar2(-20, -26, 'honey', () => honeySprite.honey, honeySprite.HONEY_HEX_CAPACITY)) 
+    container.addChild(ProgressBar2(-20, -26, 'honey', () => honeySprite.honey, honeySprite.HONEY_HEX_CAPACITY))
 
-    const textContent = new PIXI.Text('-', { ...fontConfig })
+    const textContent = new Text('-', { ...fontConfig })
     textContent.scale.set(0.15, 0.15)
     textContent.position.x = 13
     textContent.position.y = -33
     container.addChild(textContent)
 
-    const textBonus = new PIXI.Text('-', { ...fontConfig })
+    const textBonus = new Text('-', { ...fontConfig })
     textBonus.scale.set(0.15, 0.15)
     textBonus.position.x = -22
     textBonus.position.y = -46
@@ -288,12 +294,12 @@ function cellHoney(x, y, parent) {
     addTicker('ui', () => {
       textContent.text = Math.round(honeySprite.honey)
       textContent.position.x = Math.round(honeySprite.honey) > 9 ? 9 : 13
-      
+
       const buff = honeySprite.bonuses.find(isHoneyBuff)
       textBonus.text = buff ? `Adjacency bonus: +${((buff.modifier - 1) * 100).toFixed(0)}%` : 'No bonuses'
     })
 
-    const notEnoughWarning = new PIXI.Text('NOT ENOUGH HONEY', { ...fontConfig, fill: 'white' })
+    const notEnoughWarning = new Text('NOT ENOUGH HONEY', { ...fontConfig, fill: 'white' })
     notEnoughWarning.scale.set(0.15, 0.15)
     notEnoughWarning.position.x = 76
     notEnoughWarning.position.y = 26
@@ -302,14 +308,14 @@ function cellHoney(x, y, parent) {
 
     const buttonDelete = Button(-20, 11, Sprite.fromImage('images/ui/button-large/button-large-content-delete.png'), () => {
       replaceHex([x, y], 'prepared').instantlyPrepare()
-      setSelected(null) 
+      updateSelected(null)
     }, null, null, 'large')
     container.addChild(buttonDelete)
 
     const button = Button(9, 0, Sprite.fromImage('images/ui/button-large/button-large-content-wax.png'), () => {
       if (honeySprite.honey >= (honeySprite.HONEY_HEX_CAPACITY * 0.9)) {
         replaceHex([x, y], 'wax')
-        setSelected(null) 
+        updateSelected(null)
       } else {
         notEnoughWarning.visible = true
       }
@@ -323,7 +329,7 @@ function cellHoney(x, y, parent) {
   return honeySprite
 }
 
-function cellWax(x, y, parent) {
+function cellWax (x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const waxSprite = Sprite.fromImage('images/hex/wax/cell-wax-full.png')
   makeHexagon(waxSprite, x, y, 'wax')
@@ -338,9 +344,8 @@ function cellWax(x, y, parent) {
   waxSprite.setWax = amount => { waxSprite.wax = cap(0, waxSprite.WAX_HEX_CAPACITY)(amount); return waxSprite }
   waxSprite.isWaxFull = () => waxSprite.wax >= waxSprite.WAX_HEX_CAPACITY
   waxSprite.isWaxEmpty = () => waxSprite.wax <= 0
-  
+
   addTicker('game-stuff', time => {
-    
     if (waxSprite.wax <= 0) {
       waxSprite.wax = 1
       replaceHex([x, y], 'honey').honey = 0
@@ -350,7 +355,7 @@ function cellWax(x, y, parent) {
       waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-full.png')
     } else if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.72) {
       waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-a.png')
-    } else if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.66 ) {
+    } else if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.66) {
       waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-b.png')
     } else if (waxSprite.wax > waxSprite.WAX_HEX_CAPACITY * 0.5) {
       waxSprite.texture = Texture.fromImage('images/hex/wax/cell-wax-c.png')
@@ -370,17 +375,17 @@ function cellWax(x, y, parent) {
 
   waxSprite.panelContent = () => {
     const container = new Container()
-    
+
     const content = Sprite.fromImage('images/ui/content-wax.png')
     content.position.x = -24
     content.position.y = -37
     container.addChild(content)
 
-    container.addChild(ProgressBar2(-20, -26, 'wax', () => waxSprite.wax, waxSprite.WAX_HEX_CAPACITY)) 
+    container.addChild(ProgressBar2(-20, -26, 'wax', () => waxSprite.wax, waxSprite.WAX_HEX_CAPACITY))
 
     const buttonDelete = Button(-20, 11, Sprite.fromImage('images/ui/button-large/button-large-content-delete.png'), () => {
       replaceHex([x, y], 'prepared').instantlyPrepare()
-      setSelected(null) 
+      updateSelected(null)
     }, null, null, 'large')
     container.addChild(buttonDelete)
 
@@ -391,8 +396,7 @@ function cellWax(x, y, parent) {
   return waxSprite
 }
 
-
-function cellNectar(x, y, parent) {
+export function cellNectar (x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const nectarSprite = Sprite.fromImage('images/hex/nectar/cell-nectar-empty.png')
   makeUpgradeable(nectarSprite)
@@ -409,23 +413,23 @@ function cellNectar(x, y, parent) {
   nectarSprite.setNectar = amount => { nectarSprite.nectar = cap(0, nectarSprite.NECTAR_CAPACITY)(amount); return nectarSprite }
   nectarSprite.isNectarFull = () => nectarSprite.nectar >= nectarSprite.NECTAR_CAPACITY
   nectarSprite.isNectarEmpty = () => nectarSprite.nectar <= 0
- 
+
   nectarSprite.panelLabel = () => false
   nectarSprite.panelPosition = () => ({ x: pixelCoordinate.x + 8, y: pixelCoordinate.y + 5 })
 
   nectarSprite.panelContent = () => {
     const container = new Container()
-    
+
     const content = Sprite.fromImage('images/ui/content-nectar.png')
     content.position.x = -24
     content.position.y = -37
     container.addChild(content)
 
-    container.addChild(ProgressBar2(-20, -26, 'nectar', () => nectarSprite.nectar, nectarSprite.NECTAR_CAPACITY)) 
+    container.addChild(ProgressBar2(-20, -26, 'nectar', () => nectarSprite.nectar, nectarSprite.NECTAR_CAPACITY))
 
     const buttonDelete = Button(-20, 11, Sprite.fromImage('images/ui/button-large/button-large-content-delete.png'), () => {
       replaceHex([x, y], 'prepared').instantlyPrepare()
-      setSelected(null) 
+      updateSelected(null)
     }, null, null, 'large')
     container.addChild(buttonDelete)
 
@@ -434,19 +438,19 @@ function cellNectar(x, y, parent) {
     }, null, null, 'large')
     container.addChild(buttonUpgrade)
 
-    const upgradesText = new PIXI.Text('-', { ...fontConfig })
+    const upgradesText = new Text('-', { ...fontConfig })
     upgradesText.scale.set(0.15, 0.15)
     upgradesText.position.x = 22
     upgradesText.position.y = -4
     container.addChild(upgradesText)
 
-    const textContent = new PIXI.Text('-', { ...fontConfig })
+    const textContent = new Text('-', { ...fontConfig })
     textContent.scale.set(0.15, 0.15)
     textContent.position.x = 13
     textContent.position.y = -33
     container.addChild(textContent)
 
-    const textBonus = new PIXI.Text('-', { ...fontConfig })
+    const textBonus = new Text('-', { ...fontConfig })
     textBonus.scale.set(0.15, 0.15)
     textBonus.position.x = -22
     textBonus.position.y = -46
@@ -479,7 +483,7 @@ function cellNectar(x, y, parent) {
       nectarSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-full.png')
     } else if (nectarSprite.nectar > nectarSprite.NECTAR_CAPACITY * 0.72) {
       nectarSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-a.png')
-    } else if (nectarSprite.nectar > nectarSprite.NECTAR_CAPACITY * 0.66 ) {
+    } else if (nectarSprite.nectar > nectarSprite.NECTAR_CAPACITY * 0.66) {
       nectarSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-b.png')
     } else if (nectarSprite.nectar > nectarSprite.NECTAR_CAPACITY * 0.5) {
       nectarSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-c.png')
@@ -491,13 +495,12 @@ function cellNectar(x, y, parent) {
       nectarSprite.texture = Texture.fromImage('images/hex/nectar/cell-nectar-empty.png')
     }
   })
-  
+
   parent.addChild(nectarSprite)
   return nectarSprite
 }
 
-
-function cellBrood(x, y, parent) {
+export function cellBrood (x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const broodSprite = Sprite.fromImage('images/hex/brood/cell-brood-empty.png')
   makeHexagon(broodSprite, x, y, 'brood')
@@ -530,13 +533,13 @@ function cellBrood(x, y, parent) {
   hatchingAnimation.sprite.visible = true
 
   broodSprite.paused = false
-  
+
   // Stored in seconds for easy transitions
   broodSprite.lifecycle = 0
   const eggDuration = 30
   const larvaeDuration = 300
-  const puppaDuration = 540    
-  
+  const puppaDuration = 540
+
   broodSprite.content = 'empty'
   broodSprite.NUTRITION_CAPACITY = 100
   broodSprite.nutrition = null
@@ -574,7 +577,7 @@ function cellBrood(x, y, parent) {
     } else {
       broodSprite.texture = Texture.fromImage(`images/hex/brood/cell-brood-${broodSprite.content}.png`)
     }
-    
+
     broodExclamation.visible = broodSprite.isStarving()
     if (!broodSprite.content) return
     if (broodSprite.content === 'empty') return
@@ -585,7 +588,7 @@ function cellBrood(x, y, parent) {
       }
       return
     }
-    
+
     if (season === 'winter' && broodSprite.content === 'puppa') {
       // Make sure all puppas will hatch on the first day of summer by speeding up the process in the winter
       broodSprite.lifecycle += transferTo(225).inSeconds(10)
@@ -595,7 +598,7 @@ function cellBrood(x, y, parent) {
 
     // Transitions
     if (broodSprite.lifecycle > eggDuration && broodSprite.content === 'egg') {
-      broodSprite.setContents('larvae')      
+      broodSprite.setContents('larvae')
     } else if (broodSprite.lifecycle > eggDuration + larvaeDuration && broodSprite.content === 'larvae') {
       broodSprite.setContents('puppa')
     } else if (broodSprite.lifecycle > eggDuration + larvaeDuration + puppaDuration && broodSprite.content === 'puppa' && season === 'summer' && day === 1 && !hatchingAnimation.isRunning()) {
@@ -622,7 +625,7 @@ function cellBrood(x, y, parent) {
     content.position.y = -54
     container.addChild(content)
 
-    const emptyText = new PIXI.Text('NO EGG', { ...fontConfig, ...smallFont, fill: colors.darkPink })
+    const emptyText = new Text('NO EGG', { ...fontConfig, ...smallFont, fill: colors.darkPink })
     emptyText.position.x = -20
     emptyText.position.y = -26
     container.addChild(emptyText)
@@ -644,7 +647,7 @@ function cellBrood(x, y, parent) {
 
     const buttonDelete = Button(-20, 11, Sprite.fromImage('images/ui/button-large/button-large-content-delete.png'), () => {
       replaceHex([x, y], 'prepared').instantlyPrepare()
-      setSelected(null)
+      updateSelected(null)
     }, null, null, 'large')
     container.addChild(buttonDelete)
 
@@ -672,25 +675,20 @@ function cellBrood(x, y, parent) {
           emptyText.text = 'NO EGG'
           emptyText.style.fill = colors.darkPink
         }
-
       } else if (isEgg) {
         content.texture = Texture.fromImage('images/ui/content-brood-egg.png')
-
       } else if (isDead) {
         content.texture = Texture.fromImage('images/ui/content-brood-dead.png')
-
       } else if (isLarva) {
         content.texture = Texture.fromImage('images/ui/content-brood-larva.png')
-
       } else if (isPuppa) {
         content.texture = Texture.fromImage('images/ui/content-brood-puppa.png')
       }
-
     })
 
     const button = Button(9, 0, Sprite.fromImage('images/ui/button-large/button-large-content-toggle.png'), broodSprite.togglePause, null, null, 'large')
     container.addChild(button)
-    
+
     return container
   }
 
@@ -698,8 +696,7 @@ function cellBrood(x, y, parent) {
   return broodSprite
 }
 
-
-function cellPollen(x, y, parent) {
+export function cellPollen (x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const pollenSprite = Sprite.fromImage('images/hex/pollen/cell-pollen-empty.png')
   makeUpgradeable(pollenSprite)
@@ -712,10 +709,10 @@ function cellPollen(x, y, parent) {
 
   pollenSprite.POLLEN_HEX_CAPACITY = 120
   pollenSprite.pollen = 0
-  pollenSprite.setPollen = (pollen) => pollenSprite.pollen = pollen
+  pollenSprite.setPollen = (pollen) => (pollenSprite.pollen = pollen)
   pollenSprite.isPollenFull = () => pollenSprite.pollen >= pollenSprite.POLLEN_HEX_CAPACITY
   pollenSprite.isPollenEmpty = () => pollenSprite.pollen <= 0
-  
+
   addTicker('game-stuff', time => {
     if (pollenSprite.pollen > pollenSprite.POLLEN_HEX_CAPACITY * 0.95) {
       pollenSprite.texture = Texture.fromImage('images/hex/pollen/cell-pollen-full.png')
@@ -739,35 +736,35 @@ function cellPollen(x, y, parent) {
 
   pollenSprite.panelContent = () => {
     const container = new Container()
-    
+
     const content = Sprite.fromImage('images/ui/content-pollen.png')
     content.position.x = -24
     content.position.y = -37
     container.addChild(content)
 
-    container.addChild(ProgressBar2(-20, -26, 'pollen', () => pollenSprite.pollen, pollenSprite.POLLEN_HEX_CAPACITY)) 
+    container.addChild(ProgressBar2(-20, -26, 'pollen', () => pollenSprite.pollen, pollenSprite.POLLEN_HEX_CAPACITY))
 
     const buttonDelete = Button(-20, 11, Sprite.fromImage('images/ui/button-large/button-large-content-delete.png'), () => {
       replaceHex([x, y], 'prepared').instantlyPrepare()
-      setSelected(null)
+      updateSelected(null)
     }, null, null, 'large')
     container.addChild(buttonDelete)
 
     const buttonUpgrade = Button(9, 0, Sprite.fromImage('images/ui/button-large/button-large-content-upgrade-b.png'), () => {
       replaceHex([x, y], 'experiment-1')
-      setSelected(null)
+      updateSelected(null)
     }, null, null, 'large')
     container.addChild(buttonUpgrade)
 
     /*
     const buttonUpgrade2 = Button(-49, 0, Sprite.fromImage('images/ui/button-large/button-large-content-forager-resting-place.png'), () => {
       replaceHex([x, y], 'forager-resting-place')
-      setSelected(null)
+      updateSelected(null)
     }, null, null, 'large')
     container.addChild(buttonUpgrade2)
     */
 
-    const upgradesText = new PIXI.Text('-', { ...fontConfig })
+    const upgradesText = new Text('-', { ...fontConfig })
     upgradesText.scale.set(0.15, 0.15)
     upgradesText.position.x = 22
     upgradesText.position.y = -4
@@ -784,7 +781,7 @@ function cellPollen(x, y, parent) {
 
     return container
   }
-  
+
   parent.addChild(pollenSprite)
   return pollenSprite
 }
@@ -805,15 +802,15 @@ const cellForagerRestingPlace = (x, y, parent) => {
   restingSprite.panelContent = () => {
     const container = new Container()
 
-    const text = new PIXI.Text('Forager resting place', { ...fontConfig, fill: colors.yellow })
+    const text = new Text('Forager resting place', { ...fontConfig, fill: colors.yellow })
     text.scale.set(0.15, 0.15)
     text.position.x = -30
     text.position.y = -14
     container.addChild(text)
-    
+
     const buttonDelete = Button(-20, 11, Sprite.fromImage('images/ui/button-large/button-large-content-delete.png'), () => {
       replaceHex([x, y], 'prepared').instantlyPrepare()
-      setSelected(null) 
+      updateSelected(null)
     }, null, null, 'large')
     container.addChild(buttonDelete)
 
@@ -822,4 +819,19 @@ const cellForagerRestingPlace = (x, y, parent) => {
 
   parent.addChild(restingSprite)
   return restingSprite
+}
+
+export const nameToFunction = (input) => {
+  return {
+    nectar: cellNectar,
+    brood: cellBrood,
+    pollen: cellPollen,
+    honey: cellHoney,
+    wax: cellWax,
+    prepared: cellPrepared,
+    empty: cellEmpty,
+    blocked: cellBlocked,
+    'experiment-1': cellExperiment1,
+    'forager-resting-place': cellForagerRestingPlace
+  }[input]
 }

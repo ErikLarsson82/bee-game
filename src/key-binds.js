@@ -1,40 +1,41 @@
+import { gameover, paused, setPaused, setGameSpeed } from './game/game-state'
+import { gameloop } from './game-loop'
 
 window.addEventListener('keydown', e => {
-  if (scene !== 'game') return
   if (gameover) return
 
-  //Space
+  // Space
   if (e.keyCode === 32) {
-    paused = !paused
+    setPaused(!paused)
   }
 
-  //T, for gameTick
+  // T, for gameTick
   if (e.keyCode === 84) {
     gameloop(16.66, true)
   }
 
   // 1
   if (e.keyCode === 49) {
-    gameSpeed = 1
-    paused = false
+    setGameSpeed(1)
+    setPaused(false)
   }
 
   // 2
   if (e.keyCode === 50) {
-    gameSpeed = 4
-    paused = false
+    setGameSpeed(4)
+    setPaused(false)
   }
 
   // 2
   if (e.keyCode === 51) {
-    gameSpeed = 8
-    paused = false
+    setGameSpeed(8)
+    setPaused(false)
   }
 
   // 3
   if (e.keyCode === 52) {
-    gameSpeed = 64
-    paused = false
+    setGameSpeed(64)
+    setPaused(false)
   }
 
   /*

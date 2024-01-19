@@ -1,7 +1,7 @@
 import { Sprite, Texture } from 'pixi.js'
-import { gameover, setKeepPlaying, setGameover } from './game/game-state'
-import { addTicker } from './exported-help-functions'
-import { Button } from './ui'
+import { gameover, setKeepPlaying, setGameover } from '../game/game-state'
+import { addTicker } from '../exported-help-functions'
+import { Button } from '../ui'
 
 const DEBUG_BUTTON = false
 

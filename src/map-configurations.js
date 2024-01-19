@@ -1,7 +1,6 @@
 import { createBee } from './bee'
-import { set as setSeed } from './seeds'
-
-const replaceHex = window.replaceHex
+import { setSeeds } from './game/game-state'
+import { replaceHex } from './exported-help-functions'
 
 const MAP_CONFIGURATIONS = [
   {
@@ -404,7 +403,7 @@ const MAP_CONFIGURATIONS = [
       }
 
       if (m === 'all') {
-        setSeed(2)
+        setSeeds(2)
         createBee(parent, 'idle').setHunger(40).setAge(80)
 
         // for (let i = 0; i < hexGrid.length; i++) {
@@ -416,13 +415,13 @@ const MAP_CONFIGURATIONS = [
       }
 
       if (m === 'die') {
-        setSeed(2)
+        setSeeds(2)
         createBee(parent, 'idle').setHunger(1).setPollen(60)
         return
       }
 
       if (m === 'loe') {
-        setSeed(2)
+        setSeeds(2)
         createBee(parent, 'idle').setHunger(40).setAge(80).setWax(10)
         createBee(parent, 'idle').setHunger(42).setAge(60).setWax(10)
         createBee(parent, 'idle').setHunger(50).setAge(20).setWax(10)
@@ -451,7 +450,7 @@ const MAP_CONFIGURATIONS = [
       }
 
       if (m === 'stress') {
-        setSeed(100)
+        setSeeds(100)
 
         for (let i = 0; i < 100; i++) {
           createBee(parent, 'forager')

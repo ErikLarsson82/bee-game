@@ -1,3 +1,9 @@
+export let beeContainer = null
+export const setBeeContainer = b => (beeContainer = b)
+
+export let hatchContainer = null
+export const setHatchContainer = h => (hatchContainer = h)
+
 export let gameSpeedIcon = null
 export const setGameSpeedIcon = gs => (gameSpeedIcon = gs)
 
@@ -13,6 +19,9 @@ export const setBackgroundColor = bc => (backgroundColor = bc)
 export let panel = null
 export const setPanel = p => (panel = p)
 
+export let hexForeground = null
+export const setHexForeground = hf => (hexForeground = hf)
+
 export let hexBackground = null
 export const setHexBackground = hb => (hexBackground = hb)
 
@@ -27,3 +36,12 @@ export const setQueen = q => (queen = q)
 
 export let sun = null
 export const setSun = s => (sun = s)
+
+export let angelBubble = null
+export const setAngelBubble = ab => (angelBubble = ab)
+
+export let angelBubbleText = null
+export const setAngelBubbleText = ab => (angelBubbleText = ab)
+
+export let hiveHole = null
+export const setHiveHole = hh => (hiveHole = hh)

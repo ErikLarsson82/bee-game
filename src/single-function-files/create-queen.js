@@ -1,10 +1,11 @@
-import { Sprite, Container, Text } from 'js'
-import { makeSelectable, goIdle, makeFlyable, makeHexDetectable } from './sprite-factories'
-import { addTicker, transferTo } from './exported-help-functions'
-import { filterHexagon } from './hex'
-import { season, gameSpeed, hexGrid } from './game/game-state'
-import { setQueen } from './pixi-elements'
-import { fontConfig, speeds } from './config'
+import { Sprite, Container, Text } from 'pixi.js'
+import { makeSelectable, makeHexDetectable } from '../sprite-factories'
+import { makeFlyable } from '../bee-factories'
+import { addTicker, transferTo, goIdle } from '../exported-help-functions'
+import { filterHexagon } from '../hex'
+import { season, gameSpeed, hexGrid } from '../game/game-state'
+import { setQueen } from '../game/pixi-elements'
+import { fontConfig, speeds } from '../config'
 
 export function createQueen (parent) {
   const queenSprite = Sprite.fromImage('images/queen/bee-queen.png')

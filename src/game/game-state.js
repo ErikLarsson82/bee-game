@@ -78,3 +78,6 @@ export const setKillNonPollinatedFlowers = knpf => (killNonPollinatedFlowers = k
 
 export let angelBubbleTimer = null
 export const setAngelBubbleTimer = b => (angelBubbleTimer = b)
+
+export let angels = null
+export const setAngels = a => (angels = a)

@@ -3,6 +3,7 @@ import app from '../setup-pixi'
 import { VERSION, WIDTH, HEIGHT, fontConfig, smallFont } from '../config'
 import MAP_CONFIGURATIONS from '../map-configurations'
 import { Button } from '../ui'
+import { loadMapParameters } from '../load-map-parameters'
 
 class DebugMenuScene extends Container {
   constructor (sceneManager) {
@@ -58,6 +59,7 @@ function setupDebugMenu () {
 
   const startGame = () => {
     console.log('hasClickedIdx', hasClickedIdx)
+    loadMapParameters(MAP_CONFIGURATIONS[hasClickedIdx], hasClickedIdx)
     sceneManager.goToScene('game')
   }
 

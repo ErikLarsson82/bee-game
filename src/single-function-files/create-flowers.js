@@ -1,9 +1,9 @@
 import { Texture, Sprite, Container } from 'pixi.js'
-import { flowers, setFlowers, seeds, setSeeds, selected, isDayBeforeWinter, season, hour, killNonPollinatedFlowers } from './game/game-state'
-import { makeOccupiable, makeSelectable } from './sprite-factories'
-import { addTicker, updateSelected } from './exported-help-functions'
-import { WIDTH, fontConfig } from './config'
-import { ProgressBar } from './ui'
+import { flowers, setFlowers, seeds, setSeeds, selected, season, hour, killNonPollinatedFlowers } from '../game/game-state'
+import { makeOccupiable, makeSelectable } from '../sprite-factories'
+import { addTicker, updateSelected, isDayBeforeWinter } from '../exported-help-functions'
+import { WIDTH, fontConfig } from '../config'
+import { ProgressBar } from '../ui'
 
 export function createFlowers (flowerBed) {
   const positions = [10, -50, 60, -110, 120, -160, 170]

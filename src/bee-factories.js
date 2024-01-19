@@ -1,6 +1,13 @@
-import { distance } from './exported-help-functions'
+import { Point, Sprite } from 'pixi.js'
 
-function makeFlyable(sprite) {
+import { snapTo, transferTo, addTicker } from './exported-help-functions'
+import { getClosestHex, filterHexagon } from './hex'
+import { distance, distanceFactor, cap, magnitude, normalize } from './pure-help-functions'
+import { hiveHole, foreground } from './game/pixi-elements'
+import { gameSpeed, season, blizzardWinter, winterHungerMultiplier, hexGrid } from './game/game-state'
+import { fps } from './framerate'
+
+export function makeFlyable (sprite) {
   sprite.vx = 0
   sprite.vy = 0
   sprite.flyTo = targetSprite => {
@@ -23,8 +30,7 @@ function makeFlyable(sprite) {
 
     sprite.setShadowPosition()
     if (x === 0 && y === 0) return
-    const direction = new PIXI.Point(x, y).normalize()
-
+    const direction = normalize(Point, new Point(x, y))
     sprite.vx += direction.x * 0.030 * (gameSpeed * 5)
     sprite.vy += direction.y * 0.030 * (gameSpeed * 5)
 
@@ -40,12 +46,12 @@ function makeFlyable(sprite) {
     if (distFactor < 6) maxSpeed = 0.07
     if (distFactor < 3) maxSpeed = 0.05
 
-    let velocity = new PIXI.Point(sprite.vx, sprite.vy)
+    let velocity = new Point(sprite.vx, sprite.vy)
 
     const sum = maxSpeed * gameSpeed * overburdenedFactor * boostFactor
-    
-    if (velocity.magnitude() > sum) {
-      velocity = new PIXI.Point(velocity.normalize().x * sum, velocity.normalize().y * sum)
+
+    if (magnitude(velocity) > sum) {
+      velocity = new Point(normalize(Point, velocity).x * sum, normalize(Point, velocity).y * sum)
     }
     sprite.vx = velocity.x
     sprite.vy = velocity.y
@@ -61,16 +67,15 @@ function makeFlyable(sprite) {
   }
 }
 
-
-function makeHungry(bee) {
+export function makeHungry (bee) {
   bee.HUNGER_CAPACITY = 100
   bee.hunger = bee.HUNGER_CAPACITY
   bee._dead = false
   bee._dying = false
   bee.isDead = () => bee._dead
   bee.isDying = () => bee._dying
-  bee.setDead = input => bee._dead = input
-  bee.setDying = input => bee._dying = input
+  bee.setDead = input => (bee._dead = input)
+  bee.setDying = input => (bee._dying = input)
   bee.isWellFed = () => bee.hunger >= bee.HUNGER_CAPACITY
   bee.isHungry = () => bee.hunger < 30
   bee.isWinterHungry = () => bee.hunger < 80
@@ -83,7 +88,7 @@ function makeHungry(bee) {
     } else {
       bee.hunger -= transferTo(bee.HUNGER_CAPACITY).inSeconds(900 / winterHungerMultiplier)
     }
-    
+
     bee.hunger = cap(0, bee.HUNGER_CAPACITY)(bee.hunger)
   }
 
@@ -123,12 +128,12 @@ function makeHungry(bee) {
   }
 }
 
-function makeParticleCreator(bee) {
+export function makeParticleCreator (bee) {
   bee.particleDelay = 0
   bee.particleActive = true
   let transferRate = 0
 
-  bee.disableParticle = () => bee.particleActive = false
+  bee.disableParticle = () => (bee.particleActive = false)
 
   bee.removeParticleTicker = () => {
     bee.disableParticle()
@@ -137,7 +142,7 @@ function makeParticleCreator(bee) {
 
   bee.particleTicker = addTicker('game-stuff', time => {
     if (!bee.particleActive) return bee.removeParticleTicker()
-    let availableTypes = []
+    const availableTypes = []
 
     if (bee.isPollenSackFull()) availableTypes.push('pollen')
     if (bee.isHoneySackFull()) availableTypes.push('honey')
@@ -148,19 +153,19 @@ function makeParticleCreator(bee) {
       transferRate = (Math.random() * 1) + 0.8
       bee.particleDelay = 1
 
-      const randomType = availableTypes[Math.floor(availableTypes.length * Math.random())];
+      const randomType = availableTypes[Math.floor(availableTypes.length * Math.random())]
       const pixel = Sprite.fromImage(`images/drops/pixel-${randomType}.png`)
       pixel.position.x = bee.position.x + 2 + (Math.random() * 4)
       pixel.position.y = bee.position.y + 4 + (Math.random() * 3) - 1.5
       let lifetime = 0
-      const removeParticle = () => pixel.particle.remove = true 
+      const removeParticle = () => (pixel.particle.remove = true)
       pixel.particle = addTicker('game-stuff', time => {
         if (!bee.particleActive) {
           removeParticle()
           foreground.removeChild(pixel)
           return
         }
-        pixel.position.y += 0.0003 * FPS * gameSpeed
+        pixel.position.y += 0.0003 * fps * gameSpeed
         lifetime += transferTo(1).inSeconds(1)
         if (lifetime > 1) {
           removeParticle()
