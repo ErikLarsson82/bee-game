@@ -6,7 +6,7 @@ class LoadingScene extends Container {
 
     this.sceneManager = sceneManager
 
-    const text = new Text('Loading Scene', { fill: 0xffffff })
+    const text = new Text('Loading...', { fill: 0xffffff })
     text.position.set(50, 50)
     this.addChild(text)
   }

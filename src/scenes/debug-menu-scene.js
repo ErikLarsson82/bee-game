@@ -10,10 +10,6 @@ class DebugMenuScene extends Container {
     super()
 
     this.sceneManager = sceneManager
-
-    const text = new Text('DebugMenuScene', { fill: 0xffffff })
-    text.position.set(50, 50)
-    this.addChild(text)
   }
 
   init () {
