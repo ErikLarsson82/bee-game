@@ -12,7 +12,18 @@ import { makeSelectable, makeHexDetectable } from './sprite-factories'
 import { makeFlyable, makeHungry, makeParticleCreator } from './bee-factories'
 import { samePosition, cap, distance } from './pure-help-functions'
 import { fps } from './framerate'
-import { bees, setBees, angels, setAngels, gameSpeed, season, flowers, hexGrid, gameover, setAngelBubbleTimer } from './game/game-state'
+import {
+  bees,
+  setBees,
+  angels,
+  setAngels,
+  gameSpeed,
+  season,
+  flowers,
+  hexGrid,
+  gameover,
+  setAngelBubbleTimer
+} from './game/game-state'
 import { ProgressBar } from './ui'
 import { fontConfig, speeds } from './config'
 import { filterHexagon, getClosestHex } from './hex'

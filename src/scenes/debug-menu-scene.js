@@ -58,7 +58,6 @@ function setupDebugMenu () {
   container.addChild(loadingSecondLabel)
 
   const startGame = () => {
-    console.log('hasClickedIdx', hasClickedIdx)
     loadMapParameters(MAP_CONFIGURATIONS[hasClickedIdx], hasClickedIdx)
     sceneManager.goToScene('game')
   }

@@ -6,7 +6,6 @@ import { forEachHexagon, HEX_AMOUNT_HEIGHT, HEX_AMOUNT_WIDTH } from '../hex'
 import { cellDisabled } from '../cells'
 import { ProgressBar2 } from '../ui'
 import {
-  backgroundColor,
   setTickers,
   setBees,
   setFlowers,
@@ -35,7 +34,8 @@ import {
   currentMapInit,
   hexGrid,
   setHexGrid,
-  setHoveredCells
+  setHoveredCells,
+  setAngels
 } from '../game/game-state'
 import {
   updateSelected,
@@ -66,7 +66,8 @@ import {
   setAngelBubbleText,
   setHiveHole,
   setForeground,
-  setHexForeground
+  setHexForeground,
+  backgroundColor
 } from '../game/pixi-elements'
 import { gameloop } from '../game-loop'
 
@@ -103,6 +104,7 @@ function setupGame () {
   setBees([])
   setFlowers([])
   setHoveredCells([])
+  setAngels([])
 
   setCurrentCycleIndex(0)
   setGameover(false)

@@ -18,7 +18,7 @@ class LoadingScene extends Container {
 
     function step2 () {
       loader.on('progress', function (e) {
-        console.log(`Loading ${e.progress.toFixed(0)} %`)
+        // console.log(`Loading ${e.progress.toFixed(0)} %`)
       })
 
       // shorthands

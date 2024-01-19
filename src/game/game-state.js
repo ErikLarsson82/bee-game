@@ -52,9 +52,6 @@ export const setYear = y => (year = y)
 export let season = null
 export const setSeason = s => (season = s)
 
-export let backgroundColor = null
-export const setBackgroundColor = bc => (backgroundColor = bc)
-
 export let previousSeasonLength = null
 export const setPreviousSeasonLength = pl => (previousSeasonLength = pl)
 
