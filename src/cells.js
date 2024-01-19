@@ -1,37 +1,42 @@
-const generateHitArea = () => 
-  new PIXI.Polygon([
-      new PIXI.Point(5, 0),
-      new PIXI.Point(13, 0),
-      new PIXI.Point(18, 5),
-      new PIXI.Point(13, 10),
-      new PIXI.Point(5, 10),
-      new PIXI.Point(0, 5),
+import { Polygon, Point, Sprite } from 'pixi.js'
+import { toLocalCoordinateFlat } from './hex'
+import { makeHexagon } from './sprite-factories'
+import { hexBackground } from './pixi-elements'
+
+const generateHitArea = () =>
+  new Polygon([
+    new Point(5, 0),
+    new Point(13, 0),
+    new Point(18, 5),
+    new Point(13, 10),
+    new Point(5, 10),
+    new Point(0, 5)
   ])
 
-function cellDisabled(x, y, parent) {
+export function cellDisabled (x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const disabledSprite = Sprite.fromImage('images/hex/states/cell-disabled.png')
   makeHexagon(disabledSprite, x, y, 'disabled')
   disabledSprite.position.x = pixelCoordinate.x
   disabledSprite.position.y = pixelCoordinate.y
   disabledSprite.isDisabled = () => true
-  
+
   parent.addChild(disabledSprite)
   return disabledSprite
 }
 
-function cellBlocked(x, y, parent) {
+export function cellBlocked (x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const blockedSprite = Sprite.fromImage('images/hex/states/cell-blocked.png')
   makeHexagon(blockedSprite, x, y, 'blocked')
   blockedSprite.position.x = pixelCoordinate.x
   blockedSprite.position.y = pixelCoordinate.y
-  
+
   parent.addChild(blockedSprite)
   return blockedSprite
 }
 
-function cellEmpty(x, y, parent) {
+export function cellEmpty (x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
 
   const backgroundSprite = Sprite.fromImage('images/hex/states/cell-empty-background.png')

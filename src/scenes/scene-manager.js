@@ -8,11 +8,9 @@ class SceneManager {
 
   addScene (name, scene) {
     this.scenes[name] = scene
-    console.log('kurt', name, scene, this.scenes)
   }
 
   goToScene (name) {
-    console.log(this.scenes)
     if (this.scenes[name]) {
       if (this.currentScene) {
         app.stage.removeChild(this.currentScene)

@@ -1,5 +1,8 @@
+import { Sprite, Texture } from 'pixi.js'
+import { addTicker } from '../exported-help-functions'
+import { season, day, hour, previousSeasonLength, currentSeasonLength } from '../game/game-state'
 
-function createSeasonTracker() {
+export function createSeasonTracker (uiTopBar) {
   const seasonTracker = Sprite.fromImage('images/ui/season-tracker/background.png')
   seasonTracker.position.x = 244
   seasonTracker.position.y = 2

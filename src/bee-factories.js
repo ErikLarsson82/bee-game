@@ -1,3 +1,4 @@
+import { distance } from './exported-help-functions'
 
 function makeFlyable(sprite) {
   sprite.vx = 0
@@ -114,7 +115,7 @@ function makeHungry(bee) {
     const wantsFood = (season === 'summer' && bee.isHungry()) || (season === 'winter' && bee.isWinterHungry())
     if (honeyHex.length > 0 && wantsFood) {
       honeyHex[0].claimSlot(bee)
-      const closest = getClosestHex(honeyHex, bee)
+      const closest = getClosestHex(honeyHex, bee, distance)
       bee.flyTo(closest)
       return true
     }

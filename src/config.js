@@ -23,3 +23,11 @@ export const smallFont = { fontSize: 4 }
 export const largeFont = { fontSize: 8 }
 export const massiveFont = { fontSize: 16 }
 export const hugeFont = { fontSize: 50 }
+
+export const colors = {
+  yellow: '#fee761',
+  orange: '#feae34',
+  darkOrange: '#f77622',
+  darkGray: '#3a4466',
+  darkPink: '#b55088'
+}

@@ -1,23 +1,6 @@
-/* eslint-disable no-undef */
-
-function setGameSpeedText () {
-  if (paused) {
-    gameSpeedIcon.texture = Texture.fromImage('images/ui/gamespeed0.png')
-  } else {
-    gameSpeedIcon.texture = Texture.fromImage(
-      'images/ui/gamespeed' + gameSpeed + '.png'
-    )
-  }
-  pauseFrame.visible = paused
-}
-
 function singularOrPluralDay (amount) {
   if (amount === 1) return 'last day'
   return `${amount} days left`
-}
-
-function isDayBeforeWinter () {
-  return currentCycle === 1 && season === 'summer'
 }
 
 function removeTicker (id) {
@@ -26,29 +9,6 @@ function removeTicker (id) {
       ticker.remove = true
     }
   })
-}
-
-function updateTotals (valueLabel, capacityLabel, type, funcA, funcB) {
-  return (time) => {
-    let value = 0
-    let capacity = 0
-    forEachHexagon(hexGrid, (hex) => {
-      if (hex.type === type) {
-        value += funcA(hex)
-        capacity += funcB(hex)
-      }
-    })
-    valueLabel.text = value.toFixed(0)
-    capacityLabel.text = capacity.toFixed(0)
-  }
-}
-
-function isUI (ticker) {
-  return ticker.type === 'ui'
-}
-
-function isGameStuff (ticker) {
-  return ticker.type === 'game-stuff'
 }
 
 function killBroodlings () {
@@ -192,73 +152,6 @@ function activateAdjacent (_x, _y) {
     })
 }
 
-function setSelected (item) {
-  // start with cleanup of panel
-  panel.removeChildren()
-
-  angelBubbleTimer = 0
-  selected = item || null
-
-  if (!item) {
-    return
-  }
-
-  panel.addChild(item.panelContent())
-
-  if (item.label && !(item.panelLabel && item.panelLabel() !== true)) {
-    const panelText = new PIXI.Text(item.label, { ...fontConfig })
-    panelText.position.x = 6
-    panelText.position.y = 2
-    panel.addChild(panelText)
-  }
-}
-
-function addJobsButtons (jobsPanel) {
-  for (let i = 0; i < 3; i++) {
-    for (let j = 0; j < 2; j++) {
-      const button = new Sprite()
-      const textureA = Texture.fromImage(
-        j === 0
-          ? 'images/ui/button-jobs/button-plus.png'
-          : 'images/ui/button-jobs/button-minus.png'
-      )
-      const textureB = Texture.fromImage(
-        j === 0
-          ? 'images/ui/button-jobs/button-active-plus.png'
-          : 'images/ui/button-jobs/button-active-minus.png'
-      )
-      const textureC = Texture.fromImage(
-        j === 0
-          ? 'images/ui/button-jobs/button-hover-plus.png'
-          : 'images/ui/button-jobs/button-hover-minus.png'
-      )
-      button.texture = textureA
-
-      button.position.x = 76
-      button.position.y = 36 + i * 38 + j * 10
-      button.interactive = true
-      button.buttonMode = true
-      const idx = ['forager', 'nurser', 'worker']
-      const type = idx[i]
-      const action = j === 0 ? 'add' : 'remove'
-      button.mouseover = () => {
-        button.texture = textureC
-      }
-      button.mouseout = () => {
-        button.texture = textureA
-      }
-      button.mouseup = () => {
-        jobs(action, type)
-        button.texture = textureA
-      }
-      button.mousedown = () => {
-        button.texture = textureB
-      }
-      jobsPanel.addChild(button)
-    }
-  }
-}
-
 function spawnBonusIcon (x, y, img) {
   if (day === 1 && hour === 0) return
   const sprite = Sprite.fromImage(img)
@@ -291,26 +184,6 @@ function spawnBonusMinus (x, y) {
 function goIdle (bee) {
   bee.position.x = bee.idle.x
   bee.position.y = bee.idle.y
-}
-
-function samePosition (a, b) {
-  if (b) {
-    return a.position.x === b.position.x && a.position.y === b.position.y
-  } else {
-    return function prepared (c) {
-      return a.position.x === c.position.x && a.position.y === c.position.y
-    }
-  }
-}
-
-function distance (x1, y1, x2, y2) {
-  return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
-}
-
-function distanceFactor (a, b) {
-  const x2 = Math.abs(a.position.x - b.position.x) * 2
-  const y2 = Math.abs(a.position.y - b.position.y) * 2
-  return Math.sqrt(x2 + y2)
 }
 
 function snapTo (a, b) {
@@ -393,28 +266,6 @@ function replaceSelectedHex (type) {
   return returnHex
 }
 
-function toGameTick (seconds) {
-  return seconds * FPS
-}
-
-function fromSeconds (gameTicks) {
-  return gameTicks / 144
-}
-
-function rate (capacity, seconds) {
-  return (capacity / (seconds * FPS)) * gameSpeed
-}
-
-function transferTo (capacity) {
-  return {
-    inSeconds: (seconds) => rate(capacity, seconds),
-    inMinutes: (minutes) => {
-      const seconds = minutes * 60
-      return rate(capacity, seconds)
-    }
-  }
-}
-
 function typeIdlePos (type, pos) {
   const rowHeight = 38
   const beesPerRow = 8
@@ -459,20 +310,6 @@ function getIdlePosition (type) {
   return comparee
 }
 
-const isForager = (b) => b.type === 'forager'
-const isIdle = (b) => b.type === 'idle'
-
-function jobs (addOrRemove, type) {
-  const aliveBees = bees.filter((bee) => !bee.isDead() && !bee.isDying())
-  const availableBees = aliveBees.filter(
-    addOrRemove === 'add' ? isIdle : (x) => x.type === type
-  )
-
-  if (availableBees.length > 0) {
-    availableBees[0].setType(addOrRemove === 'add' ? type : 'idle')
-  }
-}
-
 function increaseForagers () {
   const idleBees = bees.filter(isIdle)
 
@@ -480,6 +317,7 @@ function increaseForagers () {
     idleBees[0].type = 'forager'
   }
 }
+const isForager = (b) => b.type === 'forager'
 
 function decreaseForagers () {
   const foragerBees = bees.filter(isForager)
@@ -488,58 +326,3 @@ function decreaseForagers () {
     foragerBees[0].type = 'idle'
   }
 }
-
-function isGameOver (currentCycleIndex, aliveBees) {
-  if (aliveBees.length === 0) return true
-  if (levelCompleteCriteria(currentCycleIndex)) return true
-
-  return false
-}
-
-function levelCompleteCriteria (currentCycleIndex) {
-  return currentCycleIndex === 6 && keepPlaying === false
-}
-
-window.setGameSpeedText = setGameSpeedText
-window.singularOrPluralDay = singularOrPluralDay
-window.isDayBeforeWinter = isDayBeforeWinter
-window.removeTicker = removeTicker
-window.updateTotals = updateTotals
-window.isUI = isUI
-window.isGameStuff = isGameStuff
-window.killBroodlings = killBroodlings
-window.freezeNectar = freezeNectar
-window.something = something
-window.notMe = notMe
-window.adjacent = adjacent
-window.isHoney = isHoney
-window.isNectar = isNectar
-window.isHoneyBuff = isHoneyBuff
-window.isNectarBuff = isNectarBuff
-window.isPollenFeederBuff = isPollenFeederBuff
-window.calculateAdjacencyBonuses = calculateAdjacencyBonuses
-window.activateAdjacent = activateAdjacent
-window.setSelected = setSelected
-window.addJobsButtons = addJobsButtons
-window.spawnBonusIcon = spawnBonusIcon
-window.spawnBonusPlus = spawnBonusPlus
-window.spawnBonusMinus = spawnBonusMinus
-window.goIdle = goIdle
-window.samePosition = samePosition
-window.distance = distance
-window.distanceFactor = distanceFactor
-window.snapTo = snapTo
-window.sortHexForeground = sortHexForeground
-window.replaceHex = replaceHex
-window.replaceSelectedHex = replaceSelectedHex
-window.toGameTick = toGameTick
-window.fromSeconds = fromSeconds
-window.rate = rate
-window.transferTo = transferTo
-window.typeIdlePos = typeIdlePos
-window.getIdlePosition = getIdlePosition
-window.jobs = jobs
-window.increaseForagers = increaseForagers
-window.decreaseForagers = decreaseForagers
-window.isGameOver = isGameOver
-window.levelCompleteCriteria = levelCompleteCriteria

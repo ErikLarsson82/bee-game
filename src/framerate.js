@@ -1,11 +1,5 @@
-export let FPS = 144
-export const ticksToSeconds = number => Math.round(number / FPS)
-export const secondsToTicks = number => number * FPS
+export let fps = 144
+export const ticksToSeconds = number => Math.round(number / fps)
+export const secondsToTicks = number => number * fps
 
-export function setFPS (f) {
-  FPS = f
-}
-
-export function getFPS () {
-  return FPS
-}
+export const setFps = f => (fps = f)

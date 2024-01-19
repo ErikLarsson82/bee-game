@@ -1,3 +1,4 @@
+import { distance } from './exported-help-functions'
 
 function createBee(parent, type, startPosition) {
   if (!type) {
@@ -471,7 +472,7 @@ function createBee(parent, type, startPosition) {
   function flyToHoneyToDeposit() {
     const honeyHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.isUnclaimed(bee) && !hex.isHoneyFull())
     if (honeyHex.length === 0 || isHoneySackEmpty()) return false
-    const closest = getClosestHex(honeyHex, bee)
+    const closest = getClosestHex(honeyHex, bee, distance)
     closest.claimSlot(bee)
     bee.flyTo(closest)      
     return true
@@ -480,7 +481,7 @@ function createBee(parent, type, startPosition) {
   function flyToNectarToDeposit() {
     const nectarHex = filterHexagon(hexGrid, hex => hex.type === 'nectar' && hex.isUnclaimed(bee) && !hex.isNectarFull())
     if (nectarHex.length === 0 || isNectarSackEmpty()) return false
-    const closest = getClosestHex(nectarHex, bee)
+    const closest = getClosestHex(nectarHex, bee, distance)
     closest.claimSlot(bee)
     bee.flyTo(closest)
     return true
@@ -489,7 +490,7 @@ function createBee(parent, type, startPosition) {
   function flyToPollenToDeposit() {
     const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && hex.isUnclaimed(bee) && !hex.isPollenFull())
     if (pollenHex.length === 0 || isPollenSackEmpty()) return false
-    const closest = getClosestHex(pollenHex, bee)
+    const closest = getClosestHex(pollenHex, bee, distance)
     closest.claimSlot(bee)
     bee.flyTo(closest)
     return true
@@ -498,7 +499,7 @@ function createBee(parent, type, startPosition) {
   function flyToPollenToRefill() {
     const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && hex.isUnclaimed(bee) && !hex.isPollenEmpty())
     if (pollenHex.length === 0 || isPollenSackFull()) return false
-    const closest = getClosestHex(pollenHex, bee)
+    const closest = getClosestHex(pollenHex, bee, distance)
     closest.claimSlot(bee)
     bee.flyTo(closest)
     return true
@@ -526,7 +527,7 @@ function createBee(parent, type, startPosition) {
     )
 
     if (deadLarvaeHex.length === 0) return false
-    const closest = getClosestHex(deadLarvaeHex, bee)
+    const closest = getClosestHex(deadLarvaeHex, bee, distance)
     closest.claimSlot(bee)
     bee.flyTo(closest)
     return true
@@ -746,7 +747,7 @@ function createBee(parent, type, startPosition) {
       return true
     }
 
-    const closest = getClosestHex(restingPlaces, bee)
+    const closest = getClosestHex(restingPlaces, bee, distance)
     closest.claimSlot(bee)
     bee.flyTo(closest)
 
@@ -797,7 +798,7 @@ function createBee(parent, type, startPosition) {
   function flyToNectarToConvert() {
     const nectarHex = filterHexagon(hexGrid, hex => hex.type === 'nectar' && hex.isUnclaimed(bee) && (!hex.isNectarEmpty() || !isNectarSackEmpty()))
     if (nectarHex.length === 0 || isHoneySackFull()) return false
-    const closest = getClosestHex(nectarHex, bee)
+    const closest = getClosestHex(nectarHex, bee, distance)
     closest.claimSlot(bee)
     bee.flyTo(closest)      
     return true
@@ -806,7 +807,7 @@ function createBee(parent, type, startPosition) {
   function flyToWax() {
     const waxHex = filterHexagon(hexGrid, hex => hex.type === 'wax' && hex.isUnclaimed(bee) && !hex.isWaxEmpty())
     if (waxHex.length === 0 || isWaxSackFull()) return false
-    const closest = getClosestHex(waxHex, bee)
+    const closest = getClosestHex(waxHex, bee, distance)
     closest.claimSlot(bee)
     bee.flyTo(closest)
     return true
@@ -835,7 +836,7 @@ function createBee(parent, type, startPosition) {
     if (isWaxSackEmpty()) return
     const preparedHex = filterHexagon(hexGrid, hex => hex.type === 'prepared' && hex.isUnclaimed(bee) && hex.completeness < 100)
     if (preparedHex.length === 0) return false
-    const closest = getClosestHex(preparedHex, bee)
+    const closest = getClosestHex(preparedHex, bee, distance)
     closest.claimSlot(bee)
     bee.flyTo(closest)      
     return true

@@ -1,49 +1,85 @@
+import { Texture } from 'pixi.js'
+import { tickers, setTickers, isGameOver, transferTo } from './exported-help-functions'
+import {
+  selected,
+  bees,
+  gameover,
+  setGameover,
+  paused,
+  setPaused,
+  hour,
+  setHour,
+  day,
+  setDay,
+  year,
+  setYear,
+  season,
+  setSeason,
+  currentCycle,
+  setCurrentCycle,
+  currentCycleIndex,
+  setCurrentCycleIndex,
+  cycles,
+  setCurrentSeasonLength,
+  setPreviousSeasonLength,
+  setGameSpeed
+} from './game-state'
+import { panel, backgroundScene } from './pixi-elements'
 
-function gameloop(delta, manualTick) {
+function isUI (ticker) {
+  return ticker.type === 'ui'
+}
+
+function isGameStuff (ticker) {
+  return ticker.type === 'game-stuff'
+}
+
+export function gameloop (delta, manualTick) {
   const newTickers = tickers.filter(ticker => ticker.remove === false)
   if (tickers.length > newTickers.length) {
-    tickers = tickers.filter(ticker => ticker.remove === false)
+    setTickers(tickers.filter(ticker => ticker.remove === false))
   }
 
   tickers.filter(isUI).forEach(ticker => ticker.func())
 
   if (selected && selected.panelContent) {
-    const { x, y } = selected.panelPosition && selected.panelPosition() || { x: 350, y: 100 }
+    const { x, y } = (selected.panelPosition && selected.panelPosition()) || { x: 350, y: 100 }
     panel.position.x = x
     panel.position.y = y
   }
-  
+
   const aliveBees = bees.filter(bee => !bee.isDead() && bee.type !== 'bookie')
 
-  gameover = isGameOver(currentCycleIndex, aliveBees)
+  setGameover(isGameOver(aliveBees))
 
   if (gameover) {
-    paused = true
+    setPaused(true)
   }
 
   if (paused && !manualTick) return
-  
+
   tickers.filter(isGameStuff).forEach(ticker => ticker.func())
 
+  // eslint-disable-next-line no-lone-blocks
   {
     // Time management
-    hour += transferTo(24).inMinutes(5)
+    setHour(hour + transferTo(24).inMinutes(5))
 
     if (hour > 24) {
-      hour = 0
-      day++
-      currentCycle--
+      setHour(0)
+      setDay(day + 1)
+      setCurrentCycle(currentCycle - 1)
       if (currentCycle === 0) {
-        currentCycleIndex++
-        currentCycle = cycles[currentCycleIndex]
-        currentSeasonLength = currentCycle
-        previousSeasonLength = cycles[currentCycleIndex-1]
-        season = season === 'summer' ? 'winter' : 'summer'        
+        setCurrentCycleIndex(currentCycleIndex + 1)
+        setCurrentCycle(cycles[currentCycleIndex])
+        setCurrentSeasonLength(currentCycle)
+        setPreviousSeasonLength(cycles[currentCycleIndex-1])
+        setSeason(season === 'summer' ? 'winter' : 'summer')
         if (season === 'summer') {
-          gameSpeed = 1
-          backgroundScene.texture = Texture.fromImage('images/scene/background-summer.png')        
-          year++
-          day = 1
+          setGameSpeed(1)
+          backgroundScene.texture = Texture.fromImage('images/scene/background-summer.png')
+          setYear(year + 1)
+          setDay(1)
           createFlowers()
           sun.winterSun.visible = false
           sun.summerSun.visible = true

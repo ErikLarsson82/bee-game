@@ -1,5 +1,10 @@
+import { Sprite, Text } from 'pixi.js'
+import { fontConfig } from './config'
+import { addTicker } from './exported-help-functions'
+import { season, isDayBeforeWinter } from './game/game-state'
+import { foreground, queen } from './game/pixi-elements'
 
-function createWarningSign() {
+export function createWarningSign () {
   const queenWarning = Sprite.fromImage('images/queen/dialogue.png')
   queenWarning.dismissed = false
   queenWarning.position.x = 0
@@ -12,7 +17,7 @@ function createWarningSign() {
   }
   foreground.addChild(queenWarning)
 
-  const textHeading = new PIXI.Text('WINTER IN ONE DAY', { ...fontConfig, fill: 'black' })
+  const textHeading = new Text('WINTER IN ONE DAY', { ...fontConfig, fill: 'black' })
   textHeading.scale.set(0.15, 0.15)
   textHeading.position.x = 10
   textHeading.position.y = 3
