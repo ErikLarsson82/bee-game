@@ -109,7 +109,6 @@ function setupDebugMenu () {
   loader.add('images/ui/button-jobs/button-minus.png')
   loader.add('images/ui/button-jobs/button-active-minus.png')
   loader.add('images/ui/button-jobs/button-hover-minus.png')
-  loader.add('images/ui/button-standard/button-standard-standard.png')
   loader.add('images/ui/button-large/button-large-standard.png')
   loader.add('images/ui/button-large/button-large-hover.png')
   loader.add('images/ui/button-large/button-large-click.png')
@@ -168,7 +167,6 @@ function setupDebugMenu () {
   loader.add('images/hex/prepared/cell-prepared-partial7.png')
   loader.add('images/hex/prepared/cell-prepared-partial8.png')
   loader.add('images/hex/honey/cell-honey-empty.png')
-  loader.add('images/hex/honey/cell-honey-full.png')
   loader.add('images/hex/honey/cell-honey-a.png')
   loader.add('images/hex/honey/cell-honey-b.png')
   loader.add('images/hex/honey/cell-honey-c.png')
@@ -256,9 +254,6 @@ function setupDebugMenu () {
   loader.add('images/ui/hover-cell.png')
   loader.add('images/scene/hive-hole.png')
   loader.add('images/ui/have-winter-food-progress-background.png')
-  loader.add('images/bee/bee-drone-flap.png')
-  loader.add('images/bee/bee-drone-flop.png')
-  loader.add('images/bee/bee-drone-reference.png')
   loader.add('images/world-map-2/desertmap.png')
   loader.add('images/world-map-3/shitcoin.png')
   loader.add('images/world-map-3/coin-dim.png')
@@ -279,6 +274,13 @@ function setupDebugMenu () {
   loader.add('images/ui/progress-bar/progress-pollen.png')
   loader.add('images/ui/progress-bar/progress-age.png')
   loader.load()
+
+  // Skipped - loaded in Splash Menu
+  // loader.add('images/bee/bee-drone-flap.png')
+  // loader.add('images/bee/bee-drone-flop.png')
+  // loader.add('images/bee/bee-drone-reference.png')
+  // loader.add('images/hex/honey/cell-honey-full.png')
+  // loader.add('images/ui/button-standard/button-standard-standard.png')
 }
 
 export default DebugMenuScene

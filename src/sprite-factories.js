@@ -1,13 +1,12 @@
 import { Sprite } from 'pixi.js'
 import {
-  setSelected,
   hoveredCells,
   setHoveredCells,
   gameSpeed,
   flowers,
   hexGrid
 } from './game/game-state'
-import { addTicker } from './exported-help-functions'
+import { addTicker, updateSelected } from './exported-help-functions'
 import { secondsToTicks } from './framerate'
 import { filterHexagon } from './hex'
 import { samePosition } from './pure-help-functions'
@@ -36,7 +35,7 @@ export function makeSelectable (sprite, label, shape) {
       setHoveredCells(hoveredCells.filter((cell) => cell !== sprite))
     }
   }
-  sprite.mousedown = () => setSelected(sprite)
+  sprite.mousedown = () => updateSelected(sprite)
 }
 
 export function makeHexagon (sprite, x, y, type) {

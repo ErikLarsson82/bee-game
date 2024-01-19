@@ -1,10 +1,10 @@
 import { Texture, Sprite } from 'pixi.js'
 import {
+  setSelected,
   gameSpeed,
   paused,
   hexGrid,
   tickers,
-  setSelected,
   setTickers,
   currentCycle,
   season,
@@ -60,7 +60,7 @@ export function replaceSelectedHex (type) {
         sortHexForeground()
 
         returnHex = newHex
-        setSelected(newHex)
+        updateSelected(newHex)
       }
     })
   )

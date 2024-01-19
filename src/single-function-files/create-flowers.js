@@ -5,7 +5,12 @@ import { addTicker, updateSelected, isDayBeforeWinter } from '../exported-help-f
 import { WIDTH, fontConfig } from '../config'
 import { ProgressBar } from '../ui'
 
-export function createFlowers (flowerBed) {
+let flowerBed = null
+
+export function createFlowers (_flowerBed) {
+  if (_flowerBed) {
+    flowerBed = _flowerBed
+  }
   const positions = [10, -50, 60, -110, 120, -160, 170]
   const texture = {
     dead: Texture.fromImage('images/scene/flower-dead.png'),

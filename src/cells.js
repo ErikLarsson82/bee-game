@@ -1,5 +1,5 @@
 import { Container, Polygon, Point, Sprite, Text, Texture } from 'pixi.js'
-import { bees, hexGrid, selected, season } from './game/game-state'
+import { bees, hexGrid, day, selected, season } from './game/game-state'
 import { toLocalCoordinateFlat, forEachHexagon } from './hex'
 import { makeHexagon, makeSelectable, makeOccupiable, makeUpgradeable, makeHexDetectable } from './sprite-factories'
 import { replaceSelectedHex, updateSelected, replaceHex, addTicker, transferTo } from './exported-help-functions'
