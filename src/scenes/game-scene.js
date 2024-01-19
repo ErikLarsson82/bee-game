@@ -490,7 +490,6 @@ function setupGame () {
     } else {
       app.ticker.start()
     }
-    window.setGameSpeedText()
   }
   document.addEventListener('visibilitychange', handleVisibilityChange, false)
 }
