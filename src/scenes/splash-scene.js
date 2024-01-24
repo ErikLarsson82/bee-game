@@ -39,14 +39,14 @@ function setup () {
   container.addChild(text)
 
   // eslint-disable-next-line new-cap
-  const logo = new Sprite.fromImage('images/splash/logo.png')
+  const logo = new Sprite.fromImage('logo.png')
   logo.position.x = 10
   logo.position.y = 50
   container.addChild(logo)
 
-  const welcomeFlapA = Texture.fromImage('images/bee/bee-drone-flap.png')
-  const welcomeFlapB = Texture.fromImage('images/bee/bee-drone-flop.png')
-  const welcomeFlapC = Texture.fromImage('images/bee/bee-drone-reference.png')
+  const welcomeFlapA = Texture.fromImage('bee-drone-flap.png')
+  const welcomeFlapB = Texture.fromImage('bee-drone-flop.png')
+  const welcomeFlapC = Texture.fromImage('bee-drone-reference.png')
   const welcomeSplashBee = new Sprite(welcomeFlapA)
   welcomeSplashBee.scale.x = 2
   welcomeSplashBee.scale.y = 2
@@ -89,7 +89,7 @@ function setup () {
     }
   }, 16.66)
 
-  const welcomeHoney = Sprite.fromImage('images/hex/honey/cell-honey-full.png')
+  const welcomeHoney = Sprite.fromImage('honey/cell-honey-full.png')
   welcomeHoney.scale.x = 2
   welcomeHoney.scale.y = 2
   welcomeHoney.position.x = Math.round(WIDTH / 2 / 2) + 5

@@ -154,7 +154,7 @@ export function makeParticleCreator (bee) {
       bee.particleDelay = 1
 
       const randomType = availableTypes[Math.floor(availableTypes.length * Math.random())]
-      const pixel = Sprite.fromImage(`images/drops/pixel-${randomType}.png`)
+      const pixel = Sprite.fromImage(`pixel-${randomType}.png`)
       pixel.position.x = bee.position.x + 2 + (Math.random() * 4)
       pixel.position.y = bee.position.y + 4 + (Math.random() * 3) - 1.5
       let lifetime = 0

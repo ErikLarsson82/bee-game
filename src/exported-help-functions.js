@@ -161,11 +161,11 @@ function spawnBonusIcon (x, y, img) {
 }
 
 function spawnBonusPlus (x, y) {
-  spawnBonusIcon(x, y, 'images/ui/bonus-plus.png')
+  spawnBonusIcon(x, y, 'bonus-plus.png')
 }
 
 function spawnBonusMinus (x, y) {
-  spawnBonusIcon(x, y, 'images/ui/bonus-minus.png')
+  spawnBonusIcon(x, y, 'bonus-minus.png')
 }
 
 function sortHexForeground () {
@@ -219,10 +219,10 @@ export function updateTotals (valueLabel, capacityLabel, type, funcA, funcB) {
 
 export function updateGameSpeedText () {
   if (paused) {
-    gameSpeedIcon.texture = Texture.fromImage('images/ui/gamespeed0.png')
+    gameSpeedIcon.texture = Texture.fromImage('gamespeed0.png')
   } else {
     gameSpeedIcon.texture = Texture.fromImage(
-      'images/ui/gamespeed' + gameSpeed + '.png'
+      'gamespeed' + gameSpeed + '.png'
     )
   }
   pauseFrame.visible = paused
@@ -255,18 +255,18 @@ export function addJobsButtons (jobsPanel) {
       const button = new Sprite()
       const textureA = Texture.fromImage(
         j === 0
-          ? 'images/ui/button-jobs/button-plus.png'
-          : 'images/ui/button-jobs/button-minus.png'
+          ? 'button-jobs/button-plus.png'
+          : 'button-jobs/button-minus.png'
       )
       const textureB = Texture.fromImage(
         j === 0
-          ? 'images/ui/button-jobs/button-active-plus.png'
-          : 'images/ui/button-jobs/button-active-minus.png'
+          ? 'button-jobs/button-active-plus.png'
+          : 'button-jobs/button-active-minus.png'
       )
       const textureC = Texture.fromImage(
         j === 0
-          ? 'images/ui/button-jobs/button-hover-plus.png'
-          : 'images/ui/button-jobs/button-hover-minus.png'
+          ? 'button-jobs/button-hover-plus.png'
+          : 'button-jobs/button-hover-minus.png'
       )
       button.texture = textureA
 

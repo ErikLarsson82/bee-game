@@ -6,9 +6,9 @@ import { Button } from '../ui'
 const DEBUG_BUTTON = false
 
 export function createGameOverUI (sceneManager, ui) {
-  const background = Sprite.fromImage('images/ui/game-over-background-failed.png')
-  const successTexture = Texture.fromImage('images/ui/game-over-background-success.png')
-  // const failTexture = Texture.fromImage('images/ui/game-over-background-failed.png')
+  const background = Sprite.fromImage('game-over-background-failed.png')
+  const successTexture = Texture.fromImage('game-over-background-success.png')
+  // const failTexture = Texture.fromImage('game-over-background-failed.png')
   background.position.x = 146
   background.position.y = 98
   background.visible = false

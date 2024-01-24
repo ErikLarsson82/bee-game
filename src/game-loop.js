@@ -80,14 +80,14 @@ export function gameloop (delta, manualTick) {
         setSeason(season === 'summer' ? 'winter' : 'summer')
         if (season === 'summer') {
           setGameSpeed(1)
-          backgroundScene.texture = Texture.fromImage('images/scene/background-summer.png')
+          backgroundScene.texture = Texture.fromImage('background-summer.png')
           setYear(year + 1)
           setDay(1)
           createFlowers()
           sun.winterSun.visible = false
           sun.summerSun.visible = true
         } else {
-          backgroundScene.texture = Texture.fromImage('images/scene/background-winter.png')
+          backgroundScene.texture = Texture.fromImage('background-winter.png')
           resolveWinterFlowers()
           killBroodlings()
           freezeNectar()

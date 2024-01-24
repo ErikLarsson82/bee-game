@@ -5,7 +5,7 @@ import { season } from '../game/game-state'
 import { foreground, queen } from '../game/pixi-elements'
 
 export function createWarningSign () {
-  const queenWarning = Sprite.fromImage('images/queen/dialogue.png')
+  const queenWarning = Sprite.fromImage('dialogue.png')
   queenWarning.dismissed = false
   queenWarning.position.x = 0
   queenWarning.position.y = 0

@@ -275,7 +275,7 @@ function setupGame () {
     summaryLabel('pollen', 60, '#fee761', hex => hex.pollen, hex => hex.POLLEN_HEX_CAPACITY)
     summaryLabel('wax', 70, '#e8b796', hex => hex.wax, hex => hex.WAX_HEX_CAPACITY)
 
-    const gameSpeedIcon = Sprite.fromImage('images/ui/gamespeed1.png')
+    const gameSpeedIcon = Sprite.fromImage('gamespeed1.png')
     gameSpeedIcon.position.x = 380
     gameSpeedIcon.position.y = topBarContentOffsetY
     uiTopBar.addChild(gameSpeedIcon)
@@ -292,8 +292,8 @@ function setupGame () {
 
   // sun
   const sun = new Container()
-  const summerSunSprite = Sprite.fromImage('images/scene/summer-sun.png')
-  const winterSunSprite = Sprite.fromImage('images/scene/winter-sun.png')
+  const summerSunSprite = Sprite.fromImage('summer-sun.png')
+  const winterSunSprite = Sprite.fromImage('winter-sun.png')
 
   sun.winterSun = winterSunSprite
   sun.summerSun = summerSunSprite
@@ -313,14 +313,14 @@ function setupGame () {
     sun.position.y = 290 - (Math.sin((hour / 24) * Math.PI) * 45)
   })
 
-  const backgroundScene = Sprite.fromImage(`images/scene/${backgroundImage}.png`)
+  const backgroundScene = Sprite.fromImage(`${backgroundImage}.png`)
   backgroundScene.interactive = true
   backgroundScene.mouseup = () => updateSelected(null)
   setBackgroundScene(backgroundScene)
   background.addChild(backgroundScene)
 
   // angel bubble
-  const angelBubble = Sprite.fromImage('images/scene/sun-bubble.png')
+  const angelBubble = Sprite.fromImage('sun-bubble.png')
   angelBubble.position.x = -7
   angelBubble.position.y = 18
   setAngelBubble(angelBubble)
@@ -342,7 +342,7 @@ function setupGame () {
     }
   })
 
-  const jobsPanel = Sprite.fromImage('images/ui/ui-jobs-panel.png')
+  const jobsPanel = Sprite.fromImage('ui-jobs-panel.png')
   jobsPanel.position.x = 20
   jobsPanel.position.y = 25
   uiHangarComponents.addChild(jobsPanel)
@@ -353,7 +353,7 @@ function setupGame () {
 
   jobs.forEach((type, idx) => {
     // eslint-disable-next-line new-cap
-    const jobCounterHex = new Sprite.fromImage('images/ui/button-jobs/button-alt.png')
+    const jobCounterHex = new Sprite.fromImage('button-jobs/button-alt.png')
     jobCounterHex.position.x = 63
     jobCounterHex.position.y = (idx * 38) + 3
     jobsPanel.addChild(jobCounterHex)
@@ -384,16 +384,16 @@ function setupGame () {
 
   const selectedSprite = new Container()
   selectedSprite.visible = false
-  const selectedSpriteSub = Sprite.fromImage('images/ui/selection-cell.png')
+  const selectedSpriteSub = Sprite.fromImage('selection-cell.png')
   selectedSprite.addChild(selectedSpriteSub)
   addTicker('ui', time => {
     if (selected) {
       if (selected.label === 'bee') {
-        selectedSpriteSub.texture = Texture.fromImage('images/ui/selection-circle.png')
+        selectedSpriteSub.texture = Texture.fromImage('selection-circle.png')
         selectedSprite.position.x = selected.position.x - 1
         selectedSprite.position.y = selected.position.y - 3
       } else {
-        selectedSpriteSub.texture = Texture.fromImage('images/ui/selection-cell.png')
+        selectedSpriteSub.texture = Texture.fromImage('selection-cell.png')
         selectedSprite.position.x = selected.position.x
         selectedSprite.position.y = selected.position.y
       }
@@ -404,7 +404,7 @@ function setupGame () {
   })
   ui.addChild(selectedSprite)
 
-  const hoverCellSprite = Sprite.fromImage('images/ui/hover-cell.png')
+  const hoverCellSprite = Sprite.fromImage('hover-cell.png')
   hoverCellSprite.visible = false
   addTicker('ui', () => {
     if (hoveredCells.length) {
@@ -417,7 +417,7 @@ function setupGame () {
   })
   ui.addChild(hoverCellSprite)
 
-  const hiveHole = Sprite.fromImage('images/scene/hive-hole.png')
+  const hiveHole = Sprite.fromImage('hive-hole.png')
   hiveHole.position.x = 200
   hiveHole.position.y = 214
   hiveHole.anchor.x = 0.5
@@ -435,7 +435,7 @@ function setupGame () {
     const haveFoodLabel = new Text('Winter food', { ...fontConfig, ...smallFont, fill: 'gray' })
     haveFoodContainer.addChild(haveFoodLabel)
 
-    const haveWinterFood = Sprite.fromImage('images/ui/have-winter-food-progress-background.png')
+    const haveWinterFood = Sprite.fromImage('have-winter-food-progress-background.png')
     haveWinterFood.position.x = 61
     haveFoodContainer.addChild(haveWinterFood)
 

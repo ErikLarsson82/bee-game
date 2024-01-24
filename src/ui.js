@@ -7,8 +7,8 @@ export function ProgressBar (x, y, type, tickerData, max) {
   const container = new Container()
   container.position.x = x
   container.position.y = y
-  const progressBarBgSprite = Sprite.fromImage('images/ui/progress-bar/progress-bg.png')
-  const progressSprite = Sprite.fromImage('images/ui/progress-bar/progress-' + type + '.png')
+  const progressBarBgSprite = Sprite.fromImage('progress-bar/progress-bg.png')
+  const progressSprite = Sprite.fromImage('progress-bar/progress-' + type + '.png')
   addTicker('ui', time => {
     const _max = max === undefined ? 100 : max
     progressSprite.width = cap(0, _max)(tickerData()) / max * 21
@@ -22,7 +22,7 @@ export const ProgressBar2 = (x, y, type, tickerData, max) => {
   const container = new Container()
   container.position.x = x
   container.position.y = y
-  const progressSprite = Sprite.fromImage('images/ui/content-' + type + '-fill.png')
+  const progressSprite = Sprite.fromImage('content-' + type + '-fill.png')
   addTicker('ui', () => {
     progressSprite.width = cap(0, max)(tickerData()) / max * 43
   })
@@ -32,7 +32,7 @@ export const ProgressBar2 = (x, y, type, tickerData, max) => {
 
 export function Button (x, y, content, callback, hoverover, hoverout, _size) {
   const size = _size === undefined ? 'standard' : _size
-  const buttonSprite = Sprite.fromImage(`images/ui/button-${size}/button-${size}-standard.png`)
+  const buttonSprite = Sprite.fromImage(`button-${size}/button-${size}-standard.png`)
   let swallow = false
   buttonSprite.position.x = x
   buttonSprite.position.y = y
@@ -50,20 +50,20 @@ export function Button (x, y, content, callback, hoverover, hoverout, _size) {
   buttonSprite.buttonMode = true
   buttonSprite.mouseover = () => {
     hoverover && hoverover()
-    buttonSprite.texture = Texture.fromImage(`images/ui/button-${size}/button-${size}-hover.png`)
+    buttonSprite.texture = Texture.fromImage(`button-${size}/button-${size}-hover.png`)
   }
   buttonSprite.mouseout = () => {
     hoverout && hoverout()
-    buttonSprite.texture = Texture.fromImage(`images/ui/button-${size}/button-${size}-standard.png`)
+    buttonSprite.texture = Texture.fromImage(`button-${size}/button-${size}-standard.png`)
   }
   buttonSprite.mouseup = () => {
     if (swallow) return
     swallow = true
-    buttonSprite.texture = Texture.fromImage(`images/ui/button-${size}/button-${size}-click.png`)
+    buttonSprite.texture = Texture.fromImage(`button-${size}/button-${size}-click.png`)
     setTimeout(() => {
       callback()
       swallow = false
-      buttonSprite.texture = Texture.fromImage(`images/ui/button-${size}/button-${size}-hover.png`)
+      buttonSprite.texture = Texture.fromImage(`button-${size}/button-${size}-hover.png`)
     }, 50)
   }
 

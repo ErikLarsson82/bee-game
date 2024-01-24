@@ -12,7 +12,7 @@ import { filterHexagon } from './hex'
 import { samePosition } from './pure-help-functions'
 
 export function makeSelectable (sprite, label, shape) {
-  const hoverCellSprite = Sprite.fromImage('images/ui/hover-cell.png')
+  const hoverCellSprite = Sprite.fromImage('hover-cell.png')
   hoverCellSprite.visible = false
 
   sprite.addChild(hoverCellSprite)
@@ -51,7 +51,7 @@ export function makeUpgradeable (sprite) {
 }
 
 export function makeOccupiable (parent) {
-  const spotClaimed = Sprite.fromImage('images/ui/spot-claimed.png')
+  const spotClaimed = Sprite.fromImage('spot-claimed.png')
   spotClaimed.visible = false
   parent.addChild(spotClaimed)
 

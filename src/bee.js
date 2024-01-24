@@ -37,25 +37,25 @@ export function createBee (parent, type, startPosition) {
   const bee = new Container()
 
   const workingAnimations = {
-    idle: animateSprite(bee, 'bee-working-animation-idle', 43, 13, 8),
-    worker: animateSprite(bee, 'bee-working-animation-worker', 43, 13, 8),
-    nurser: animateSprite(bee, 'bee-working-animation-nurser', 43, 13, 8),
-    forager: animateSprite(bee, 'bee-working-animation-forager', 43, 13, 8),
-    bookie: animateSprite(bee, 'bee-working-animation-forager', 43, 13, 8)
+    idle: animateSprite(bee, 'bee/idle/working.png', 43, 13, 8),
+    worker: animateSprite(bee, 'bee/worker/working.png', 43, 13, 8),
+    nurser: animateSprite(bee, 'bee/nurser/working.png', 43, 13, 8),
+    forager: animateSprite(bee, 'bee/forager/working.png', 43, 13, 8),
+    bookie: animateSprite(bee, 'bee/forager/working.png', 43, 13, 8)
   }
 
   const unloadingAnimations = {
-    idle: animateSprite(bee, 'bee-unloading-animation-idle', 31, 13, 8),
-    worker: animateSprite(bee, 'bee-unloading-animation-worker', 31, 13, 8),
-    nurser: animateSprite(bee, 'bee-unloading-animation-nurser', 31, 13, 8),
-    forager: animateSprite(bee, 'bee-unloading-animation-forager', 31, 13, 8)
+    idle: animateSprite(bee, 'bee/idle/unloading.png', 31, 13, 8),
+    worker: animateSprite(bee, 'bee/worker/unloading.png', 31, 13, 8),
+    nurser: animateSprite(bee, 'bee/nurser/unloading.png', 31, 13, 8),
+    forager: animateSprite(bee, 'bee/forager/unloading.png', 31, 13, 8)
   }
 
   const eatingAnimations = {
-    idle: animateSprite(bee, 'bee-eating-animation-idle', 36, 13, 13),
-    worker: animateSprite(bee, 'bee-eating-animation-worker', 36, 13, 13),
-    nurser: animateSprite(bee, 'bee-eating-animation-nurser', 36, 13, 13),
-    forager: animateSprite(bee, 'bee-eating-animation-forager', 36, 13, 13)
+    idle: animateSprite(bee, 'bee/idle/eating.png', 36, 13, 13),
+    worker: animateSprite(bee, 'bee/worker/eating.png', 36, 13, 13),
+    nurser: animateSprite(bee, 'bee/nurser/eating.png', 36, 13, 13),
+    forager: animateSprite(bee, 'bee/forager/eating.png', 36, 13, 13)
   }
 
   const dyingAgeAnimationCallback = () => {
@@ -65,10 +65,10 @@ export function createBee (parent, type, startPosition) {
   }
 
   const dyingAgeAnimations = {
-    idle: animateSprite(bee, 'bee-dying-age-animation-idle', 44, 13, 9, false, dyingAgeAnimationCallback, true),
-    worker: animateSprite(bee, 'bee-dying-age-animation-worker', 44, 13, 9, false, dyingAgeAnimationCallback, true),
-    nurser: animateSprite(bee, 'bee-dying-age-animation-nurser', 44, 13, 9, false, dyingAgeAnimationCallback, true),
-    forager: animateSprite(bee, 'bee-dying-age-animation-forager', 44, 13, 9, false, dyingAgeAnimationCallback, true)
+    idle: animateSprite(bee, 'bee/idle/dying-age.png', 44, 13, 9, false, dyingAgeAnimationCallback, true),
+    worker: animateSprite(bee, 'bee/worker/dying-age.png', 44, 13, 9, false, dyingAgeAnimationCallback, true),
+    nurser: animateSprite(bee, 'bee/nurser/dying-age.png', 44, 13, 9, false, dyingAgeAnimationCallback, true),
+    forager: animateSprite(bee, 'bee/forager/dying-age.png', 44, 13, 9, false, dyingAgeAnimationCallback, true)
   }
   Object.values(dyingAgeAnimations).forEach((animation) => animation.pause())
 
@@ -79,43 +79,43 @@ export function createBee (parent, type, startPosition) {
   }
 
   const dyingHungerAnimations = {
-    idle: animateSprite(bee, 'bee-dying-hunger-animation-idle', 45, 13, 11, false, dyingHungerAnimationCallback, true),
-    worker: animateSprite(bee, 'bee-dying-hunger-animation-worker', 45, 13, 11, false, dyingHungerAnimationCallback, true),
-    nurser: animateSprite(bee, 'bee-dying-hunger-animation-nurser', 45, 13, 11, false, dyingHungerAnimationCallback, true),
-    forager: animateSprite(bee, 'bee-dying-hunger-animation-forager', 45, 13, 11, false, dyingHungerAnimationCallback, true)
+    idle: animateSprite(bee, 'bee/idle/dying-hunger.png', 45, 13, 11, false, dyingHungerAnimationCallback, true),
+    worker: animateSprite(bee, 'bee/worker/dying-hunger.png', 45, 13, 11, false, dyingHungerAnimationCallback, true),
+    nurser: animateSprite(bee, 'bee/nurser/dying-hunger.png', 45, 13, 11, false, dyingHungerAnimationCallback, true),
+    forager: animateSprite(bee, 'bee/forager/dying-hunger.png', 45, 13, 11, false, dyingHungerAnimationCallback, true)
   }
   Object.values(dyingHungerAnimations).forEach((animation) => animation.pause())
 
-  const convertingNectarAnimation = animateSprite(bee, 'bee-converting-nectar-animation-worker', 32, 19, 13)
+  const convertingNectarAnimation = animateSprite(bee, 'bee/worker/converting-nectar.png', 32, 19, 13)
   convertingNectarAnimation.sprite.position.y = -2
 
-  const shadow = Sprite.fromImage('images/bee/shadow.png')
+  const shadow = Sprite.fromImage('shadow.png')
   bee.addChild(shadow)
 
-  const honeyBucket = Sprite.fromImage('images/buckets/honey.png')
+  const honeyBucket = Sprite.fromImage('honey.png')
   bee.addChild(honeyBucket)
-  const nectarBucket = Sprite.fromImage('images/buckets/nectar.png')
+  const nectarBucket = Sprite.fromImage('nectar.png')
   bee.addChild(nectarBucket)
-  const waxBucket = Sprite.fromImage('images/buckets/wax.png')
+  const waxBucket = Sprite.fromImage('wax.png')
   bee.addChild(waxBucket)
-  const pollenBucket = Sprite.fromImage('images/buckets/pollen.png')
+  const pollenBucket = Sprite.fromImage('pollen.png')
   bee.addChild(pollenBucket)
 
-  const droneBody = Sprite.fromImage('images/bee/bee-drone-body-idle.png')
+  const droneBody = Sprite.fromImage('bee-drone-body-idle.png')
   bee.addChild(droneBody)
 
-  const droneHand = Sprite.fromImage('images/bee/bee-drone-hand.png')
+  const droneHand = Sprite.fromImage('bee-drone-hand.png')
   droneHand.position.x = 10
   droneHand.position.y = 5
   droneHand.visible = false
   bee.addChild(droneHand)
 
-  const beeAddon = Sprite.fromImage('images/bee/bee-drone-legs.png')
+  const beeAddon = Sprite.fromImage('bee-drone-legs.png')
   beeAddon.position.x = -1
   beeAddon.position.y = -1
   bee.addChild(beeAddon)
 
-  const beeExclamation = Sprite.fromImage('images/exclamations/exclamation-warning-severe.png')
+  const beeExclamation = Sprite.fromImage('exclamation-warning-severe.png')
   beeExclamation.position.x = 12
   beeExclamation.position.y = -2
   beeExclamation.visible = false
@@ -196,7 +196,7 @@ export function createBee (parent, type, startPosition) {
       bee.destroy()
     } else {
       bee.type = type
-      droneBody.texture = Texture.fromImage('images/bee/bee-drone-body-' + type + '.png')
+      droneBody.texture = Texture.fromImage('bee-drone-body-' + type + '.png')
     }
     bee.idle = getIdlePosition(type)
   }
@@ -288,7 +288,7 @@ export function createBee (parent, type, startPosition) {
   bee.panelContent = () => {
     const container = new Container()
 
-    const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
+    const whiteLine = Sprite.fromImage('white-description-line.png')
     whiteLine.position.x = -3
     whiteLine.position.y = -38
     container.addChild(whiteLine)
@@ -296,18 +296,18 @@ export function createBee (parent, type, startPosition) {
     const contentOffsetX = 66
     const contentOffsetY = -37
 
-    const content = Sprite.fromImage('images/ui/content-boilerplate.png')
+    const content = Sprite.fromImage('content-boilerplate.png')
     content.position.x = contentOffsetX
     content.position.y = contentOffsetY
     container.addChild(content)
 
-    const beeExclamationLabel = Sprite.fromImage('images/exclamations/exclamation-warning-severe.png')
+    const beeExclamationLabel = Sprite.fromImage('exclamation-warning-severe.png')
     beeExclamationLabel.position.x = contentOffsetX + 10
     beeExclamationLabel.position.y = contentOffsetY + 58
     beeExclamationLabel.visible = false
     container.addChild(beeExclamationLabel)
 
-    const boostedPlusIcon = Sprite.fromImage('images/ui/bonus-plus.png')
+    const boostedPlusIcon = Sprite.fromImage('bonus-plus.png')
     boostedPlusIcon.position.x = contentOffsetX + 20
     boostedPlusIcon.position.y = contentOffsetY + 2
     boostedPlusIcon.visible = false
@@ -974,16 +974,16 @@ export function createBee (parent, type, startPosition) {
     if (bee.vx !== 0 || bee.vy !== 0) {
       (bee.vx >= -0.15 || bee.vx === 0) ? bee.scale.set(1, 1) : bee.scale.set(-1, 1) //
       if (Math.sin(bee.animationTicker) > 0) {
-        beeAddon.texture = Texture.fromImage('images/bee/bee-drone-wings.png')
+        beeAddon.texture = Texture.fromImage('bee-drone-wings.png')
       } else {
-        beeAddon.texture = Texture.fromImage('images/bee/bee-drone-wings-flapped.png')
+        beeAddon.texture = Texture.fromImage('bee-drone-wings-flapped.png')
       }
     } else {
       bee.scale.set(1, 1)
       if ((bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) || Math.sin(bee.animationTicker / 2) > 0) {
-        beeAddon.texture = Texture.fromImage('images/bee/bee-drone-legs.png')
+        beeAddon.texture = Texture.fromImage('bee-drone-legs.png')
       } else {
-        beeAddon.texture = Texture.fromImage('images/bee/bee-drone-legs-jerk.png')
+        beeAddon.texture = Texture.fromImage('bee-drone-legs-jerk.png')
       }
     }
 
@@ -1004,11 +1004,11 @@ export function createBee (parent, type, startPosition) {
 function createAngel (bee) {
   const container = new Container()
 
-  const angelSprite = Sprite.fromImage('images/bee/angel.png')
+  const angelSprite = Sprite.fromImage('angel.png')
   angelSprite.alpha = 0.6
   container.addChild(angelSprite)
 
-  const beeExclamation = Sprite.fromImage('images/exclamations/exclamation-warning-severe.png')
+  const beeExclamation = Sprite.fromImage('exclamation-warning-severe.png')
   beeExclamation.position.x = 12
   beeExclamation.position.y = -2
   beeExclamation.visible = false

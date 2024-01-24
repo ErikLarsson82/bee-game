@@ -3,16 +3,24 @@ import { fps } from './framerate'
 import { addTicker } from './exported-help-functions'
 import { gameSpeed } from './game/game-state'
 
-export function animateSprite (sprite, resource, amount, w, h, _loop, callback, _timelocked) {
+export function animateSprite (sprite, name, amount, w, h, _loop, callback, _timelocked) {
   const frame = new Sprite()
 
   // eslint-disable-next-line new-cap
-  const spritesheet = new BaseTexture.from(loader.resources[resource].url)
+  const texture = new Texture.from(name)
+  // eslint-disable-next-line new-cap
+  const baseTexture = new BaseTexture.from(texture)
+  const resourceFrames = loader.resources.sheet.data.frames[name]
+  if (resourceFrames === undefined) throw new Error(`sprite named ${name} is missing`)
+  const offset = resourceFrames.frame
+
   const frames = []
+  const offx = offset.x
+  const offy = offset.y
 
   for (let i = 0; i < amount; i++) {
     frames.push(
-      new Texture(spritesheet, new Rectangle(i * w, 0, w, h))
+      new Texture(baseTexture, new Rectangle((i * w) + offx, offy, w, h))
     )
   }
 

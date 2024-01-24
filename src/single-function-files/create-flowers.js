@@ -1,4 +1,4 @@
-import { Texture, Sprite, Container } from 'pixi.js'
+import { Texture, Sprite, Container, Text } from 'pixi.js'
 import { flowers, setFlowers, seeds, setSeeds, selected, season, hour, killNonPollinatedFlowers } from '../game/game-state'
 import { makeOccupiable, makeSelectable } from '../sprite-factories'
 import { addTicker, updateSelected, isDayBeforeWinter } from '../exported-help-functions'
@@ -13,9 +13,9 @@ export function createFlowers (_flowerBed) {
   }
   const positions = [10, -50, 60, -110, 120, -160, 170]
   const texture = {
-    dead: Texture.fromImage('images/scene/flower-dead.png'),
-    normal: Texture.fromImage('images/scene/flower.png'),
-    pollinated: Texture.fromImage('images/scene/flower-pollinated.png')
+    dead: Texture.fromImage('flower-dead.png'),
+    normal: Texture.fromImage('flower.png'),
+    pollinated: Texture.fromImage('flower-pollinated.png')
   }
 
   // first, cleanup
@@ -28,15 +28,15 @@ export function createFlowers (_flowerBed) {
 
   // then, create flowers
   for (let f = 1; f <= seeds; f++) {
-    const flower = Sprite.fromImage('images/scene/flower.png')
+    const flower = Sprite.fromImage('flower.png')
 
     const flipped = Math.random() < 0.5
 
     const exclamationTextures = {
-      mild: Texture.fromImage('images/exclamations/exclamation-warning-mild.png'),
-      severe: Texture.fromImage('images/exclamations/exclamation-warning-severe.png')
+      mild: Texture.fromImage('exclamation-warning-mild.png'),
+      severe: Texture.fromImage('exclamation-warning-severe.png')
     }
-    const flowerExclamation = Sprite.fromImage('images/exclamations/exclamation-warning-mild.png')
+    const flowerExclamation = Sprite.fromImage('exclamation-warning-mild.png')
     flowerExclamation.position.x = flipped ? -10 : 10
     flowerExclamation.position.y = -20
     flowerExclamation.visible = false
@@ -61,12 +61,12 @@ export function createFlowers (_flowerBed) {
     flower.panelContent = () => {
       const container = new Container()
 
-      const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
+      const whiteLine = Sprite.fromImage('white-description-line.png')
       whiteLine.position.x = 0
       whiteLine.position.y = -30
       container.addChild(whiteLine)
 
-      const content = Sprite.fromImage('images/ui/content-flower.png')
+      const content = Sprite.fromImage('content-flower.png')
       content.position.x = 72
       content.position.y = -29
       container.addChild(content)

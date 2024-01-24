@@ -1,4 +1,4 @@
-import { Sprite, Container, Text } from 'pixi.js'
+import { Text, Sprite, Container } from 'pixi.js'
 import { makeSelectable, makeHexDetectable } from '../sprite-factories'
 import { makeFlyable } from '../bee-factories'
 import { addTicker, transferTo, goIdle } from '../exported-help-functions'
@@ -8,16 +8,16 @@ import { setQueen } from '../game/pixi-elements'
 import { fontConfig, speeds } from '../config'
 
 export function createQueen (parent) {
-  const queenSprite = Sprite.fromImage('images/queen/bee-queen.png')
+  const queenSprite = Sprite.fromImage('bee-queen.png')
 
   makeSelectable(queenSprite, 'queen', 'round')
   queenSprite.type = 'queen'
 
-  const queenWingAddon = Sprite.fromImage('images/queen/bee-queen-wings-flapped.png')
+  const queenWingAddon = Sprite.fromImage('bee-queen-wings-flapped.png')
   queenWingAddon.visible = false
   queenSprite.addChild(queenWingAddon)
 
-  const queenLegAddon = Sprite.fromImage('images/queen/bee-queen-legs-jerk.png')
+  const queenLegAddon = Sprite.fromImage('bee-queen-legs-jerk.png')
   queenLegAddon.visible = false
   queenSprite.addChild(queenLegAddon)
 
@@ -49,12 +49,12 @@ export function createQueen (parent) {
   queenSprite.panelContent = () => {
     const container = new Container()
 
-    const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
+    const whiteLine = Sprite.fromImage('white-description-line.png')
     whiteLine.position.x = 0
     whiteLine.position.y = -30
     container.addChild(whiteLine)
 
-    const content = Sprite.fromImage('images/ui/content-queen.png')
+    const content = Sprite.fromImage('content-queen.png')
     content.position.x = 72
     content.position.y = -29
     container.addChild(content)
