@@ -1,31 +1,61 @@
+import { Container, Sprite, Texture, Text } from 'pixi.js'
+import {
+  getIdlePosition,
+  goIdle,
+  addTicker,
+  transferTo,
+  adjacent,
+  activateAdjacent
+} from './exported-help-functions'
+import { animateSprite } from './animate-sprite'
+import { makeSelectable, makeHexDetectable } from './sprite-factories'
+import { makeFlyable, makeHungry, makeParticleCreator } from './bee-factories'
+import { samePosition, cap, distance } from './pure-help-functions'
+import { fps } from './framerate'
+import {
+  bees,
+  setBees,
+  angels,
+  setAngels,
+  gameSpeed,
+  season,
+  flowers,
+  hexGrid,
+  gameover,
+  setAngelBubbleTimer
+} from './game/game-state'
+import { ProgressBar } from './ui'
+import { fontConfig, speeds } from './config'
+import { filterHexagon, getClosestHex } from './hex'
+import { queen, angelBubble, angelBubbleText } from './game/pixi-elements'
 
-function createBee(parent, type, startPosition) {
+export function createBee (parent, type, startPosition) {
   if (!type) {
-    throw 'Error: createBee called without type'
+    throw new Error('Error: createBee called without type')
   }
 
   const bee = new Container()
-  
+
   const workingAnimations = {
-    idle: animateSprite(bee, 'bee-working-animation-idle', 43, 13, 8),
-    worker: animateSprite(bee, 'bee-working-animation-worker', 43, 13, 8),
-    nurser: animateSprite(bee, 'bee-working-animation-nurser', 43, 13, 8),
-    forager: animateSprite(bee, 'bee-working-animation-forager', 43, 13, 8),
-    bookie: animateSprite(bee, 'bee-working-animation-forager', 43, 13, 8),
+    idle: animateSprite(bee, 'bee/idle/working.png', 43, 13, 8),
+    worker: animateSprite(bee, 'bee/worker/working.png', 43, 13, 8),
+    nurser: animateSprite(bee, 'bee/nurser/working.png', 43, 13, 8),
+    forager: animateSprite(bee, 'bee/forager/working.png', 43, 13, 8),
+    bookie: animateSprite(bee, 'bee/forager/working.png', 43, 13, 8)
   }
 
   const unloadingAnimations = {
-    idle: animateSprite(bee, 'bee-unloading-animation-idle', 31, 13, 8),
-    worker: animateSprite(bee, 'bee-unloading-animation-worker', 31, 13, 8),
-    nurser: animateSprite(bee, 'bee-unloading-animation-nurser', 31, 13, 8),
-    forager: animateSprite(bee, 'bee-unloading-animation-forager', 31, 13, 8),
+    idle: animateSprite(bee, 'bee/idle/unloading.png', 31, 13, 8),
+    worker: animateSprite(bee, 'bee/worker/unloading.png', 31, 13, 8),
+    nurser: animateSprite(bee, 'bee/nurser/unloading.png', 31, 13, 8),
+    forager: animateSprite(bee, 'bee/forager/unloading.png', 31, 13, 8)
   }
 
   const eatingAnimations = {
-    idle: animateSprite(bee, 'bee-eating-animation-idle', 36, 13, 13),
-    worker: animateSprite(bee, 'bee-eating-animation-worker', 36, 13, 13),
-    nurser: animateSprite(bee, 'bee-eating-animation-nurser', 36, 13, 13),
-    forager: animateSprite(bee, 'bee-eating-animation-forager', 36, 13, 13),
+    idle: animateSprite(bee, 'bee/idle/eating.png', 36, 13, 13),
+    worker: animateSprite(bee, 'bee/worker/eating.png', 36, 13, 13),
+    nurser: animateSprite(bee, 'bee/nurser/eating.png', 36, 13, 13),
+    forager: animateSprite(bee, 'bee/forager/eating.png', 36, 13, 13)
   }
 
   const dyingAgeAnimationCallback = () => {
@@ -35,10 +65,10 @@ function createBee(parent, type, startPosition) {
   }
 
   const dyingAgeAnimations = {
-    idle: animateSprite(bee, 'bee-dying-age-animation-idle', 44, 13, 9, false, dyingAgeAnimationCallback, true),
-    worker: animateSprite(bee, 'bee-dying-age-animation-worker', 44, 13, 9, false, dyingAgeAnimationCallback, true),
-    nurser: animateSprite(bee, 'bee-dying-age-animation-nurser', 44, 13, 9, false, dyingAgeAnimationCallback, true),
-    forager: animateSprite(bee, 'bee-dying-age-animation-forager', 44, 13, 9, false, dyingAgeAnimationCallback, true),
+    idle: animateSprite(bee, 'bee/idle/dying-age.png', 44, 13, 9, false, dyingAgeAnimationCallback, true),
+    worker: animateSprite(bee, 'bee/worker/dying-age.png', 44, 13, 9, false, dyingAgeAnimationCallback, true),
+    nurser: animateSprite(bee, 'bee/nurser/dying-age.png', 44, 13, 9, false, dyingAgeAnimationCallback, true),
+    forager: animateSprite(bee, 'bee/forager/dying-age.png', 44, 13, 9, false, dyingAgeAnimationCallback, true)
   }
   Object.values(dyingAgeAnimations).forEach((animation) => animation.pause())
 
@@ -49,43 +79,43 @@ function createBee(parent, type, startPosition) {
   }
 
   const dyingHungerAnimations = {
-    idle: animateSprite(bee, 'bee-dying-hunger-animation-idle', 45, 13, 11, false, dyingHungerAnimationCallback, true),
-    worker: animateSprite(bee, 'bee-dying-hunger-animation-worker', 45, 13, 11, false, dyingHungerAnimationCallback, true),
-    nurser: animateSprite(bee, 'bee-dying-hunger-animation-nurser', 45, 13, 11, false, dyingHungerAnimationCallback, true),
-    forager: animateSprite(bee, 'bee-dying-hunger-animation-forager', 45, 13, 11, false, dyingHungerAnimationCallback, true),
+    idle: animateSprite(bee, 'bee/idle/dying-hunger.png', 45, 13, 11, false, dyingHungerAnimationCallback, true),
+    worker: animateSprite(bee, 'bee/worker/dying-hunger.png', 45, 13, 11, false, dyingHungerAnimationCallback, true),
+    nurser: animateSprite(bee, 'bee/nurser/dying-hunger.png', 45, 13, 11, false, dyingHungerAnimationCallback, true),
+    forager: animateSprite(bee, 'bee/forager/dying-hunger.png', 45, 13, 11, false, dyingHungerAnimationCallback, true)
   }
   Object.values(dyingHungerAnimations).forEach((animation) => animation.pause())
 
-  const convertingNectarAnimation = animateSprite(bee, 'bee-converting-nectar-animation-worker', 32, 19, 13)
+  const convertingNectarAnimation = animateSprite(bee, 'bee/worker/converting-nectar.png', 32, 19, 13)
   convertingNectarAnimation.sprite.position.y = -2
-  
-  const shadow = Sprite.fromImage('images/bee/shadow.png')
+
+  const shadow = Sprite.fromImage('shadow.png')
   bee.addChild(shadow)
 
-  const honeyBucket = Sprite.fromImage('images/buckets/honey.png')
+  const honeyBucket = Sprite.fromImage('honey.png')
   bee.addChild(honeyBucket)
-  const nectarBucket = Sprite.fromImage('images/buckets/nectar.png')
+  const nectarBucket = Sprite.fromImage('nectar.png')
   bee.addChild(nectarBucket)
-  const waxBucket = Sprite.fromImage('images/buckets/wax.png')
+  const waxBucket = Sprite.fromImage('wax.png')
   bee.addChild(waxBucket)
-  const pollenBucket = Sprite.fromImage('images/buckets/pollen.png')
+  const pollenBucket = Sprite.fromImage('pollen.png')
   bee.addChild(pollenBucket)
 
-  const droneBody = Sprite.fromImage('images/bee/bee-drone-body-idle.png')
+  const droneBody = Sprite.fromImage('bee-drone-body-idle.png')
   bee.addChild(droneBody)
 
-  const droneHand = Sprite.fromImage('images/bee/bee-drone-hand.png')
+  const droneHand = Sprite.fromImage('bee-drone-hand.png')
   droneHand.position.x = 10
   droneHand.position.y = 5
   droneHand.visible = false
-  bee.addChild(droneHand)  
-  
-  const beeAddon = Sprite.fromImage('images/bee/bee-drone-legs.png')
+  bee.addChild(droneHand)
+
+  const beeAddon = Sprite.fromImage('bee-drone-legs.png')
   beeAddon.position.x = -1
   beeAddon.position.y = -1
   bee.addChild(beeAddon)
-  
-  const beeExclamation = Sprite.fromImage('images/exclamations/exclamation-warning-severe.png')
+
+  const beeExclamation = Sprite.fromImage('exclamation-warning-severe.png')
   beeExclamation.position.x = 12
   beeExclamation.position.y = -2
   beeExclamation.visible = false
@@ -112,13 +142,13 @@ function createBee(parent, type, startPosition) {
   bee.dying = {
     direction: {
       x: (Math.random() * 2) - 1,
-      y: (Math.random() * 2) - 1,
+      y: (Math.random() * 2) - 1
     },
     magnitude: 0.1
   }
-  
+
   bee.roundedPos = { x: 0, y: 0 }
-  
+
   bee.age = 0
   bee.setAge = amount => {
     bee.age = amount
@@ -161,12 +191,12 @@ function createBee(parent, type, startPosition) {
   bee.type = type
   bee.setType = type => {
     if (type === 'dead') {
-      bees = bees.filter((b) => b !== bee)
-      angels.push(createAngel(bee))
+      setBees(bees.filter((b) => b !== bee))
+      setAngels(angels.concat(createAngel(bee)))
       bee.destroy()
     } else {
       bee.type = type
-      droneBody.texture = Texture.fromImage('images/bee/bee-drone-body-' + type + '.png')
+      droneBody.texture = Texture.fromImage('bee-drone-body-' + type + '.png')
     }
     bee.idle = getIdlePosition(type)
   }
@@ -196,7 +226,7 @@ function createBee(parent, type, startPosition) {
     bee.removeChild(beeExclamation)
     parent.removeChild(bee)
   }
-  
+
   const isPollenSackFull = () => bee.pollenSack >= bee.POLLEN_SACK_CAPACITY
   const isPollenSackEmpty = () => !(bee.pollenSack > 0)
 
@@ -230,7 +260,7 @@ function createBee(parent, type, startPosition) {
     if (bee.type === 'forager' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y && isPollenSackFull()) {
       return 'Cannot find\nunoccupied\npollen hexagon'
     }
-    if (bee.type === 'forager' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) {      
+    if (bee.type === 'forager' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) {
       return 'Cannot find\nunoccupied\nflower'
     }
     if (bee.type === 'nurser' && !bee.isMoving() && bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) {
@@ -257,8 +287,8 @@ function createBee(parent, type, startPosition) {
 
   bee.panelContent = () => {
     const container = new Container()
-    
-    const whiteLine = Sprite.fromImage('images/ui/white-description-line.png')
+
+    const whiteLine = Sprite.fromImage('white-description-line.png')
     whiteLine.position.x = -3
     whiteLine.position.y = -38
     container.addChild(whiteLine)
@@ -266,18 +296,18 @@ function createBee(parent, type, startPosition) {
     const contentOffsetX = 66
     const contentOffsetY = -37
 
-    const content = Sprite.fromImage('images/ui/content-boilerplate.png')
+    const content = Sprite.fromImage('content-boilerplate.png')
     content.position.x = contentOffsetX
     content.position.y = contentOffsetY
     container.addChild(content)
 
-    const beeExclamationLabel = Sprite.fromImage('images/exclamations/exclamation-warning-severe.png')
+    const beeExclamationLabel = Sprite.fromImage('exclamation-warning-severe.png')
     beeExclamationLabel.position.x = contentOffsetX + 10
     beeExclamationLabel.position.y = contentOffsetY + 58
     beeExclamationLabel.visible = false
     container.addChild(beeExclamationLabel)
 
-    const boostedPlusIcon = Sprite.fromImage('images/ui/bonus-plus.png')
+    const boostedPlusIcon = Sprite.fromImage('bonus-plus.png')
     boostedPlusIcon.position.x = contentOffsetX + 20
     boostedPlusIcon.position.y = contentOffsetY + 2
     boostedPlusIcon.visible = false
@@ -291,8 +321,8 @@ function createBee(parent, type, startPosition) {
     container.addChild(ProgressBar(106, p[3], 'wax', () => bee.waxSack, bee.WAX_SACK_CAPACITY))
     container.addChild(ProgressBar(106, p[4], 'pollen', () => bee.pollenSack, bee.POLLEN_SACK_CAPACITY))
     container.addChild(ProgressBar(106, p[5], 'age', () => bee.age, bee.DEAD_AT_AGE))
-    
-    const textHeading = new PIXI.Text('BEE', { ...fontConfig })
+
+    const textHeading = new Text('BEE', { ...fontConfig })
     textHeading.scale.set(0.15, 0.15)
     textHeading.position.x = contentOffsetX + 30
     textHeading.position.y = contentOffsetY + 3
@@ -301,14 +331,14 @@ function createBee(parent, type, startPosition) {
     const texts = ['HUNGER', 'HONEY', 'NECTAR', 'WAX', 'POLLEN', 'AGE']
 
     texts.forEach((text, idx) => {
-      const textDescription = new PIXI.Text(text, { ...fontConfig, fill: '#8b9bb4' })
+      const textDescription = new Text(text, { ...fontConfig, fill: '#8b9bb4' })
       textDescription.scale.set(0.15, 0.15)
       textDescription.position.x = contentOffsetX + 10
       textDescription.position.y = contentOffsetY + 13 + (idx * 7)
       container.addChild(textDescription)
     })
 
-    const helper = new PIXI.Text('Loading...', { ...fontConfig, lineHeight: 44 })
+    const helper = new Text('Loading...', { ...fontConfig, lineHeight: 44 })
     helper.scale.set(0.15, 0.15)
     helper.position.x = contentOffsetX + 10
     helper.position.y = contentOffsetY + 58
@@ -319,14 +349,14 @@ function createBee(parent, type, startPosition) {
       beeExclamationLabel.visible = bee.isHungry() && !bee.isDead()
       helper.text = helperText().toUpperCase()
     })
-    
+
     return container
   }
 
-  function collectFlowerResources() {
+  function collectFlowerResources () {
     const flower = bee.isAtType('flower')
     const needsResource = !(isPollenSackFull() && isNectarSackFull())
-    if (flower && needsResource && season === 'summer') { 
+    if (flower && needsResource && season === 'summer') {
       flower.claimSlot(bee)
 
       bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(40)
@@ -338,11 +368,11 @@ function createBee(parent, type, startPosition) {
         bee.position.y = flower.position.y - 5
       }
       return true
-    }    
+    }
     return false
   }
 
-  function flyToFlowerToCollect() {
+  function flyToFlowerToCollect () {
     const flower = flowers.find(flower => flower.isUnclaimed(bee))
     const needsResource = !(isPollenSackFull() && isNectarSackFull())
 
@@ -354,18 +384,18 @@ function createBee(parent, type, startPosition) {
     return false
   }
 
-  function flyToFlowerToPollinate() {
+  function flyToFlowerToPollinate () {
     if (isPollenSackEmpty() || season === 'winter') return false
     const needsPollination = flower => flower.pollinationLevel < flower.POLLINATION_REQUIREMENT
     const flower = flowers.filter(needsPollination)[0]
-    
+
     if (!flower) return false
 
     bee.flyTo(flower)
     return true
   }
 
-  function pollinateFlower() {    
+  function pollinateFlower () {
     const flower = bee.isAtType('flower')
     if (!flower || season === 'winter') return false
     if (isPollenSackEmpty() || flower.isPollinated()) {
@@ -381,26 +411,26 @@ function createBee(parent, type, startPosition) {
     return true
   }
 
-  function depositPollen() {
+  function depositPollen () {
     const hex = bee.isAtType('pollen')
     if (!hex) return false
     hex.claimSlot(bee)
 
     const duration = bee.isBoosted() ? 15 : 30
-    
+
     const rate = bee.POLLEN_SACK_CAPACITY
     bee.pollenSack -= transferTo(rate).inSeconds(duration)
     bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
     hex.pollen += transferTo(rate).inSeconds(duration)
     hex.pollen = cap(0, hex.POLLEN_HEX_CAPACITY)(hex.pollen)
-    
+
     if (isPollenSackEmpty() || hex.isPollenFull()) {
       bee.position.y = hex.position.y - 5
     }
     return true
   }
 
-  function refillPollen() {
+  function refillPollen () {
     const hex = bee.isAtType('pollen')
     if (!hex) return false
     hex.claimSlot(bee)
@@ -417,24 +447,24 @@ function createBee(parent, type, startPosition) {
     return true
   }
 
-  function refillWax() {
+  function refillWax () {
     const hex = bee.isAtType('wax')
     if (!hex) return false
     hex.claimSlot(bee)
-    
+
     const rate = bee.WAX_SACK_CAPACITY
     bee.waxSack += transferTo(rate).inSeconds(30)
     bee.waxSack = cap(0, bee.WAX_SACK_CAPACITY)(bee.waxSack)
     hex.wax -= transferTo(rate).inSeconds(30)
     hex.wax = cap(0, hex.WAX_HEX_CAPACITY)(hex.wax)
-    
+
     if (isWaxSackFull() || hex.isWaxEmpty()) {
       bee.position.y = hex.position.y - 5
     }
     return true
   }
 
-  function depositHoney() {
+  function depositHoney () {
     const targetHex = bee.isAtType('honey')
     if (!targetHex) return false
     const valid = !isHoneySackEmpty() && !targetHex.isHoneyFull()
@@ -445,14 +475,14 @@ function createBee(parent, type, startPosition) {
     const rate = bee.HONEY_SACK_CAPACITY / 3
     bee.honeySack -= transferTo(rate).inSeconds(5)
     bee.honeySack = cap(0, bee.HONEY_SACK_CAPACITY)(bee.honeySack)
-    
+
     targetHex.honey += transferTo(rate).inSeconds(5)
     targetHex.honey = cap(0, targetHex.HONEY_HEX_CAPACITY)(targetHex.honey)
 
     return true
   }
 
-  function depositNectar() {
+  function depositNectar () {
     const targetHex = bee.isAtType('nectar')
     if (!targetHex) return false
     const valid = !isNectarSackEmpty() && !targetHex.isNectarFull()
@@ -468,47 +498,47 @@ function createBee(parent, type, startPosition) {
     return true
   }
 
-  function flyToHoneyToDeposit() {
+  function flyToHoneyToDeposit () {
     const honeyHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.isUnclaimed(bee) && !hex.isHoneyFull())
     if (honeyHex.length === 0 || isHoneySackEmpty()) return false
-    const closest = getClosestHex(honeyHex, bee)
+    const closest = getClosestHex(honeyHex, bee, distance)
     closest.claimSlot(bee)
-    bee.flyTo(closest)      
+    bee.flyTo(closest)
     return true
   }
 
-  function flyToNectarToDeposit() {
+  function flyToNectarToDeposit () {
     const nectarHex = filterHexagon(hexGrid, hex => hex.type === 'nectar' && hex.isUnclaimed(bee) && !hex.isNectarFull())
     if (nectarHex.length === 0 || isNectarSackEmpty()) return false
-    const closest = getClosestHex(nectarHex, bee)
+    const closest = getClosestHex(nectarHex, bee, distance)
     closest.claimSlot(bee)
     bee.flyTo(closest)
     return true
   }
 
-  function flyToPollenToDeposit() {
+  function flyToPollenToDeposit () {
     const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && hex.isUnclaimed(bee) && !hex.isPollenFull())
     if (pollenHex.length === 0 || isPollenSackEmpty()) return false
-    const closest = getClosestHex(pollenHex, bee)
+    const closest = getClosestHex(pollenHex, bee, distance)
     closest.claimSlot(bee)
     bee.flyTo(closest)
     return true
   }
 
-  function flyToPollenToRefill() {
+  function flyToPollenToRefill () {
     const pollenHex = filterHexagon(hexGrid, hex => hex.type === 'pollen' && hex.isUnclaimed(bee) && !hex.isPollenEmpty())
     if (pollenHex.length === 0 || isPollenSackFull()) return false
-    const closest = getClosestHex(pollenHex, bee)
+    const closest = getClosestHex(pollenHex, bee, distance)
     closest.claimSlot(bee)
     bee.flyTo(closest)
     return true
   }
 
-  function flyToBroodling() {
-    const larvaeHex = filterHexagon(hexGrid, hex => 
+  function flyToBroodling () {
+    const larvaeHex = filterHexagon(hexGrid, hex =>
       hex.type === 'brood' &&
       hex.content === 'larvae' &&
-      hex.isUnclaimed(bee) && 
+      hex.isUnclaimed(bee) &&
       !hex.isWellFed()
     ).sort((a, b) => a.nutrition > b.nutrition ? 1 : -1)
 
@@ -518,89 +548,89 @@ function createBee(parent, type, startPosition) {
     return true
   }
 
-  function flyToCleanBrood() {
-    const deadLarvaeHex = filterHexagon(hexGrid, hex => 
+  function flyToCleanBrood () {
+    const deadLarvaeHex = filterHexagon(hexGrid, hex =>
       hex.type === 'brood' &&
-      hex.isUnclaimed(bee) && 
+      hex.isUnclaimed(bee) &&
       hex.isDead()
     )
 
     if (deadLarvaeHex.length === 0) return false
-    const closest = getClosestHex(deadLarvaeHex, bee)
+    const closest = getClosestHex(deadLarvaeHex, bee, distance)
     closest.claimSlot(bee)
     bee.flyTo(closest)
     return true
   }
 
-  function nurseBroodling() {
+  function nurseBroodling () {
     const isAnyLarvaeStarving = filterHexagon(hexGrid, hex => hex.type === 'brood' && hex.isStarving() && hex.isUnclaimed(bee))
     const isAtWellFedLarvae = filterHexagon(hexGrid, hex => hex.type === 'brood' && hex.isWellFed() && isAt(hex))
     const isAtAnyLarvae = filterHexagon(hexGrid, hex => hex.type === 'brood' && hex.content === 'larvae' && hex.isUnclaimed(bee) && isAt(hex))
-    
+
     if (isAnyLarvaeStarving.length > 0 && isAtWellFedLarvae.length > 0) {
       // Take off, another larvae needs me
       bee.position.y = isAtWellFedLarvae[0].position.y - 5
     }
 
     if (isAtAnyLarvae.length === 0 || isPollenSackEmpty()) return false
-    
+
     isAtAnyLarvae[0].claimSlot(bee)
     bee.pollenSack -= transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(40)
     isAtAnyLarvae[0].nutrition += transferTo(isAtAnyLarvae[0].NUTRITION_CAPACITY).inSeconds(10)
-    isAtAnyLarvae[0].nutrition = cap(0, isAtAnyLarvae[0].NUTRITION_CAPACITY)(isAtAnyLarvae[0].nutrition) 
-    return true   
+    isAtAnyLarvae[0].nutrition = cap(0, isAtAnyLarvae[0].NUTRITION_CAPACITY)(isAtAnyLarvae[0].nutrition)
+    return true
   }
 
-  function cleanBrood() {
+  function cleanBrood () {
     const hex = bee.isAtType('brood')
     if (!hex) return false
-    hex.claimSlot(bee)  
+    hex.claimSlot(bee)
     hex.corpseCleaned -= transferTo(hex.CORPSE_DELAY).inSeconds(10)
     if (hex.corpseCleaned <= 0) {
       bee.position.y = hex.position.y - 5
     }
-    return true    
+    return true
   }
 
-  function ageBee() {
+  function ageBee () {
     bee.age += transferTo(200).inMinutes(200)
   }
 
-  function dying() {
+  function dying () {
     if (bee.isDead()) return
-    if (dyingHungerAnimations[bee.type].isRunning() || dyingAgeAnimations[bee.type].isRunning()) {  
-        bee.hideBee()
-        shadow.visible = false
-        bee.position.x += bee.dying.direction.x * bee.dying.magnitude
-        bee.position.y += bee.dying.direction.y * bee.dying.magnitude
-        bee.dying.magnitude -= 0.0003
-        bee.dying.magnitude = Math.max(0, bee.dying.magnitude)
-        
-        if (bee.hunger <= 0) {
-          dyingHungerAnimations[bee.type].sprite.visible = true
-          beeExclamation.visible = true
-        } else if (bee.age > bee.DEAD_AT_AGE) {
-          dyingAgeAnimations[bee.type].sprite.visible = true
-          beeExclamation.visible = false
-        }
+    if (dyingHungerAnimations[bee.type].isRunning() || dyingAgeAnimations[bee.type].isRunning()) {
+      bee.hideBee()
+      shadow.visible = false
+      bee.position.x += bee.dying.direction.x * bee.dying.magnitude
+      bee.position.y += bee.dying.direction.y * bee.dying.magnitude
+      bee.dying.magnitude -= 0.0003
+      bee.dying.magnitude = Math.max(0, bee.dying.magnitude)
 
-        return true
+      if (bee.hunger <= 0) {
+        dyingHungerAnimations[bee.type].sprite.visible = true
+        beeExclamation.visible = true
+      } else if (bee.age > bee.DEAD_AT_AGE) {
+        dyingAgeAnimations[bee.type].sprite.visible = true
+        beeExclamation.visible = false
+      }
+
+      return true
     }
 
     if (bee.hunger <= 0) {
-        dyingHungerAnimations[bee.type].start()
-        bee.setDying(true)
-        return true
+      dyingHungerAnimations[bee.type].start()
+      bee.setDying(true)
+      return true
     } else if (bee.age > bee.DEAD_AT_AGE) {
-        dyingAgeAnimations[bee.type].start()
-        bee.setDying(true)
-        return true
+      dyingAgeAnimations[bee.type].start()
+      bee.setDying(true)
+      return true
     }
-    
+
     return false
   }
 
-  function boost() {
+  function boost () {
     if (bee.isBoosted()) return false
 
     const boostHex = filterHexagon(hexGrid, hex => hex.type === 'experiment-1' && hex.hasBoostLeft())
@@ -619,28 +649,28 @@ function createBee(parent, type, startPosition) {
     }
   }
 
-  function broodsAreDoneForTheSeason() {
+  function broodsAreDoneForTheSeason () {
     const isDone = hex => ['dead', 'puppa'].includes(hex.content)
     const unfinishedHexes = filterHexagon(hexGrid, hex => hex.type === 'brood' && !isDone(hex) && hex.paused === false)
 
     return unfinishedHexes.length === 0
   }
 
-  function idle() {
+  function idle () {
     if (dying()) return
     if (ageBee()) return
     if (bee.feedBee()) return
     if (boost()) return
     if (depositPollen()) return
-    if (depositNectar()) return 
+    if (depositNectar()) return
     if (depositHoney()) return
     if (flyToHoneyToDeposit()) return
     if (flyToNectarToDeposit()) return
-    if (flyToPollenToDeposit()) return    
+    if (flyToPollenToDeposit()) return
     bee.flyTo(null)
   }
 
-  function forager() {
+  function forager () {
     if (dying()) return
     if (ageBee()) return
     if (bee.feedBee()) return
@@ -649,13 +679,13 @@ function createBee(parent, type, startPosition) {
     if (depositPollen()) return
     if (depositNectar()) return
     if (flyToNectarToDeposit()) return
-    if (flyToPollenToDeposit()) return    
+    if (flyToPollenToDeposit()) return
     if (flyToFlowerToCollect()) return
     if (flyToRestingPlace()) return
     bee.flyTo(null)
   }
 
-  function nurser() {
+  function nurser () {
     if (dying()) return
     if (ageBee()) return
     if (bee.feedBee()) return
@@ -669,13 +699,13 @@ function createBee(parent, type, startPosition) {
     if (season !== 'summer') {
       if (cleanBrood()) return
       if (flyToCleanBrood()) return
-    }  
+    }
     if (flyToPollenToRefill()) return
     if (flyToBroodling()) return
     bee.flyTo(null)
   }
 
-  function worker() {
+  function worker () {
     if (dying()) return
     if (ageBee()) return
     if (boost()) return
@@ -695,7 +725,7 @@ function createBee(parent, type, startPosition) {
     bee.flyTo(null)
   }
 
-  function bookie() {
+  function bookie () {
     if (gameover) {
       bee.destroy()
     }
@@ -705,7 +735,7 @@ function createBee(parent, type, startPosition) {
     bee.flyTo(null)
   }
 
-  function tallyFlower() {
+  function tallyFlower () {
     const flower = bee.isAtType('flower')
 
     if (flower) {
@@ -714,7 +744,7 @@ function createBee(parent, type, startPosition) {
     return false
   }
 
-  function flyToFlowerToTally() {
+  function flyToFlowerToTally () {
     const flower = flowers[bee.tallyIndex]
 
     if (flower) {
@@ -724,7 +754,7 @@ function createBee(parent, type, startPosition) {
     return false
   }
 
-  function flyToQueenToReport() {
+  function flyToQueenToReport () {
     if (samePosition(bee, queen)) {
       bee.tallyIndex = 0
       return false
@@ -740,30 +770,30 @@ function createBee(parent, type, startPosition) {
     if (restingPlaces.length === 0 && !myRestingPlace) {
       return false
     }
-    
+
     if (myRestingPlace) {
       myRestingPlace.claimSlot(bee)
       return true
     }
 
-    const closest = getClosestHex(restingPlaces, bee)
+    const closest = getClosestHex(restingPlaces, bee, distance)
     closest.claimSlot(bee)
     bee.flyTo(closest)
 
     return true
   }
 
-  function convertNectar() {
+  function convertNectar () {
     const hex = bee.isAtType('nectar')
     if (!hex || isHoneySackFull()) return false
     hex.claimSlot(bee)
-    
+
     const duration = bee.isBoosted() ? 15 : 30
-    
-    if (!isNectarSackEmpty()) {      
+
+    if (!isNectarSackEmpty()) {
       const rateA = bee.NECTAR_SACK_CAPACITY
       bee.nectarSack -= transferTo(rateA).inSeconds(duration)
-      bee.nectarSack = cap(0, bee.NECTAR_SACK_CAPACITY)(bee.nectarSack)      
+      bee.nectarSack = cap(0, bee.NECTAR_SACK_CAPACITY)(bee.nectarSack)
       hex.nectar += transferTo(rateA).inSeconds(duration)
       hex.nectar = cap(0, hex.NECTAR_CAPACITY)(hex.nectar)
     }
@@ -783,7 +813,7 @@ function createBee(parent, type, startPosition) {
       if (ad.length > 0) {
         const target = ad[0]
         target.honey += transferTo(target.HONEY_HEX_CAPACITY / 6).inSeconds(5)
-        target.honey = cap(0, target.HONEY_HEX_CAPACITY)(target.honey)        
+        target.honey = cap(0, target.HONEY_HEX_CAPACITY)(target.honey)
       }
     }
 
@@ -794,25 +824,25 @@ function createBee(parent, type, startPosition) {
     return true
   }
 
-  function flyToNectarToConvert() {
+  function flyToNectarToConvert () {
     const nectarHex = filterHexagon(hexGrid, hex => hex.type === 'nectar' && hex.isUnclaimed(bee) && (!hex.isNectarEmpty() || !isNectarSackEmpty()))
     if (nectarHex.length === 0 || isHoneySackFull()) return false
-    const closest = getClosestHex(nectarHex, bee)
-    closest.claimSlot(bee)
-    bee.flyTo(closest)      
-    return true
-  }
-
-  function flyToWax() {
-    const waxHex = filterHexagon(hexGrid, hex => hex.type === 'wax' && hex.isUnclaimed(bee) && !hex.isWaxEmpty())
-    if (waxHex.length === 0 || isWaxSackFull()) return false
-    const closest = getClosestHex(waxHex, bee)
+    const closest = getClosestHex(nectarHex, bee, distance)
     closest.claimSlot(bee)
     bee.flyTo(closest)
     return true
   }
 
-  function prepareCell() {
+  function flyToWax () {
+    const waxHex = filterHexagon(hexGrid, hex => hex.type === 'wax' && hex.isUnclaimed(bee) && !hex.isWaxEmpty())
+    if (waxHex.length === 0 || isWaxSackFull()) return false
+    const closest = getClosestHex(waxHex, bee, distance)
+    closest.claimSlot(bee)
+    bee.flyTo(closest)
+    return true
+  }
+
+  function prepareCell () {
     if (isWaxSackEmpty()) return
     const hex = bee.isAtType('prepared')
     if (!hex) return false
@@ -823,7 +853,7 @@ function createBee(parent, type, startPosition) {
 
     bee.waxSack -= transferTo(bee.WAX_SACK_CAPACITY).inSeconds(5)
     bee.waxSack = cap(0, bee.WAX_SACK_CAPACITY)(bee.waxSack)
-    
+
     if (hex.completeness >= 100) {
       activateAdjacent(hex.index.x, hex.index.y)
       bee.position.y = hex.position.y - 5
@@ -831,13 +861,13 @@ function createBee(parent, type, startPosition) {
     return true
   }
 
-  function flyToPrepareCell() {
+  function flyToPrepareCell () {
     if (isWaxSackEmpty()) return
     const preparedHex = filterHexagon(hexGrid, hex => hex.type === 'prepared' && hex.isUnclaimed(bee) && hex.completeness < 100)
     if (preparedHex.length === 0) return false
-    const closest = getClosestHex(preparedHex, bee)
+    const closest = getClosestHex(preparedHex, bee, distance)
     closest.claimSlot(bee)
-    bee.flyTo(closest)      
+    bee.flyTo(closest)
     return true
   }
 
@@ -847,21 +877,21 @@ function createBee(parent, type, startPosition) {
     shadow.position.y = 0 - bee.position.y + bee.idle.y + 4
   }
 
-  bee.removeUiTicker = () => bee.uiTicker.remove = true
+  bee.removeUiTicker = () => (bee.uiTicker.remove = true)
 
   bee.uiTicker = addTicker('ui', time => {
     bee.setShadowPosition()
   })
 
   bee.hideAllAnimations = () => {
-    Object.values(workingAnimations).forEach((animation) => animation.sprite.visible = false)
-    Object.values(unloadingAnimations).forEach((animation) => animation.sprite.visible = false)
-    Object.values(eatingAnimations).forEach((animation) => animation.sprite.visible = false)
-    Object.values(dyingAgeAnimations).forEach((animation) => animation.sprite.visible = false)
+    Object.values(workingAnimations).forEach((animation) => (animation.sprite.visible = false))
+    Object.values(unloadingAnimations).forEach((animation) => (animation.sprite.visible = false))
+    Object.values(eatingAnimations).forEach((animation) => (animation.sprite.visible = false))
+    Object.values(dyingAgeAnimations).forEach((animation) => (animation.sprite.visible = false))
     convertingNectarAnimation.sprite.visible = false
   }
 
-  bee.removeTicker = () => bee.ticker.remove = true
+  bee.removeTicker = () => (bee.ticker.remove = true)
   bee.handleAnimations = () => {
     // Reset all
     bee.hideBee()
@@ -881,7 +911,7 @@ function createBee(parent, type, startPosition) {
     // Is eating
     const honeyTarget = bee.isAtType('honey')
     const isEating = honeyTarget && bee.isHoneySackEmpty()
-    
+
     if (isEating) {
       eatingAnimations[bee.type].sprite.visible = true
       return
@@ -900,12 +930,12 @@ function createBee(parent, type, startPosition) {
 
     // Generic working animation
     const isWorking = bee.isAtType('brood') || bee.isAtType('pollen') || bee.isAtType('prepared') || bee.isAtType('honey') || bee.isAtType('wax') || bee.isAtType('nectar') || bee.isAtType('flower')
-    
+
     if (isWorking) {
       workingAnimations[bee.type].sprite.visible = true
       return
     }
-    
+
     bee.showBee()
   }
 
@@ -916,11 +946,11 @@ function createBee(parent, type, startPosition) {
     }
 
     bee.setShadowPosition()
-    
+
     bee.handleAnimations()
 
     beeExclamation.visible = bee.isHungry()
-    
+
     bee.animationTicker += speeds[gameSpeed]
 
     // 3 buckets can be visible, and is placed "in order"
@@ -937,23 +967,23 @@ function createBee(parent, type, startPosition) {
         bucketCount++
       } else {
         bucketTargets[i].visible = false
-      }        
+      }
     }
     droneHand.visible = bucketCount > 2
 
     if (bee.vx !== 0 || bee.vy !== 0) {
       (bee.vx >= -0.15 || bee.vx === 0) ? bee.scale.set(1, 1) : bee.scale.set(-1, 1) //
       if (Math.sin(bee.animationTicker) > 0) {
-        beeAddon.texture = Texture.fromImage('images/bee/bee-drone-wings.png')
+        beeAddon.texture = Texture.fromImage('bee-drone-wings.png')
       } else {
-        beeAddon.texture = Texture.fromImage('images/bee/bee-drone-wings-flapped.png')
+        beeAddon.texture = Texture.fromImage('bee-drone-wings-flapped.png')
       }
     } else {
       bee.scale.set(1, 1)
       if ((bee.position.x === bee.idle.x && bee.position.y === bee.idle.y) || Math.sin(bee.animationTicker / 2) > 0) {
-        beeAddon.texture = Texture.fromImage('images/bee/bee-drone-legs.png')
+        beeAddon.texture = Texture.fromImage('bee-drone-legs.png')
       } else {
-        beeAddon.texture = Texture.fromImage('images/bee/bee-drone-legs-jerk.png')
+        beeAddon.texture = Texture.fromImage('bee-drone-legs-jerk.png')
       }
     }
 
@@ -962,7 +992,7 @@ function createBee(parent, type, startPosition) {
     if (bee.type === 'worker') worker()
     if (bee.type === 'bookie') bookie()
     if (bee.type === 'idle') idle()
-    
+
     bee.setShadowPosition()
   })
 
@@ -971,14 +1001,14 @@ function createBee(parent, type, startPosition) {
   return bee
 }
 
-function createAngel(bee) {
+function createAngel (bee) {
   const container = new Container()
-  
-  const angelSprite = Sprite.fromImage('images/bee/angel.png')
+
+  const angelSprite = Sprite.fromImage('angel.png')
   angelSprite.alpha = 0.6
   container.addChild(angelSprite)
 
-  const beeExclamation = Sprite.fromImage('images/exclamations/exclamation-warning-severe.png')
+  const beeExclamation = Sprite.fromImage('exclamation-warning-severe.png')
   beeExclamation.position.x = 12
   beeExclamation.position.y = -2
   beeExclamation.visible = false
@@ -993,7 +1023,7 @@ function createAngel(bee) {
       angelBubble.parent.removeChild(angelBubble)
     }
     container.addChild(angelBubble)
-    angelBubbleTimer = FPS * 5
+    setAngelBubbleTimer(fps * 5)
   }
 
   let obituary = bee.type.toUpperCase()
@@ -1011,7 +1041,7 @@ function createAngel(bee) {
     container.position.y -= 0.05 + 0.1 * Math.random()
 
     if (container.position.y < -30) {
-      angels = angels.filter(a => a !== container)
+      setAngels(angels.filter(a => a !== container))
       container.ticker.remove = true
       container.destroy()
     }

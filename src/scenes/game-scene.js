@@ -1,31 +1,125 @@
+import { Container, Text, Graphics, Sprite, Texture } from 'pixi.js'
+import app from '../setup-pixi'
+import { WIDTH, HEIGHT, fontConfig, smallFont, colors } from '../config'
+import { fps, setFps } from '../framerate'
+import { forEachHexagon, HEX_AMOUNT_HEIGHT, HEX_AMOUNT_WIDTH } from '../hex'
+import { cellDisabled } from '../cells'
+import { ProgressBar2 } from '../ui'
+import {
+  setTickers,
+  setBees,
+  setFlowers,
+  setCurrentCycleIndex,
+  setGameover,
+  setKeepPlaying,
+  setPaused,
+  setGameSpeed,
+  setHour,
+  setDay,
+  setYear,
+  setSeason,
+  setAngelBubbleTimer,
+  season,
+  hour,
+  day,
+  year,
+  currentSeasonLength,
+  previousSeasonLength,
+  angelBubbleTimer,
+  bees,
+  selected,
+  hoveredCells,
+  blizzardWinter,
+  gameover,
+  currentMapInit,
+  hexGrid,
+  setHexGrid,
+  setHoveredCells,
+  setAngels
+} from '../game/game-state'
+import {
+  updateSelected,
+  updateGameSpeedText,
+  addTicker,
+  updateTotals,
+  addJobsButtons
+} from '../exported-help-functions'
 
-function setupGame() {
+import { createWarningSign } from '../single-function-files/create-warning-sign'
+import { createSeasonTracker } from '../single-function-files/create-season-tracker'
+import { createQueen } from '../single-function-files/create-queen'
+import { createFlowers } from '../single-function-files/create-flowers'
+import { createGameOverUI } from '../single-function-files/create-game-over-menu'
 
+import { colorToHex } from '../pure-help-functions'
+import {
+  setBeeContainer,
+  setHatchContainer,
+  setGameSpeedIcon,
+  setPauseFrame,
+  backgroundImage,
+  setHexBackground,
+  setPanel,
+  setBackgroundScene,
+  setSun,
+  setAngelBubble,
+  setAngelBubbleText,
+  setHiveHole,
+  setForeground,
+  setHexForeground,
+  backgroundColor
+} from '../game/pixi-elements'
+import { gameloop } from '../game-loop'
+
+class GameScene extends Container {
+  constructor (sceneManager) {
+    super()
+
+    this.sceneManager = sceneManager
+
+    const text = new Text('GameScene', { fill: 0xffffff })
+    text.position.set(50, 50)
+    this.addChild(text)
+  }
+
+  init () {
+    setupGame.bind(this)()
+  }
+
+  destroy () {
+    console.log('is this destroyed?')
+    app.ticker.remove(gameloop)
+  }
+}
+
+function setupGame () {
+  const _container = this
+  const sceneManager = this.sceneManager
   // Persist framerate detected by PIXI
-  FPS = Math.round(app.ticker.FPS)
-  
-  scene = 'game'
+  setFps(Math.round(app.ticker.FPS))
+
   document.body.style['background-color'] = '#262b44'
-  
-  tickers = []
-  bees = []
-  
-  currentCycleIndex = 0
-  gameover = false
-  keepPlaying = false
-  paused = false
-  gameSpeed = 1
-  hour = 0
-  day = 1
-  year = 1
-  season = 'summer'
 
-  setLastPlayedLevel(levelIndex)
+  setTickers([])
+  setBees([])
+  setFlowers([])
+  setHoveredCells([])
+  setAngels([])
 
-  container = new Container()
+  setCurrentCycleIndex(0)
+  setGameover(false)
+  setKeepPlaying(false)
+  setPaused(false)
+  setGameSpeed(1)
+  setHour(0)
+  setDay(1)
+  setYear(1)
+  setSeason('summer')
+
+  const container = new Container()
   container.scale.x = 2
   container.scale.y = 2
-  app.stage.addChild(container)
+  _container.addChild(container)
 
   const colorBackground = new Container()
   container.addChild(colorBackground)
@@ -34,13 +128,14 @@ function setupGame() {
   fullColorBackground.drawRect(0, 0, WIDTH, HEIGHT)
   colorBackground.addChild(fullColorBackground)
 
-  background = new Container()
+  const background = new Container()
   container.addChild(background)
 
-  hexBackground = new Container()
+  const hexBackground = new Container()
   container.addChild(hexBackground)
+  setHexBackground(hexBackground)
 
-  dimmer = new Container()
+  const dimmer = new Container()
   container.addChild(dimmer)
   const dimmerSquare = new Graphics()
   dimmerSquare.beginFill(0x000000)
@@ -51,27 +146,32 @@ function setupGame() {
     dimmerSquare.alpha = season === 'summer' && hour < 3 && day === 1 ? 0 : 1 - (Math.sin(Math.PI * ((hour) % 24 / 24)) * 1.5) - 0.7
   })
 
-  uiHangarComponents = new Container()
+  const uiHangarComponents = new Container()
   container.addChild(uiHangarComponents)
 
-  flowerBed = new Container()
+  const flowerBed = new Container()
   container.addChild(flowerBed)
-  
-  hexForeground = new Container()
+
+  const hexForeground = new Container()
   container.addChild(hexForeground)
+  setHexForeground(hexForeground)
 
-  hatchContainer = new Container()
+  const hatchContainer = new Container()
   container.addChild(hatchContainer)
+  setHatchContainer(hatchContainer)
 
-  beeContainer = new Container()
+  const beeContainer = new Container()
   container.addChild(beeContainer)
+  setBeeContainer(beeContainer)
 
-  foreground = new Container()
+  const foreground = new Container()
   container.addChild(foreground)
+  setForeground(foreground)
 
-  ui = new Container()
+  const ui = new Container()
   container.addChild(ui)
 
+  // eslint-disable-next-line no-constant-condition
   if (false) {
     const clickFinder = new Graphics()
     clickFinder.beginFill(0xff0000)
@@ -80,59 +180,60 @@ function setupGame() {
     clickFinder.buttonMode = true
     clickFinder.interactive = true
     clickFinder.mousedown = e => {
-      console.log('Mouse Click Position', e.data.global.x / 2, e.data.global.y / 2);
+      console.log('Mouse Click Position', e.data.global.x / 2, e.data.global.y / 2)
     }
     ui.addChild(clickFinder)
   }
 
+  let populationText, uiTopBar
   {
     uiTopBar = new Container()
 
     const topBarContentOffsetY = 5
-    
-    const colonyLabel = new PIXI.Text('HIVE POPULATION', { ...fontConfig, ...smallFont, fill: colors.orange })
+
+    const colonyLabel = new Text('HIVE POPULATION', { ...fontConfig, ...smallFont, fill: colors.orange })
     colonyLabel.position.x = 8
     colonyLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(colonyLabel)
 
-    const gameSpeedLabel = new PIXI.Text('GAME SPEED', { ...fontConfig, ...smallFont, fill: colors.orange })
+    const gameSpeedLabel = new Text('GAME SPEED', { ...fontConfig, ...smallFont, fill: colors.orange })
     gameSpeedLabel.position.x = 337
     gameSpeedLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(gameSpeedLabel)
 
-    populationText = new PIXI.Text('1', { ...fontConfig, ...smallFont, fill: colors.yellow })
+    populationText = new Text('1', { ...fontConfig, ...smallFont, fill: colors.yellow })
     populationText.position.x = 72
     populationText.position.y = topBarContentOffsetY
     uiTopBar.addChild(populationText)
 
-    seasonText = new PIXI.Text('-', { ...fontConfig, ...smallFont, fill: 'white' })
+    const seasonText = new Text('-', { ...fontConfig, ...smallFont, fill: 'white' })
     seasonText.position.x = 236
     seasonText.position.y = topBarContentOffsetY + 8
     uiTopBar.addChild(seasonText)
 
-    const timelineText = new PIXI.Text('Year   Day   Hour', { ...fontConfig, ...smallFont, fill: '#8b9bb4' })
+    const timelineText = new Text('Year   Day   Hour', { ...fontConfig, ...smallFont, fill: '#8b9bb4' })
     timelineText.position.x = 110
     timelineText.position.y = topBarContentOffsetY
     uiTopBar.addChild(timelineText)
 
-    const yearLabel = new PIXI.Text('-', { ...fontConfig, ...smallFont })
+    const yearLabel = new Text('-', { ...fontConfig, ...smallFont })
     yearLabel.anchor.set(1, 0)
     yearLabel.position.x = 134
     yearLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(yearLabel)
 
-    const dayLabel = new PIXI.Text('-', { ...fontConfig, ...smallFont })
+    const dayLabel = new Text('-', { ...fontConfig, ...smallFont })
     dayLabel.anchor.set(1, 0)
     dayLabel.position.x = 158
     dayLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(dayLabel)
 
-    const hourLabel = new PIXI.Text('-', { ...fontConfig, ...smallFont })
+    const hourLabel = new Text('-', { ...fontConfig, ...smallFont })
     hourLabel.anchor.set(1, 0)
     hourLabel.position.x = 188
     hourLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(hourLabel)
-    
+
     addTicker('ui', time => {
       yearLabel.text = year
       dayLabel.text = day
@@ -143,30 +244,30 @@ function setupGame() {
       seasonText.text = `${label} - ${count} days left`
     })
 
-    function summaryLabel(type, y, color, funcA, funcB) {
-      const descriptionLabel = new PIXI.Text(type, { ...fontConfig, ...smallFont, fill: '#8b9bb4' })
+    function summaryLabel (type, y, color, funcA, funcB) {
+      const descriptionLabel = new Text(type, { ...fontConfig, ...smallFont, fill: '#8b9bb4' })
       descriptionLabel.position.x = 322
       descriptionLabel.position.y = y
       uiTopBar.addChild(descriptionLabel)
 
-      const divider = new PIXI.Text('/', { ...fontConfig, ...smallFont, fill: '#8b9bb4' })
+      const divider = new Text('/', { ...fontConfig, ...smallFont, fill: '#8b9bb4' })
       divider.position.x = 370
       divider.position.y = y
       uiTopBar.addChild(divider)
 
-      const valueLabel = new PIXI.Text('-', { ...fontConfig, ...smallFont, fill: color })
+      const valueLabel = new Text('-', { ...fontConfig, ...smallFont, fill: color })
       valueLabel.anchor.set(1, 0)
       valueLabel.position.x = 366
       valueLabel.position.y = y
       uiTopBar.addChild(valueLabel)
 
-      const capacityLabel = new PIXI.Text('-', { ...fontConfig, ...smallFont, fill: color })
+      const capacityLabel = new Text('-', { ...fontConfig, ...smallFont, fill: color })
       capacityLabel.anchor.set(1, 0)
       capacityLabel.position.x = 396
       capacityLabel.position.y = y
       uiTopBar.addChild(capacityLabel)
-    
-      addTicker('ui', updateTotals(valueLabel, capacityLabel, type, funcA, funcB))      
+
+      addTicker('ui', updateTotals(valueLabel, capacityLabel, type, funcA, funcB))
     }
 
     summaryLabel('honey', 40, '#feae34', hex => hex.honey, hex => hex.HONEY_HEX_CAPACITY)
@@ -174,24 +275,26 @@ function setupGame() {
     summaryLabel('pollen', 60, '#fee761', hex => hex.pollen, hex => hex.POLLEN_HEX_CAPACITY)
     summaryLabel('wax', 70, '#e8b796', hex => hex.wax, hex => hex.WAX_HEX_CAPACITY)
 
-    gameSpeedIcon = Sprite.fromImage('images/ui/gamespeed1.png')
+    const gameSpeedIcon = Sprite.fromImage('gamespeed1.png')
     gameSpeedIcon.position.x = 380
     gameSpeedIcon.position.y = topBarContentOffsetY
     uiTopBar.addChild(gameSpeedIcon)
+    setGameSpeedIcon(gameSpeedIcon)
 
     ui.addChild(uiTopBar)
 
-    pauseFrame = new Graphics()
+    const pauseFrame = new Graphics()
     pauseFrame.lineStyle(6, colorToHex(colors.darkOrange))
     pauseFrame.drawRect(0, 0, WIDTH / 2, HEIGHT / 2)
     ui.addChild(pauseFrame)
+    setPauseFrame(pauseFrame)
   }
 
   // sun
-  sun = new Container()
-  const summerSunSprite = Sprite.fromImage('images/scene/summer-sun.png')
-  const winterSunSprite = Sprite.fromImage('images/scene/winter-sun.png')
-  
+  const sun = new Container()
+  const summerSunSprite = Sprite.fromImage('summer-sun.png')
+  const winterSunSprite = Sprite.fromImage('winter-sun.png')
+
   sun.winterSun = winterSunSprite
   sun.summerSun = summerSunSprite
 
@@ -200,61 +303,66 @@ function setupGame() {
   sun.addChild(summerSunSprite)
   sun.addChild(winterSunSprite)
 
+  setSun(sun)
   background.addChild(sun)
-  
+
   addTicker('ui', time => {
-    setGameSpeedText()
+    updateGameSpeedText()
 
     sun.position.x = 290
     sun.position.y = 290 - (Math.sin((hour / 24) * Math.PI) * 45)
   })
 
-  backgroundScene = Sprite.fromImage(`images/scene/${backgroundImage}.png`)
+  const backgroundScene = Sprite.fromImage(`${backgroundImage}.png`)
   backgroundScene.interactive = true
-  backgroundScene.mouseup = () => setSelected(null)
+  backgroundScene.mouseup = () => updateSelected(null)
+  setBackgroundScene(backgroundScene)
   background.addChild(backgroundScene)
 
   // angel bubble
-  angelBubble = Sprite.fromImage('images/scene/sun-bubble.png')
+  const angelBubble = Sprite.fromImage('sun-bubble.png')
   angelBubble.position.x = -7
   angelBubble.position.y = 18
+  setAngelBubble(angelBubble)
 
-  angelBubbleText = new PIXI.Text('', { ...fontConfig, ...smallFont, fill: colors.darkGray })
+  const angelBubbleText = new Text('', { ...fontConfig, ...smallFont, fill: colors.darkGray })
   angelBubbleText.position.x = 9
   angelBubbleText.position.y = 6
   angelBubble.addChild(angelBubbleText)
-  
-  angelBubbleTimer = FPS * 5
-  
+  setAngelBubbleText(angelBubbleText)
+
+  setAngelBubbleTimer(fps * 5)
+
   addTicker('ui', time => {
     if (angelBubble.parent) {
-      angelBubbleTimer -= 1
+      setAngelBubbleTimer(angelBubbleTimer - 1)
       if (angelBubbleTimer <= 0) {
         angelBubble.parent.removeChild(angelBubble)
       }
     }
   })
 
-  const jobsPanel = Sprite.fromImage('images/ui/ui-jobs-panel.png')
+  const jobsPanel = Sprite.fromImage('ui-jobs-panel.png')
   jobsPanel.position.x = 20
   jobsPanel.position.y = 25
   uiHangarComponents.addChild(jobsPanel)
-  
+
   addJobsButtons(jobsPanel)
 
   const jobs = ['idle', 'forager', 'nurser', 'worker']
-  
+
   jobs.forEach((type, idx) => {
-    const jobCounterHex = new Sprite.fromImage('images/ui/button-jobs/button-alt.png')
+    // eslint-disable-next-line new-cap
+    const jobCounterHex = new Sprite.fromImage('button-jobs/button-alt.png')
     jobCounterHex.position.x = 63
     jobCounterHex.position.y = (idx * 38) + 3
     jobsPanel.addChild(jobCounterHex)
 
-    const textLabel = new PIXI.Text('-', { ...fontConfig, ...smallFont, fill: '#4b0b12' })
+    const textLabel = new Text('-', { ...fontConfig, ...smallFont, fill: '#4b0b12' })
     textLabel.position.x = 12
     textLabel.position.y = 3
     textLabel.anchor.set(1, 0)
-    
+
     addTicker('ui', time => {
       const aliveBees = bees.filter(b => !b.isDead() && !b.isDying())
       textLabel.text = aliveBees.filter(b => b.type === type).length
@@ -262,28 +370,30 @@ function setupGame() {
 
     jobCounterHex.addChild(textLabel)
   })
-  
+
   addTicker('ui', time => {
     const aliveBees = bees.filter(b => !b.isDead() && !b.isDying())
     populationText.text = aliveBees.length + 1
   })
-  
-  hexGrid = new Array(HEX_AMOUNT_HEIGHT).fill().map((_, y) => 
-    new Array(HEX_AMOUNT_WIDTH).fill().map((_, x) => cellDisabled(x, y, hexForeground))
+
+  setHexGrid(
+    new Array(HEX_AMOUNT_HEIGHT).fill().map((_, y) =>
+      new Array(HEX_AMOUNT_WIDTH).fill().map((_, x) => cellDisabled(x, y, hexForeground))
+    )
   )
-  
-  selectedSprite = new Container()
+
+  const selectedSprite = new Container()
   selectedSprite.visible = false
-  const selectedSpriteSub = Sprite.fromImage('images/ui/selection-cell.png')
-  selectedSprite.addChild(selectedSpriteSub)  
+  const selectedSpriteSub = Sprite.fromImage('selection-cell.png')
+  selectedSprite.addChild(selectedSpriteSub)
   addTicker('ui', time => {
     if (selected) {
       if (selected.label === 'bee') {
-        selectedSpriteSub.texture = Texture.fromImage('images/ui/selection-circle.png')
+        selectedSpriteSub.texture = Texture.fromImage('selection-circle.png')
         selectedSprite.position.x = selected.position.x - 1
         selectedSprite.position.y = selected.position.y - 3
       } else {
-        selectedSpriteSub.texture = Texture.fromImage('images/ui/selection-cell.png')
+        selectedSpriteSub.texture = Texture.fromImage('selection-cell.png')
         selectedSprite.position.x = selected.position.x
         selectedSprite.position.y = selected.position.y
       }
@@ -294,7 +404,7 @@ function setupGame() {
   })
   ui.addChild(selectedSprite)
 
-  hoverCellSprite = Sprite.fromImage('images/ui/hover-cell.png')
+  const hoverCellSprite = Sprite.fromImage('hover-cell.png')
   hoverCellSprite.visible = false
   addTicker('ui', () => {
     if (hoveredCells.length) {
@@ -307,12 +417,12 @@ function setupGame() {
   })
   ui.addChild(hoverCellSprite)
 
-  
-  hiveHole = Sprite.fromImage('images/scene/hive-hole.png')
+  const hiveHole = Sprite.fromImage('hive-hole.png')
   hiveHole.position.x = 200
   hiveHole.position.y = 214
   hiveHole.anchor.x = 0.5
   hiveHole.anchor.y = 1
+  setHiveHole(hiveHole)
   // foreground.addChild(hiveHole) // don't add it
 
   {
@@ -321,11 +431,11 @@ function setupGame() {
     haveFoodContainer.position.y = 79
     haveFoodContainer.visible = true
     ui.addChild(haveFoodContainer)
-    
-    const haveFoodLabel = new PIXI.Text(`Winter food`, { ...fontConfig, ...smallFont, fill: 'gray' })
+
+    const haveFoodLabel = new Text('Winter food', { ...fontConfig, ...smallFont, fill: 'gray' })
     haveFoodContainer.addChild(haveFoodLabel)
 
-    const haveWinterFood = Sprite.fromImage('images/ui/have-winter-food-progress-background.png')
+    const haveWinterFood = Sprite.fromImage('have-winter-food-progress-background.png')
     haveWinterFood.position.x = 61
     haveFoodContainer.addChild(haveWinterFood)
 
@@ -339,7 +449,7 @@ function setupGame() {
       })
       const totalBees = bees.filter(bee => bee.type !== 'bookie').length
       return (meetRequirement / totalBees) * 100
-    }, 100)) 
+    }, 100))
   }
 
   const clickblocker = new Container()
@@ -358,28 +468,30 @@ function setupGame() {
     blocker.visible = gameover
   })
 
-  panel = new Container()
+  const panel = new Container()
   ui.addChild(panel)
+  setPanel(panel)
 
   createWarningSign()
-  createSeasonTracker()
-  
+  createSeasonTracker(uiTopBar)
+
   createQueen(beeContainer)
   currentMapInit(beeContainer)
-  createFlowers()
+  createFlowers(flowerBed)
 
-  createGameOverUI()
+  createGameOverUI(sceneManager, ui)
 
   app.ticker.add(gameloop)
-  
-  function handleVisibilityChange() {
+
+  function handleVisibilityChange () {
     if (document.visibilityState === 'hidden') {
-      paused = true
+      setPaused(true)
       app.ticker.stop()
     } else {
       app.ticker.start()
     }
-    window.setGameSpeedText()
   }
   document.addEventListener('visibilitychange', handleVisibilityChange, false)
 }
+
+export default GameScene

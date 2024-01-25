@@ -1,12 +1,34 @@
+import { WIDTH, HEIGHT } from '../config'
+import { Container, Text, Graphics, Sprite, Texture } from 'pixi.js'
+import Bezier from '../bezier'
+import { Button } from '../ui'
 
-function setupSplash() {
-  scene = 'splash'
+class SplashScene extends Container {
+  constructor (sceneManager) {
+    super()
+
+    this.sceneManager = sceneManager
+
+    const text = new Text('Splash Scene', { fill: 0xffffff })
+    text.position.set(50, 50)
+    this.addChild(text)
+  }
+
+  init () {
+    setup.bind(this)()
+  }
+}
+
+function setup () {
+  const _container = this
+  const sceneManager = this.sceneManager
+
   document.body.style['background-color'] = '#fff6c5'
-    
+
   const container = new Container()
   container.scale.x = 2
   container.scale.y = 2
-  app.stage.addChild(container)
+  _container.addChild(container)
 
   const splashscreen = new Graphics()
   splashscreen.beginFill(0xffd601)
@@ -16,14 +38,15 @@ function setupSplash() {
   const text = new Container()
   container.addChild(text)
 
-  const logo = new Sprite.fromImage('images/splash/logo.png')
+  // eslint-disable-next-line new-cap
+  const logo = new Sprite.fromImage('logo.png')
   logo.position.x = 10
   logo.position.y = 50
   container.addChild(logo)
 
-  const welcomeFlapA = Texture.fromImage('images/bee/bee-drone-flap.png')
-  const welcomeFlapB = Texture.fromImage('images/bee/bee-drone-flop.png')
-  const welcomeFlapC = Texture.fromImage('images/bee/bee-drone-reference.png')
+  const welcomeFlapA = Texture.fromImage('bee-drone-flap.png')
+  const welcomeFlapB = Texture.fromImage('bee-drone-flop.png')
+  const welcomeFlapC = Texture.fromImage('bee-drone-reference.png')
   const welcomeSplashBee = new Sprite(welcomeFlapA)
   welcomeSplashBee.scale.x = 2
   welcomeSplashBee.scale.y = 2
@@ -37,16 +60,8 @@ function setupSplash() {
     [-50, -50],
     [10, 90],
     [110, 100],
-    [targetX, targetY],
+    [targetX, targetY]
   ]
-  points.forEach(point => {
-    return
-    const [x, y] = point
-    const p = new Graphics()
-    p.beginFill(0xff0000)
-    p.drawRect(x, y, 2, 2)
-    container.addChild(p)
-  })
   const beeBezier = new Bezier(
     ...points.flatMap(p => p)
   )
@@ -57,7 +72,7 @@ function setupSplash() {
   const fadeoutLUT = fadeout.getLUT(LUT_MAX)
 
   const luts = beeBezier.getLUT(LUT_MAX)
-  
+
   let counter = 0
 
   const interval = setInterval(() => {
@@ -67,53 +82,30 @@ function setupSplash() {
     counter++
 
     welcomeSplashBee.texture = counter % 10 < 5 ? welcomeFlapA : welcomeFlapB
-    
+
     if (counter >= LUT_MAX) {
       clearInterval(interval)
       welcomeSplashBee.texture = welcomeFlapC
     }
   }, 16.66)
 
-  const welcomeHoney = Sprite.fromImage('images/hex/honey/cell-honey-full.png')
+  const welcomeHoney = Sprite.fromImage('honey/cell-honey-full.png')
   welcomeHoney.scale.x = 2
   welcomeHoney.scale.y = 2
   welcomeHoney.position.x = Math.round(WIDTH / 2 / 2) + 5
   welcomeHoney.position.y = Math.round(HEIGHT / 2 / 2) - 1
   container.addChild(welcomeHoney)
 
-  const callbackA = () => {
-    app.stage.removeChild(container)
-    setupDebugMenu()
-  }
-  const callbackB = () => {
-    app.stage.removeChild(container)
-    setupWorldMap()
-  }
-  const callbackC = () => {
-    app.stage.removeChild(container)
-    setupWorldMap2()
-  }
-  const callbackD = () => {
-    // This is the "official" one
-    app.stage.removeChild(container)
-    setupWorldMap3()
-  }
   const scaler = new Container()
   scaler.scale.x = 2
   scaler.scale.y = 2
   container.addChild(scaler)
 
-  
-  // const buttonA = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 0), '  Play', callbackA)
-  // scaler.addChild(buttonA)
+  const buttonA = Button(Math.round(WIDTH / 2 / 2 / 2) - 20, 100 + (12 * 1), '  Play', () => sceneManager.goToScene('level-select'))
+  scaler.addChild(buttonA)
 
-  const buttonB = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 0), 'World Map', setupWorldMap3)
+  const buttonB = Button(Math.round(WIDTH / 2 / 2 / 2) - 20, 100 + (12 * 2), 'Debug menu', () => sceneManager.goToScene('debug-menu'))
   scaler.addChild(buttonB)
-  
-  // const buttonC = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 2), 'World Map 2', callbackC)
-  // scaler.addChild(buttonC)
-  
-  // const buttonD = Button(Math.round(WIDTH/2/2/2)-20, 100 + (12 * 1), 'World Map 1', callbackB)
-  // scaler.addChild(buttonD)
-
 }
+
+export default SplashScene

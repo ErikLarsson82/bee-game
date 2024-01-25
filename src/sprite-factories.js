@@ -1,6 +1,18 @@
+import { Sprite } from 'pixi.js'
+import {
+  hoveredCells,
+  setHoveredCells,
+  gameSpeed,
+  flowers,
+  hexGrid
+} from './game/game-state'
+import { addTicker, updateSelected } from './exported-help-functions'
+import { secondsToTicks } from './framerate'
+import { filterHexagon } from './hex'
+import { samePosition } from './pure-help-functions'
 
-function makeSelectable(sprite, label, shape) {
-  const hoverCellSprite = Sprite.fromImage('images/ui/hover-cell.png')
+export function makeSelectable (sprite, label, shape) {
+  const hoverCellSprite = Sprite.fromImage('hover-cell.png')
   hoverCellSprite.visible = false
 
   sprite.addChild(hoverCellSprite)
@@ -20,32 +32,32 @@ function makeSelectable(sprite, label, shape) {
     if (shape === 'round') {
       sprite.alpha = 1
     } else if (shape === 'hex') {
-      hoveredCells = hoveredCells.filter((cell) => cell !== sprite)
+      setHoveredCells(hoveredCells.filter((cell) => cell !== sprite))
     }
   }
-  sprite.mousedown = () => setSelected(sprite)
+  sprite.mousedown = () => updateSelected(sprite)
 }
 
-function makeHexagon(sprite, x, y, type) {
+export function makeHexagon (sprite, x, y, type) {
   sprite.type = type
   sprite.index = { x, y }
   sprite.bonuses = []
 }
 
-function makeUpgradeable(sprite) {
+export function makeUpgradeable (sprite) {
   sprite.upgrades = []
   sprite.hasUpgrade = type => sprite.upgrades.includes(type)
   sprite.addUpgrade = type => sprite.upgrades.push(type)
 }
 
-function makeOccupiable(parent) {
-  const spotClaimed = PIXI.Sprite.fromImage('images/ui/spot-claimed.png')
+export function makeOccupiable (parent) {
+  const spotClaimed = Sprite.fromImage('spot-claimed.png')
   spotClaimed.visible = false
   parent.addChild(spotClaimed)
 
   parent.slot = null
   parent.slotCounter = 0
-  
+
   parent.isUnclaimed = attemptee => {
     if (!attemptee) {
       console.error('Needs input')
@@ -70,9 +82,7 @@ function makeOccupiable(parent) {
   })
 }
 
- 
-
-function makeHexDetectable(bee) {
+export function makeHexDetectable (bee) {
   bee.isAtType = type => {
     const hexesInGrid = filterHexagon(hexGrid, hex => hex.type === type && samePosition(bee, hex))
     if (hexesInGrid.length > 0) return hexesInGrid[0]
@@ -82,4 +92,3 @@ function makeHexDetectable(bee) {
     return null
   }
 }
-
