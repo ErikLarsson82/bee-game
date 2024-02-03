@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "npm run build && npm run webpack-watch",
     "build": "sh build.sh",
-    "start": "npx serve",
+    "start": "npx serve dist/",
     "webpack": "npx webpack",
     "webpack-watch": "npx webpack --watch",
     "babel": "npx babel src --out-dir dist",
