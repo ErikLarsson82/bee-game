@@ -1,6 +1,7 @@
 import { createBee } from './bee'
 import { setSeeds } from './game/game-state'
 import { replaceHex } from './exported-help-functions'
+import { HEX_AMOUNT_HEIGHT, HEX_AMOUNT_WIDTH } from './hex'
 
 const MAP_CONFIGURATIONS = [
   {
@@ -215,7 +216,46 @@ const MAP_CONFIGURATIONS = [
     killNonPollinatedFlowers: true,
     backgroundColor: 0x2ce8f5,
     init: (parent) => {
-      const m = 'test brood' //    <------ here
+      const m = 'all-prepared-done' //    <------ here
+
+      if (m === 'all-empty') {
+        createBee(parent, 'idle').setBoosted(true)
+        // createBee(parent, 'idle')
+        // createBee(parent, 'idle')
+        // createBee(parent, 'idle')
+        // createBee(parent, 'idle')
+
+        for (let i = 0; i < HEX_AMOUNT_HEIGHT; i++) {
+          for (let j = 0; j < HEX_AMOUNT_WIDTH; j++) {
+            replaceHex([j, i], 'empty')
+          }
+        }
+
+        for (let i = 4; i < 8; i++) {
+          for (let j = 4; j < 8; j++) {
+            replaceHex([j, i], 'nectar', 'activate')
+            // replaceHex([j, i], 'prepared', 'activate').instantlyPrepare()
+          }
+        }
+
+        return
+      }
+
+      if (m === 'all-prepared-done') {
+        createBee(parent, 'idle')
+        createBee(parent, 'idle')
+        createBee(parent, 'idle')
+        createBee(parent, 'idle')
+        createBee(parent, 'idle')
+
+        for (let i = 0; i < HEX_AMOUNT_HEIGHT; i++) {
+          for (let j = 0; j < HEX_AMOUNT_WIDTH; j++) {
+            replaceHex([j, i], 'prepared', 'activate').instantlyPrepare()
+          }
+        }
+
+        return
+      }
 
       if (m === 'test brood') {
         // I want this to be the beginner level
