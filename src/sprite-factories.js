@@ -78,7 +78,7 @@ export function makeOccupiable (parent) {
         parent.slot = null
       }
     }
-    // spotClaimed.visible = !!parent.slot // enable for debug
+    spotClaimed.visible = !!parent.slot // enable for debug
   })
 }
 

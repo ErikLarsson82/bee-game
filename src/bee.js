@@ -384,32 +384,45 @@ export function createBee (parent, type, startPosition) {
     return false
   }
 
-  function flyToFlowerToPollinate () {
-    if (isPollenSackEmpty() || season === 'winter') return false
-    const needsPollination = flower => flower.pollinationLevel < flower.POLLINATION_REQUIREMENT
-    const flower = flowers.filter(needsPollination)[0]
+  function flyToFlowerToPollinateV2 () {
+    console.log(flowers.flatMap(flower => flower.subFlowers))
+    const subFlower = flowers.flatMap(flower => flower.subFlowers).find(subF => subF.isUnclaimed(bee))
+    // const needsResource = !(isPollenSackFull() && isNectarSackFull())
 
-    if (!flower) return false
-
-    bee.flyTo(flower)
-    return true
-  }
-
-  function pollinateFlower () {
-    const flower = bee.isAtType('flower')
-    if (!flower || season === 'winter') return false
-    if (isPollenSackEmpty() || flower.isPollinated()) {
-      bee.position.y = flower.position.y - 5
+    if (subFlower && season === 'summer') {
+      subFlower.claimSlot(bee)
+      bee.flyTo(subFlower)
       return true
     }
-    flower.claimSlot(bee)
-    flower.pollinationLevel += transferTo(flower.POLLINATION_REQUIREMENT).inSeconds(200)
-    flower.pollinationLevel = cap(0, flower.POLLINATION_REQUIREMENT)(flower.pollinationLevel)
-
-    bee.pollenSack -= transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(40)
-    bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
-    return true
+    return false
   }
+
+  // function flyToFlowerToPollinate () {
+  //   if (isPollenSackEmpty() || season === 'winter') return false
+  //   const needsPollination = flower => flower.pollinationLevel < flower.POLLINATION_REQUIREMENT
+  //   const flower = flowers.filter(needsPollination)[0]
+
+  //   if (!flower) return false
+
+  //   bee.flyTo(flower)
+  //   return true
+  // }
+
+  // function pollinateFlower () {
+  //   const flower = bee.isAtType('flower')
+  //   if (!flower || season === 'winter') return false
+  //   if (isPollenSackEmpty() || flower.isPollinated()) {
+  //     bee.position.y = flower.position.y - 5
+  //     return true
+  //   }
+  //   flower.claimSlot(bee)
+  //   flower.pollinationLevel += transferTo(flower.POLLINATION_REQUIREMENT).inSeconds(200)
+  //   flower.pollinationLevel = cap(0, flower.POLLINATION_REQUIREMENT)(flower.pollinationLevel)
+
+  //   bee.pollenSack -= transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(40)
+  //   bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
+  //   return true
+  // }
 
   function depositPollen () {
     const hex = bee.isAtType('pollen')
@@ -649,12 +662,12 @@ export function createBee (parent, type, startPosition) {
     }
   }
 
-  function broodsAreDoneForTheSeason () {
-    const isDone = hex => ['dead', 'puppa'].includes(hex.content)
-    const unfinishedHexes = filterHexagon(hexGrid, hex => hex.type === 'brood' && !isDone(hex) && hex.paused === false)
+  // function broodsAreDoneForTheSeason () {
+  //   const isDone = hex => ['dead', 'puppa'].includes(hex.content)
+  //   const unfinishedHexes = filterHexagon(hexGrid, hex => hex.type === 'brood' && !isDone(hex) && hex.paused === false)
 
-    return unfinishedHexes.length === 0
-  }
+  //   return unfinishedHexes.length === 0
+  // }
 
   function idle () {
     if (dying()) return
@@ -681,6 +694,7 @@ export function createBee (parent, type, startPosition) {
     if (flyToNectarToDeposit()) return
     if (flyToPollenToDeposit()) return
     if (flyToFlowerToCollect()) return
+    if (flyToFlowerToPollinateV2()) return
     if (flyToRestingPlace()) return
     bee.flyTo(null)
   }
@@ -691,10 +705,10 @@ export function createBee (parent, type, startPosition) {
     if (bee.feedBee()) return
     if (boost()) return
     if (refillPollen()) return
-    if (broodsAreDoneForTheSeason()) {
-      if (pollinateFlower()) return
-      if (flyToFlowerToPollinate()) return
-    }
+    // if (broodsAreDoneForTheSeason()) {
+    //   if (pollinateFlower()) return
+    //   if (flyToFlowerToPollinate()) return
+    // }
     if (nurseBroodling()) return
     if (season !== 'summer') {
       if (cleanBrood()) return
@@ -702,6 +716,10 @@ export function createBee (parent, type, startPosition) {
     }
     if (flyToPollenToRefill()) return
     if (flyToBroodling()) return
+    if (convertNectar()) return
+    if (flyToNectarToConvert()) return
+    if (depositHoney()) return
+    if (flyToHoneyToDeposit()) return
     bee.flyTo(null)
   }
 
@@ -720,8 +738,8 @@ export function createBee (parent, type, startPosition) {
     if (refillWax()) return
     if (prepareCell()) return
     if (flyToPrepareCell()) return
-    if (flyToWax()) return
     if (flyToNectarToConvert()) return
+    if (flyToWax()) return
     bee.flyTo(null)
   }
 
@@ -785,7 +803,8 @@ export function createBee (parent, type, startPosition) {
 
   function convertNectar () {
     const hex = bee.isAtType('nectar')
-    if (!hex || isHoneySackFull()) return false
+    if (!hex || (isHoneySackFull() && !isHoneySackEmpty())) return false
+    console.log('im converting nectar')
     hex.claimSlot(bee)
 
     const duration = bee.isBoosted() ? 15 : 30

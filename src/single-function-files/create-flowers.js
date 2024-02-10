@@ -22,15 +22,16 @@ export function createFlowers (_flowerBed) {
   flowers.forEach(flower => {
     flower.removeChild(flower.flowerSprite)
     delete flower.flowerSprite
+    flower.subFlowers.map(subF => flowerBed.removeChild(subF))
     flowerBed.removeChild(flower)
   })
   setFlowers([])
 
   // then, create flowers
-  for (let f = 1; f <= seeds; f++) {
+  for (let f = 1; f <= 3; f++) {
     const flower = Sprite.fromImage('flower.png')
 
-    const flipped = Math.random() < 0.5
+    const flipped = false // Math.random() < 0.5
 
     const exclamationTextures = {
       mild: Texture.fromImage('exclamation-warning-mild.png'),
@@ -111,6 +112,21 @@ export function createFlowers (_flowerBed) {
     })
 
     flowers.push(flower)
+
+    // Add sub-flower pollination spot
+    const subFlowerA = new Sprite()
+    subFlowerA.position.x = flower.position.x - 10
+    subFlowerA.position.y = flower.position.y - 10
+    makeOccupiable(subFlowerA)
+    flowerBed.addChild(subFlowerA)
+
+    const subFlowerB = new Sprite()
+    subFlowerB.position.x = flower.position.x + 10
+    subFlowerB.position.y = flower.position.y - 10
+    makeOccupiable(subFlowerB)
+    flowerBed.addChild(subFlowerB)
+
+    flower.subFlowers = [subFlowerA, subFlowerB]
   }
 }
 
