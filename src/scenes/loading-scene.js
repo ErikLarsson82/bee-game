@@ -14,6 +14,11 @@ class LoadingScene extends Container {
   init () {
     const sceneManager = this.sceneManager
     loader.add('ironchest-bee.ttf')
+    loader.add('butterfly-flying', 'images/butterfly/butterfly_flying.png')
+    loader.add('butterfly-perched', 'images/butterfly/butterfly_perched.png')
+    loader.add('images/butterfly/butterfly_v2_flying.png')
+    loader.add('images/butterfly/butterfly_v2_flying_green.png')
+    loader.add('images/butterfly/butterfly_v2_flying_blue.png')
     loader.add('sheet', 'spritesheet.json')
     loader.load(() => sceneManager.goToScene('splash'))
     // loader.load(step2)

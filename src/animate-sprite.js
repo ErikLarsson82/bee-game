@@ -11,8 +11,8 @@ export function animateSprite (sprite, name, amount, w, h, _loop, callback, _tim
   // eslint-disable-next-line new-cap
   const baseTexture = new BaseTexture.from(texture)
   const resourceFrames = loader.resources.sheet.data.frames[name]
-  if (resourceFrames === undefined) throw new Error(`sprite named ${name} is missing`)
-  const offset = resourceFrames.frame
+  // if (resourceFrames === undefined) throw new Error(`sprite named ${name} is missing`)
+  const offset = resourceFrames && resourceFrames.frame || { x: 0, y: 0 }
 
   const frames = []
   const offx = offset.x

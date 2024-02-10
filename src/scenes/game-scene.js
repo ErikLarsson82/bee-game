@@ -3,6 +3,7 @@ import app from '../setup-pixi'
 import { WIDTH, HEIGHT, fontConfig, smallFont, colors } from '../config'
 import { fps, setFps } from '../framerate'
 import { forEachHexagon, HEX_AMOUNT_HEIGHT, HEX_AMOUNT_WIDTH } from '../hex'
+import { animateSprite } from '../animate-sprite'
 import { cellDisabled } from '../cells'
 import { ProgressBar2 } from '../ui'
 import {
@@ -166,7 +167,31 @@ function setupGame () {
 
   const foreground = new Container()
   container.addChild(foreground)
-  setForeground(foreground)
+  setForeground(foreground);
+
+  (['', '_green', '_blue', '_brown', '_brown_no']).forEach(x => {
+    const butterflyFlying = new Sprite()
+    const anim = animateSprite(butterflyFlying, `images/butterfly/butterfly_v2_flying${x}.png`, 7, 30, 30)
+    butterflyFlying.position.x = (Math.random() * 200) + 100
+    butterflyFlying.position.y = (Math.random() * 100) + 200
+
+    const dira = Math.random() > 0.5 ? 1 : -1
+    const dirb = Math.random() > 0.5 ? 1 : -1
+    const dirc = Math.random() > 0.5 ? 1 : -1
+
+    const vecx = (Math.random() + 0.1) * 0.3 * dira
+    const vecy = (Math.random() + 0.1) * 0.3 * dirb
+
+    butterflyFlying.scale.set(dirc , 1)
+
+    addTicker('ui', time => {
+      butterflyFlying.position.x = butterflyFlying.position.x + vecx
+      butterflyFlying.position.y = butterflyFlying.position.y + vecy
+    })
+
+    // window.farmor = butterflyFlying
+    foreground.addChild(butterflyFlying)
+  })
 
   const ui = new Container()
   container.addChild(ui)
