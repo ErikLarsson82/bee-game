@@ -43,7 +43,8 @@ import {
   updateGameSpeedText,
   addTicker,
   updateTotals,
-  addJobsButtons
+  addJobsButtons,
+  setPixelPerfect
 } from '../exported-help-functions'
 
 import { createWarningSign } from '../single-function-files/create-warning-sign'
@@ -192,44 +193,52 @@ function setupGame () {
 
     const topBarContentOffsetY = 5
 
-    const colonyLabel = new Text('HIVE POPULATION', { ...fontConfig, ...smallFont, fill: colors.orange })
+    const colonyLabel = new Text('HIVE POPULATION', { ...fontConfig, fill: colors.orange })
+    setPixelPerfect(colonyLabel)
     colonyLabel.position.x = 8
     colonyLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(colonyLabel)
 
-    const gameSpeedLabel = new Text('GAME SPEED', { ...fontConfig, ...smallFont, fill: colors.orange })
+    const gameSpeedLabel = new Text('GAME SPEED', { ...fontConfig, fill: colors.orange })
+    setPixelPerfect(gameSpeedLabel)
     gameSpeedLabel.position.x = 337
     gameSpeedLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(gameSpeedLabel)
 
-    populationText = new Text('1', { ...fontConfig, ...smallFont, fill: colors.yellow })
+    populationText = new Text('1', { ...fontConfig, fill: colors.yellow })
+    setPixelPerfect(populationText)
     populationText.position.x = 72
     populationText.position.y = topBarContentOffsetY
     uiTopBar.addChild(populationText)
 
-    const seasonText = new Text('-', { ...fontConfig, ...smallFont, fill: 'white' })
+    const seasonText = new Text('-', { ...fontConfig, fill: 'white' })
+    setPixelPerfect(seasonText)
     seasonText.position.x = 236
     seasonText.position.y = topBarContentOffsetY + 8
     uiTopBar.addChild(seasonText)
 
-    const timelineText = new Text('Year   Day   Hour', { ...fontConfig, ...smallFont, fill: '#8b9bb4' })
+    const timelineText = new Text('Year   Day   Hour', { ...fontConfig, fill: '#8b9bb4' })
+    setPixelPerfect(timelineText)
     timelineText.position.x = 110
     timelineText.position.y = topBarContentOffsetY
     uiTopBar.addChild(timelineText)
 
-    const yearLabel = new Text('-', { ...fontConfig, ...smallFont })
+    const yearLabel = new Text('-', { ...fontConfig })
+    setPixelPerfect(yearLabel)
     yearLabel.anchor.set(1, 0)
     yearLabel.position.x = 134
     yearLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(yearLabel)
 
-    const dayLabel = new Text('-', { ...fontConfig, ...smallFont })
+    const dayLabel = new Text('-', { ...fontConfig })
+    setPixelPerfect(dayLabel)
     dayLabel.anchor.set(1, 0)
     dayLabel.position.x = 158
     dayLabel.position.y = topBarContentOffsetY
     uiTopBar.addChild(dayLabel)
 
-    const hourLabel = new Text('-', { ...fontConfig, ...smallFont })
+    const hourLabel = new Text('-', { ...fontConfig })
+    setPixelPerfect(hourLabel)
     hourLabel.anchor.set(1, 0)
     hourLabel.position.x = 188
     hourLabel.position.y = topBarContentOffsetY
@@ -240,29 +249,33 @@ function setupGame () {
       dayLabel.text = day
       hourLabel.text = Math.round(hour)
 
-      const label = season === 'summer' ? 'Summer' : 'Winter'
+      const label = season === 'summer' ? 'SUMMER' : 'WINTER'
       const count = season === 'summer' ? currentSeasonLength + 1 - day : currentSeasonLength + previousSeasonLength + 1 - day
-      seasonText.text = `${label} - ${count} days left`
+      seasonText.text = `${label} - ${count} DAYS LEFT`
     })
 
     function summaryLabel (type, y, color, funcA, funcB) {
-      const descriptionLabel = new Text(type, { ...fontConfig, ...smallFont, fill: '#8b9bb4' })
+      const descriptionLabel = new Text(type.toUpperCase(), { ...fontConfig, fill: '#8b9bb4' })
+      setPixelPerfect(descriptionLabel)
       descriptionLabel.position.x = 322
       descriptionLabel.position.y = y
       uiTopBar.addChild(descriptionLabel)
 
-      const divider = new Text('/', { ...fontConfig, ...smallFont, fill: '#8b9bb4' })
+      const divider = new Text('/', { ...fontConfig, fill: '#8b9bb4' })
+      setPixelPerfect(divider)
       divider.position.x = 370
       divider.position.y = y
       uiTopBar.addChild(divider)
 
-      const valueLabel = new Text('-', { ...fontConfig, ...smallFont, fill: color })
+      const valueLabel = new Text('-', { ...fontConfig, fill: color })
+      setPixelPerfect(valueLabel)
       valueLabel.anchor.set(1, 0)
       valueLabel.position.x = 366
       valueLabel.position.y = y
       uiTopBar.addChild(valueLabel)
 
-      const capacityLabel = new Text('-', { ...fontConfig, ...smallFont, fill: color })
+      const capacityLabel = new Text('-', { ...fontConfig, fill: color })
+      setPixelPerfect(capacityLabel)
       capacityLabel.anchor.set(1, 0)
       capacityLabel.position.x = 396
       capacityLabel.position.y = y
@@ -326,7 +339,8 @@ function setupGame () {
   angelBubble.position.y = 18
   setAngelBubble(angelBubble)
 
-  const angelBubbleText = new Text('', { ...fontConfig, ...smallFont, fill: colors.darkGray })
+  const angelBubbleText = new Text('', { ...fontConfig, fill: colors.darkGray })
+  setPixelPerfect(angelBubbleText)
   angelBubbleText.position.x = 9
   angelBubbleText.position.y = 6
   angelBubble.addChild(angelBubbleText)
@@ -358,14 +372,17 @@ function setupGame () {
     jobCounterHex.position.y = (idx * 38) + 3
     jobsPanel.addChild(jobCounterHex)
 
-    const textLabel = new Text('-', { ...fontConfig, ...smallFont, fill: '#4b0b12' })
+    const textLabel = new Text('-', { ...fontConfig, fill: '#4b0b12' })
+    setPixelPerfect(textLabel)
     textLabel.position.x = 12
     textLabel.position.y = 3
     textLabel.anchor.set(1, 0)
 
     addTicker('ui', time => {
       const aliveBees = bees.filter(b => !b.isDead() && !b.isDying())
-      textLabel.text = aliveBees.filter(b => b.type === type).length
+      const amount = aliveBees.filter(b => b.type === type).length
+      textLabel.text = amount
+      textLabel.position.x = amount > 9 ? 14 : 12
     })
 
     jobCounterHex.addChild(textLabel)
@@ -483,7 +500,7 @@ function setupGame () {
 
   for (let i = winterHungerMultiplier; i > 0; i--) {
     const snowball = Sprite.fromImage('images/ui/snowball.png')
-    snowball.position.x = 244 - (i * 6)
+    snowball.position.x = 244 - (i * 8)
     snowball.position.y = 5
     window.snowball = snowball
     ui.addChild(snowball)

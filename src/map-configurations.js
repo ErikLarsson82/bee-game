@@ -250,6 +250,15 @@ const MAP_CONFIGURATIONS = [
         createBee(parent, 'idle')
         createBee(parent, 'idle')
         createBee(parent, 'idle')
+        createBee(parent, 'idle')
+        createBee(parent, 'idle')
+        createBee(parent, 'idle')
+        createBee(parent, 'idle')
+        createBee(parent, 'idle')
+        createBee(parent, 'idle')
+        createBee(parent, 'idle')
+        createBee(parent, 'idle')
+        createBee(parent, 'idle')
 
         for (let i = 0; i < HEX_AMOUNT_HEIGHT; i++) {
           for (let j = 0; j < HEX_AMOUNT_WIDTH; j++) {

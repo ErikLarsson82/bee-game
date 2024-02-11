@@ -1,7 +1,7 @@
 import { Texture, Sprite, Container, Text } from 'pixi.js'
 import { flowers, setFlowers, seeds, setSeeds, selected, season, hour, killNonPollinatedFlowers } from '../game/game-state'
 import { makeOccupiable, makeSelectable } from '../sprite-factories'
-import { addTicker, updateSelected, isDayBeforeWinter } from '../exported-help-functions'
+import { addTicker, updateSelected, isDayBeforeWinter, setPixelPerfect } from '../exported-help-functions'
 import { WIDTH, fontConfig } from '../config'
 import { ProgressBar } from '../ui'
 
@@ -74,13 +74,13 @@ export function createFlowers (_flowerBed) {
       container.addChild(ProgressBar(124, -15, 'flower', () => flower.pollinationLevel, flower.POLLINATION_REQUIREMENT))
 
       const textHeading = new Text('FLOWER', { ...fontConfig })
-      textHeading.scale.set(0.15, 0.15)
+      setPixelPerfect(textHeading)
       textHeading.position.x = 105
       textHeading.position.y = -26
       container.addChild(textHeading)
 
       const textDescription = new Text('POLLINATED', { ...fontConfig, fill: '#96a5bc' })
-      textDescription.scale.set(0.15, 0.15)
+      setPixelPerfect(textDescription)
       textDescription.position.x = 82
       textDescription.position.y = -16
       container.addChild(textDescription)

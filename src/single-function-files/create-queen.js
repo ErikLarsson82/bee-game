@@ -1,7 +1,7 @@
 import { Text, Sprite, Container } from 'pixi.js'
 import { makeSelectable, makeHexDetectable } from '../sprite-factories'
 import { makeFlyable } from '../bee-factories'
-import { addTicker, transferTo, goIdle } from '../exported-help-functions'
+import { addTicker, transferTo, goIdle, setPixelPerfect } from '../exported-help-functions'
 import { filterHexagon } from '../hex'
 import { season, gameSpeed, hexGrid } from '../game/game-state'
 import { setQueen } from '../game/pixi-elements'
@@ -60,13 +60,13 @@ export function createQueen (parent) {
     container.addChild(content)
 
     const textHeading = new Text('QUEEN', { ...fontConfig })
-    textHeading.scale.set(0.15, 0.15)
+    setPixelPerfect(textHeading)
     textHeading.position.x = 100
     textHeading.position.y = -26
     container.addChild(textHeading)
 
     const helper = new Text('Loading...', { ...fontConfig })
-    helper.scale.set(0.15, 0.15)
+    setPixelPerfect(helper)
     helper.position.x = 82
     helper.position.y = -14
     container.addChild(helper)

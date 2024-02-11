@@ -5,7 +5,8 @@ import {
   addTicker,
   transferTo,
   adjacent,
-  activateAdjacent
+  activateAdjacent,
+  setPixelPerfect
 } from './exported-help-functions'
 import { animateSprite } from './animate-sprite'
 import { makeSelectable, makeHexDetectable } from './sprite-factories'
@@ -323,7 +324,7 @@ export function createBee (parent, type, startPosition) {
     container.addChild(ProgressBar(106, p[5], 'age', () => bee.age, bee.DEAD_AT_AGE))
 
     const textHeading = new Text('BEE', { ...fontConfig })
-    textHeading.scale.set(0.15, 0.15)
+    setPixelPerfect(textHeading)
     textHeading.position.x = contentOffsetX + 30
     textHeading.position.y = contentOffsetY + 3
     container.addChild(textHeading)
@@ -332,14 +333,14 @@ export function createBee (parent, type, startPosition) {
 
     texts.forEach((text, idx) => {
       const textDescription = new Text(text, { ...fontConfig, fill: '#8b9bb4' })
-      textDescription.scale.set(0.15, 0.15)
+      setPixelPerfect(textDescription)
       textDescription.position.x = contentOffsetX + 10
       textDescription.position.y = contentOffsetY + 13 + (idx * 7)
       container.addChild(textDescription)
     })
 
     const helper = new Text('Loading...', { ...fontConfig, lineHeight: 44 })
-    helper.scale.set(0.15, 0.15)
+    setPixelPerfect(helper)
     helper.position.x = contentOffsetX + 10
     helper.position.y = contentOffsetY + 58
     container.addChild(helper)

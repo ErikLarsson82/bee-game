@@ -1,5 +1,5 @@
 import { Container, Sprite, Point, Polygon, Texture, Text } from 'pixi.js'
-import { addTicker } from './exported-help-functions'
+import { addTicker, setPixelPerfect } from './exported-help-functions'
 import { cap } from './pure-help-functions'
 import { fontConfig } from './config'
 
@@ -69,7 +69,7 @@ export function Button (x, y, content, callback, hoverover, hoverout, _size) {
 
   if (typeof content === 'string') {
     const buttonText = new Text(content, { ...fontConfig, fontSize: 22 })
-    buttonText.scale.set(0.15, 0.15)
+    setPixelPerfect(buttonText)
     buttonText.position.x = 7
     buttonText.position.y = 3
     buttonSprite.addChild(buttonText)

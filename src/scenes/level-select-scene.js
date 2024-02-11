@@ -1,6 +1,7 @@
-import { WIDTH, HEIGHT } from '../config'
-import { Container, Graphics, Sprite } from 'pixi.js'
+import { WIDTH, HEIGHT, fontConfig } from '../config'
+import { Container, Graphics, Sprite, Text } from 'pixi.js'
 import { Button } from '../ui'
+import { setPixelPerfect } from '../exported-help-functions'
 import { loadMapParameters } from '../load-map-parameters'
 import MAP_CONFIGURATIONS from '../map-configurations'
 
@@ -102,6 +103,12 @@ class LevelSelectScene extends Container {
     preview.position.y = 166
     preview.scale.set(0.3, 0.3)
     popup.addChild(preview)
+
+    const textContent = new Text('TUTORIAL CAMPAIGN SANDBOX TUTORIAL CAMPAIGN SANDBOX TUTORIAL CAMPAIGN SANDBOX', { ...fontConfig, fill: '#262b44' })
+    setPixelPerfect(textContent)
+    textContent.position.x = 44
+    textContent.position.y = 94
+    container.addChild(textContent)
 
     function showPopup () {
       popup.visible = true

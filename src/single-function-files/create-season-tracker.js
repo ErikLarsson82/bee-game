@@ -3,7 +3,7 @@ import { addTicker } from '../exported-help-functions'
 import { season, day, hour, previousSeasonLength, currentSeasonLength } from '../game/game-state'
 
 export function createSeasonTracker (uiTopBar) {
-  const seasonTracker = Sprite.fromImage('season-tracker/background.png')
+  const seasonTracker = Sprite.fromImage('images/ui/season-tracker/background.png')
   seasonTracker.position.x = 244
   seasonTracker.position.y = 2
   uiTopBar.addChild(seasonTracker)
@@ -17,14 +17,13 @@ export function createSeasonTracker (uiTopBar) {
   seasonTracker.addChild(seasonProgressBar)
 
   addTicker('ui', time => {
-    const maxWidth = 66
+    const maxWidth = 64
     const isSummer = season === 'summer'
     const currentDay = isSummer ? day - 1 : day - 1 - previousSeasonLength
     const dayFraction = maxWidth / currentSeasonLength
     const dayWidth = dayFraction * (currentDay)
     const hourFraction = dayFraction / 24
-    seasonProgressBar.width = dayWidth + (hourFraction * hour)
-    seasonProgressBar.position.x = 0
+    seasonProgressBar.width = 1 + (dayWidth + (hourFraction * hour))
     seasonProgressBar.texture = isSummer
       ? summerTexture
       : winterTexture

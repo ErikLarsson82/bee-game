@@ -2,7 +2,7 @@ import { Container, Polygon, Point, Sprite, Text, Texture } from 'pixi.js'
 import { bees, hexGrid, day, selected, season } from './game/game-state'
 import { toLocalCoordinateFlat, forEachHexagon } from './hex'
 import { makeHexagon, makeSelectable, makeOccupiable, makeUpgradeable, makeHexDetectable } from './sprite-factories'
-import { replaceSelectedHex, updateSelected, replaceHex, addTicker, transferTo, cleanUpSelected } from './exported-help-functions'
+import { replaceSelectedHex, updateSelected, replaceHex, addTicker, transferTo, cleanUpSelected, setPixelPerfect } from './exported-help-functions'
 import { cap, isHoneyBuff, isNectarBuff } from './pure-help-functions'
 import { hexBackground, beeContainer, hatchContainer } from './game/pixi-elements'
 import { fontConfig, smallFont, colors } from './config'
@@ -159,7 +159,7 @@ function cellPrepared (x, y, parent) {
 
       const text = '  1.Have wax\n\n  2.Have\n  worker bees'
       const helperText = new Text(text, { ...fontConfig, fill: '#96a5bc' })
-      helperText.scale.set(0.15, 0.15)
+      setPixelPerfect(helperText)
       helperText.position.x = 80
       helperText.position.y = -6
       container.addChild(helperText)
@@ -292,7 +292,7 @@ function cellConstruction (x, y, parent, options) {
     container.addChild(ProgressBar2(-20, -26, 'pollen', () => underConstructionSprite.pollen, underConstructionSprite.POLLEN_REQUIRED))
 
     const textContent = new Text('-', { ...fontConfig })
-    textContent.scale.set(0.15, 0.15)
+    setPixelPerfect(textContent)
     textContent.position.x = 3
     textContent.position.y = -33
     container.addChild(textContent)
@@ -362,13 +362,13 @@ function cellHoney (x, y, parent) {
     container.addChild(ProgressBar2(-20, -26, 'honey', () => honeySprite.honey, honeySprite.HONEY_HEX_CAPACITY))
 
     const textContent = new Text('-', { ...fontConfig })
-    textContent.scale.set(0.15, 0.15)
+    setPixelPerfect(textContent)
     textContent.position.x = 13
     textContent.position.y = -33
     container.addChild(textContent)
 
     const textBonus = new Text('-', { ...fontConfig })
-    textBonus.scale.set(0.15, 0.15)
+    setPixelPerfect(textBonus)
     textBonus.position.x = -22
     textBonus.position.y = -46
     container.addChild(textBonus)
@@ -382,7 +382,7 @@ function cellHoney (x, y, parent) {
     })
 
     const notEnoughWarning = new Text('NOT ENOUGH HONEY', { ...fontConfig, fill: 'white' })
-    notEnoughWarning.scale.set(0.15, 0.15)
+    setPixelPerfect(notEnoughWarning)
     notEnoughWarning.position.x = 76
     notEnoughWarning.position.y = 26
     notEnoughWarning.visible = false
@@ -521,19 +521,19 @@ export function cellNectar (x, y, parent) {
     container.addChild(buttonUpgrade)
 
     const upgradesText = new Text('-', { ...fontConfig })
-    upgradesText.scale.set(0.15, 0.15)
+    setPixelPerfect(upgradesText)
     upgradesText.position.x = 22
     upgradesText.position.y = -4
     container.addChild(upgradesText)
 
     const textContent = new Text('-', { ...fontConfig })
-    textContent.scale.set(0.15, 0.15)
+    setPixelPerfect(textContent)
     textContent.position.x = 13
     textContent.position.y = -33
     container.addChild(textContent)
 
     const textBonus = new Text('-', { ...fontConfig })
-    textBonus.scale.set(0.15, 0.15)
+    setPixelPerfect(textBonus)
     textBonus.position.x = -22
     textBonus.position.y = -46
     container.addChild(textBonus)
@@ -827,7 +827,7 @@ export function cellPollen (x, y, parent) {
     container.addChild(ProgressBar2(-20, -26, 'pollen', () => pollenSprite.pollen, pollenSprite.POLLEN_HEX_CAPACITY))
 
     const textContent = new Text('-', { ...fontConfig })
-    textContent.scale.set(0.15, 0.15)
+    setPixelPerfect(textContent)
     textContent.position.x = 0
     textContent.position.y = -33
     container.addChild(textContent)
@@ -858,7 +858,7 @@ export function cellPollen (x, y, parent) {
     */
 
     const upgradesText = new Text('-', { ...fontConfig })
-    upgradesText.scale.set(0.15, 0.15)
+    setPixelPerfect(upgradesText)
     upgradesText.position.x = 22
     upgradesText.position.y = -4
     container.addChild(upgradesText)
@@ -896,7 +896,7 @@ const cellForagerRestingPlace = (x, y, parent) => {
     const container = new Container()
 
     const text = new Text('Forager resting place', { ...fontConfig, fill: colors.yellow })
-    text.scale.set(0.15, 0.15)
+    setPixelPerfect(text)
     text.position.x = -30
     text.position.y = -14
     container.addChild(text)

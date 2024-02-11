@@ -23,6 +23,20 @@ import { cellEmpty, nameToFunction } from './cells'
 
 // These are dirty fuckers
 
+const magic = 0.1538 // or this 0000000000002
+
+export function setPixelPerfect (sprite) {
+  sprite.scale.set(magic, magic)
+}
+
+export function placement (sprite) {
+  window.onmousemove = function (e) {
+    console.log('mouse location:', e, e.clientX, e.clientY)
+    sprite.position.x = e.clientX
+    sprite.position.y = e.clientY
+  }
+}
+
 export function toGameTick (seconds) {
   return seconds * fps
 }
