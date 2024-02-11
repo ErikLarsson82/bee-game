@@ -35,7 +35,8 @@ import {
   hexGrid,
   setHexGrid,
   setHoveredCells,
-  setAngels
+  setAngels,
+  winterHungerMultiplier
 } from '../game/game-state'
 import {
   updateSelected,
@@ -480,6 +481,15 @@ function setupGame () {
   createFlowers(flowerBed)
 
   createGameOverUI(sceneManager, ui)
+
+  for (let i = winterHungerMultiplier; i > 0; i--) {
+    // eslint-disable-next-line new-cap
+    const snowball = new Sprite.fromImage('images/ui/snowball.png')
+    snowball.position.x = 244 - (i * 6)
+    snowball.position.y = 5
+    window.snowball = snowball
+    ui.addChild(snowball)
+  }
 
   app.ticker.add(gameloop)
 

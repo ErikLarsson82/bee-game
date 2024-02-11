@@ -2,7 +2,7 @@ import { Container, Polygon, Point, Sprite, Text, Texture } from 'pixi.js'
 import { bees, hexGrid, day, selected, season } from './game/game-state'
 import { toLocalCoordinateFlat, forEachHexagon } from './hex'
 import { makeHexagon, makeSelectable, makeOccupiable, makeUpgradeable, makeHexDetectable } from './sprite-factories'
-import { replaceSelectedHex, updateSelected, replaceHex, addTicker, transferTo } from './exported-help-functions'
+import { replaceSelectedHex, updateSelected, replaceHex, addTicker, transferTo, cleanUpSelected } from './exported-help-functions'
 import { cap, isHoneyBuff, isNectarBuff } from './pure-help-functions'
 import { hexBackground, beeContainer, hatchContainer } from './game/pixi-elements'
 import { fontConfig, smallFont, colors } from './config'
@@ -136,19 +136,19 @@ function cellPrepared (x, y, parent) {
       const contentNectar = Sprite.fromImage('button-large/button-large-content-nectar.png')
 
       container.addChild(Button(-11, -28, contentHoney, () => {
-        replaceSelectedHex('honey')
+        replaceSelectedHex('construction', { willBecome: 'honey' })
         updateSelected(null)
       }, null, null, 'large'))
       container.addChild(Button(18, -17, contentNectar, () => {
-        replaceSelectedHex('nectar')
+        replaceSelectedHex('construction', { willBecome: 'nectar' })
         updateSelected(null)
       }, null, null, 'large'))
       container.addChild(Button(18, 5, contentPollen, () => {
-        replaceSelectedHex('pollen')
+        replaceSelectedHex('construction', { willBecome: 'pollen' })
         updateSelected(null)
       }, null, null, 'large'))
       container.addChild(Button(-11, 16, contentBrood, () => {
-        replaceSelectedHex('brood')
+        replaceSelectedHex('construction', { willBecome: 'brood' })
         updateSelected(null)
       }, null, null, 'large'))
     } else {
@@ -231,6 +231,89 @@ function cellExperiment1 (x, y, parent) {
   return experimentOneSprite
 }
 
+function cellConstruction (x, y, parent, options) {
+  console.log('will', options.willBecome)
+  const pixelCoordinate = toLocalCoordinateFlat({ x, y })
+  const underConstructionSprite = Sprite.fromImage('images/hex/under-construction/under-construction.png')
+  makeHexagon(underConstructionSprite, x, y, 'construction')
+  makeSelectable(underConstructionSprite, 'construction', 'hex')
+  makeOccupiable(underConstructionSprite)
+  underConstructionSprite.position.x = pixelCoordinate.x
+  underConstructionSprite.position.y = pixelCoordinate.y
+
+  underConstructionSprite.POLLEN_REQUIRED = null
+  switch (options.willBecome) {
+    case 'honey':
+      underConstructionSprite.POLLEN_REQUIRED = 120
+      break
+    case 'nectar':
+      underConstructionSprite.POLLEN_REQUIRED = 200
+      break
+    case 'pollen':
+      underConstructionSprite.POLLEN_REQUIRED = 20
+      break
+    case 'brood':
+      underConstructionSprite.POLLEN_REQUIRED = 50
+      break
+    case 'prepared':
+      underConstructionSprite.POLLEN_REQUIRED = 20
+      break
+  }
+  underConstructionSprite.pollen = 0
+  underConstructionSprite.isComplete = () => underConstructionSprite.pollen >= underConstructionSprite.POLLEN_REQUIRED
+  underConstructionSprite.disabled = false
+
+  const finish = () => {
+    underConstructionSprite.disabled = true
+    const hex = replaceHex([x, y], options.willBecome, 'activate')
+    cleanUpSelected(underConstructionSprite)
+    if (options.willBecome === 'prepared') {
+      hex.instantlyPrepare()
+    }
+  }
+
+  addTicker('game-stuff', time => {
+    if (underConstructionSprite.disabled) return
+    if (underConstructionSprite.isComplete()) {
+      finish()
+    }
+  })
+
+  underConstructionSprite.panelLabel = () => false
+  underConstructionSprite.panelPosition = () => ({ x: pixelCoordinate.x + 8, y: pixelCoordinate.y + 5 })
+
+  underConstructionSprite.panelContent = () => {
+    const container = new Container()
+
+    const content = Sprite.fromImage('content-pollen.png')
+    content.position.x = -24
+    content.position.y = -37
+    container.addChild(content)
+
+    container.addChild(ProgressBar2(-20, -26, 'pollen', () => underConstructionSprite.pollen, underConstructionSprite.POLLEN_REQUIRED))
+
+    const textContent = new Text('-', { ...fontConfig })
+    textContent.scale.set(0.15, 0.15)
+    textContent.position.x = 3
+    textContent.position.y = -33
+    container.addChild(textContent)
+
+    addTicker('ui', () => {
+      textContent.text = -Math.round(underConstructionSprite.POLLEN_REQUIRED - underConstructionSprite.pollen)
+    })
+
+    const buttonDebugFinish = Button(-20, 11, Sprite.fromImage('images/ui/button-large/button-large-content-debug.png'), () => {
+      finish()
+    }, null, null, 'large')
+    container.addChild(buttonDebugFinish)
+
+    return container
+  }
+
+  parent.addChild(underConstructionSprite)
+  return underConstructionSprite
+}
+
 function cellHoney (x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const honeySprite = Sprite.fromImage('honey/cell-honey-empty.png')
@@ -307,7 +390,7 @@ function cellHoney (x, y, parent) {
     container.addChild(notEnoughWarning)
 
     const buttonDelete = Button(-20, 11, Sprite.fromImage('button-large/button-large-content-delete.png'), () => {
-      replaceHex([x, y], 'prepared').instantlyPrepare()
+      replaceHex([x, y], 'construction', 'activate', { willBecome: 'prepared' })
       updateSelected(null)
     }, null, null, 'large')
     container.addChild(buttonDelete)
@@ -428,7 +511,7 @@ export function cellNectar (x, y, parent) {
     container.addChild(ProgressBar2(-20, -26, 'nectar', () => nectarSprite.nectar, nectarSprite.NECTAR_CAPACITY))
 
     const buttonDelete = Button(-20, 11, Sprite.fromImage('button-large/button-large-content-delete.png'), () => {
-      replaceHex([x, y], 'prepared').instantlyPrepare()
+      replaceHex([x, y], 'construction', 'activate', { willBecome: 'prepared' })
       updateSelected(null)
     }, null, null, 'large')
     container.addChild(buttonDelete)
@@ -646,7 +729,7 @@ export function cellBrood (x, y, parent) {
     container.addChild(nutrientsBar)
 
     const buttonDelete = Button(-20, 11, Sprite.fromImage('button-large/button-large-content-delete.png'), () => {
-      replaceHex([x, y], 'prepared').instantlyPrepare()
+      replaceHex([x, y], 'construction', 'activate', { willBecome: 'prepared' })
       updateSelected(null)
     }, null, null, 'large')
     container.addChild(buttonDelete)
@@ -744,8 +827,19 @@ export function cellPollen (x, y, parent) {
 
     container.addChild(ProgressBar2(-20, -26, 'pollen', () => pollenSprite.pollen, pollenSprite.POLLEN_HEX_CAPACITY))
 
+    const textContent = new Text('-', { ...fontConfig })
+    textContent.scale.set(0.15, 0.15)
+    textContent.position.x = 0
+    textContent.position.y = -33
+    container.addChild(textContent)
+
+    addTicker('ui', () => {
+      textContent.text = Math.round(pollenSprite.pollen)
+      textContent.position.x = Math.round(pollenSprite.pollen) > 9 ? (Math.round(pollenSprite.pollen) > 99 ? 5 : 9) : 13
+    })
+
     const buttonDelete = Button(-20, 11, Sprite.fromImage('button-large/button-large-content-delete.png'), () => {
-      replaceHex([x, y], 'prepared').instantlyPrepare()
+      replaceHex([x, y], 'construction', 'activate', { willBecome: 'prepared' })
       updateSelected(null)
     }, null, null, 'large')
     container.addChild(buttonDelete)
@@ -831,6 +925,7 @@ export const nameToFunction = (input) => {
     prepared: cellPrepared,
     empty: cellEmpty,
     blocked: cellBlocked,
+    construction: cellConstruction,
     'experiment-1': cellExperiment1,
     'forager-resting-place': cellForagerRestingPlace
   }[input]

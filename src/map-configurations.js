@@ -242,7 +242,10 @@ const MAP_CONFIGURATIONS = [
       }
 
       if (m === 'all-prepared-done') {
-        createBee(parent, 'idle')
+        // Built for
+        // export const HEX_AMOUNT_WIDTH = 5
+        // export const HEX_AMOUNT_HEIGHT = 4
+        createBee(parent, 'idle').setHunger(40)
         createBee(parent, 'idle')
         createBee(parent, 'idle')
         createBee(parent, 'idle')
@@ -253,6 +256,17 @@ const MAP_CONFIGURATIONS = [
             replaceHex([j, i], 'prepared', 'activate').instantlyPrepare()
           }
         }
+
+        replaceHex([0, 0], 'pollen', 'activate').pollen = 300
+        replaceHex([1, 0], 'nectar', 'activate')
+        // replaceHex([0, 1], 'pollen', 'activate').pollen = 99
+        // replaceHex([1, 0], 'pollen', 'activate').pollen = 9
+        // replaceHex([1, 1], 'pollen', 'activate').pollen = 120
+
+        replaceHex([2 + 0, 0], 'honey', 'activate').honey = 30
+        replaceHex([2 + 0, 1], 'honey', 'activate').honey = 30
+        replaceHex([2 + 1, 0], 'honey', 'activate').honey = 30
+        replaceHex([2 + 1, 1], 'honey', 'activate').honey = 30
 
         return
       }

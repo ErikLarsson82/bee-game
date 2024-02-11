@@ -45,7 +45,7 @@ export function transferTo (capacity) {
   }
 }
 
-export function replaceSelectedHex (type) {
+export function replaceSelectedHex (type, options) {
   let returnHex = null
   hexGrid.forEach((row, yIdx) =>
     row.forEach((hex, xIdx) => {
@@ -55,7 +55,7 @@ export function replaceSelectedHex (type) {
         if (!nameToFunction(type)) {
           console.error('No type!')
         }
-        const newHex = nameToFunction(type)(xIdx, yIdx, hexForeground)
+        const newHex = nameToFunction(type)(xIdx, yIdx, hexForeground, options)
         hexGrid[yIdx][xIdx] = newHex
         sortHexForeground()
 
@@ -226,6 +226,12 @@ export function updateGameSpeedText () {
     )
   }
   pauseFrame.visible = paused
+}
+
+export function cleanUpSelected (item) {
+  if (selected === item) {
+    updateSelected(null)
+  }
 }
 
 export function updateSelected (item) {
@@ -414,18 +420,21 @@ export function snapTo (a, b) {
   }
 }
 
-export function replaceHex (coordinate, type, activate) {
+export function replaceHex (coordinate, type, activate, options) {
   if (!nameToFunction(type)) {
     throw new Error('Missing type!')
   }
 
   const [x, y] = coordinate
 
+  if (hexGrid[y] === undefined) throw new Error('Out of bounds')
+  if (hexGrid[y][x] === undefined) throw new Error('Out of bounds')
+
   if (activate === 'activate') activateAdjacent(x, y)
 
   hexForeground.removeChild(hexGrid[y][x])
 
-  const newHex = nameToFunction(type)(x, y, hexForeground)
+  const newHex = nameToFunction(type)(x, y, hexForeground, options)
   hexGrid[y][x] = newHex
   sortHexForeground()
 

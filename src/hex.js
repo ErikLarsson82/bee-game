@@ -1,8 +1,8 @@
 export const OFFSET_X = 120
 export const OFFSET_Y = 56
 
-export const HEX_AMOUNT_WIDTH = 14
-export const HEX_AMOUNT_HEIGHT = 13
+export const HEX_AMOUNT_WIDTH = 5
+export const HEX_AMOUNT_HEIGHT = 4
 export const HEX_COLUMN_WIDTH = 13
 export const HEX_ROW_HEIGHT = 10
 export const HEX_ODD_ROW_OFFSET = 5

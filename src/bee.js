@@ -359,6 +359,11 @@ export function createBee (parent, type, startPosition) {
     if (flower && needsResource && season === 'summer') {
       flower.claimSlot(bee)
 
+      if (!isPollenSackFull()) {
+        flower.pollinationLevel += transferTo(flower.POLLINATION_REQUIREMENT).inSeconds(200)
+        flower.pollinationLevel = cap(0, flower.POLLINATION_REQUIREMENT)(flower.pollinationLevel)
+      }
+
       bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(40)
       bee.nectarSack += transferTo(bee.NECTAR_SACK_CAPACITY).inSeconds(40)
       bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
@@ -384,32 +389,32 @@ export function createBee (parent, type, startPosition) {
     return false
   }
 
-  function flyToFlowerToPollinate () {
-    if (isPollenSackEmpty() || season === 'winter') return false
-    const needsPollination = flower => flower.pollinationLevel < flower.POLLINATION_REQUIREMENT
-    const flower = flowers.filter(needsPollination)[0]
+  // function flyToFlowerToPollinate () {
+  //   if (isPollenSackEmpty() || season === 'winter') return false
+  //   const needsPollination = flower => flower.pollinationLevel < flower.POLLINATION_REQUIREMENT
+  //   const flower = flowers.filter(needsPollination)[0]
 
-    if (!flower) return false
+  //   if (!flower) return false
 
-    bee.flyTo(flower)
-    return true
-  }
+  //   bee.flyTo(flower)
+  //   return true
+  // }
 
-  function pollinateFlower () {
-    const flower = bee.isAtType('flower')
-    if (!flower || season === 'winter') return false
-    if (isPollenSackEmpty() || flower.isPollinated()) {
-      bee.position.y = flower.position.y - 5
-      return true
-    }
-    flower.claimSlot(bee)
-    flower.pollinationLevel += transferTo(flower.POLLINATION_REQUIREMENT).inSeconds(200)
-    flower.pollinationLevel = cap(0, flower.POLLINATION_REQUIREMENT)(flower.pollinationLevel)
+  // function pollinateFlower () {
+  //   const flower = bee.isAtType('flower')
+  //   if (!flower || season === 'winter') return false
+  //   if (isPollenSackEmpty() || flower.isPollinated()) {
+  //     bee.position.y = flower.position.y - 5
+  //     return true
+  //   }
+  //   flower.claimSlot(bee)
+  //   flower.pollinationLevel += transferTo(flower.POLLINATION_REQUIREMENT).inSeconds(200)
+  //   flower.pollinationLevel = cap(0, flower.POLLINATION_REQUIREMENT)(flower.pollinationLevel)
 
-    bee.pollenSack -= transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(40)
-    bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
-    return true
-  }
+  //   bee.pollenSack -= transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(40)
+  //   bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
+  //   return true
+  // }
 
   function depositPollen () {
     const hex = bee.isAtType('pollen')
@@ -502,6 +507,15 @@ export function createBee (parent, type, startPosition) {
     const honeyHex = filterHexagon(hexGrid, hex => hex.type === 'honey' && hex.isUnclaimed(bee) && !hex.isHoneyFull())
     if (honeyHex.length === 0 || isHoneySackEmpty()) return false
     const closest = getClosestHex(honeyHex, bee, distance)
+    closest.claimSlot(bee)
+    bee.flyTo(closest)
+    return true
+  }
+
+  function flyToConstruct () {
+    const constructHex = filterHexagon(hexGrid, hex => hex.type === 'construction' && hex.isUnclaimed(bee))
+    if (constructHex.length === 0 || isPollenSackEmpty()) return false
+    const closest = getClosestHex(constructHex, bee, distance)
     closest.claimSlot(bee)
     bee.flyTo(closest)
     return true
@@ -649,12 +663,12 @@ export function createBee (parent, type, startPosition) {
     }
   }
 
-  function broodsAreDoneForTheSeason () {
-    const isDone = hex => ['dead', 'puppa'].includes(hex.content)
-    const unfinishedHexes = filterHexagon(hexGrid, hex => hex.type === 'brood' && !isDone(hex) && hex.paused === false)
+  // function broodsAreDoneForTheSeason () {
+  //   const isDone = hex => ['dead', 'puppa'].includes(hex.content)
+  //   const unfinishedHexes = filterHexagon(hexGrid, hex => hex.type === 'brood' && !isDone(hex) && hex.paused === false)
 
-    return unfinishedHexes.length === 0
-  }
+  //   return unfinishedHexes.length === 0
+  // }
 
   function idle () {
     if (dying()) return
@@ -691,32 +705,35 @@ export function createBee (parent, type, startPosition) {
     if (bee.feedBee()) return
     if (boost()) return
     if (refillPollen()) return
-    if (broodsAreDoneForTheSeason()) {
-      if (pollinateFlower()) return
-      if (flyToFlowerToPollinate()) return
-    }
+    // if (broodsAreDoneForTheSeason()) {
+    //   if (pollinateFlower()) return
+    //   if (flyToFlowerToPollinate()) return
+    // }
     if (nurseBroodling()) return
+    if (construct()) return
     if (season !== 'summer') {
       if (cleanBrood()) return
       if (flyToCleanBrood()) return
     }
     if (flyToPollenToRefill()) return
     if (flyToBroodling()) return
+    if (flyToConstruct()) return
     bee.flyTo(null)
   }
 
   function worker () {
     if (dying()) return
     if (ageBee()) return
+    if (depositHoney()) return
+    if (bee.feedBee()) return
     if (boost()) return
     if (convertNectar()) return
-    if (depositHoney()) return
     if (flyToHoneyToDeposit()) return
-    if (season === 'summer') {
-      bee.consumeEnergy()
-    } else {
-      if (bee.feedBee()) return
-    }
+    // if (season === 'summer') {
+    //  bee.consumeEnergy()
+    // } else {
+    //   if (bee.feedBee()) return
+    // }
     if (refillWax()) return
     if (prepareCell()) return
     if (flyToPrepareCell()) return
@@ -830,6 +847,23 @@ export function createBee (parent, type, startPosition) {
     const closest = getClosestHex(nectarHex, bee, distance)
     closest.claimSlot(bee)
     bee.flyTo(closest)
+    return true
+  }
+
+  function construct () {
+    const hex = bee.isAtType('construction')
+    if (!hex || isPollenSackEmpty()) return false
+    hex.claimSlot(bee)
+
+    const rateA = bee.POLLEN_SACK_CAPACITY
+    bee.pollenSack -= transferTo(rateA).inSeconds(5)
+    bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
+    hex.pollen += transferTo(rateA).inSeconds(5)
+    hex.pollen = cap(0, hex.POLLEN_REQUIRED)(hex.pollen)
+
+    if (isPollenSackEmpty() || hex.isComplete()) {
+      bee.position.y = hex.position.y - 5
+    }
     return true
   }
 
