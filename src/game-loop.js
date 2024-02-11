@@ -26,7 +26,7 @@ import {
   tickers,
   setTickers
 } from './game/game-state'
-import { panel, backgroundScene, sun } from './game/pixi-elements'
+import { panel, backgroundScene, sun, backgroundImage } from './game/pixi-elements'
 import { createFlowers, resolveWinterFlowers } from './single-function-files/create-flowers'
 
 function isUI (ticker) {
@@ -80,7 +80,7 @@ export function gameloop (delta, manualTick) {
         setSeason(season === 'summer' ? 'winter' : 'summer')
         if (season === 'summer') {
           setGameSpeed(1)
-          backgroundScene.texture = Texture.fromImage('background-summer.png')
+          backgroundScene.texture = Texture.fromImage(`${backgroundImage}.png`)
           setYear(year + 1)
           setDay(1)
           createFlowers()

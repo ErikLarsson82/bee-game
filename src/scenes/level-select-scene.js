@@ -1,7 +1,7 @@
-import { WIDTH, HEIGHT, fontConfig } from '../config'
-import { Container, Graphics, Sprite, Text } from 'pixi.js'
+import { WIDTH, HEIGHT } from '../config'
+import { Container, Graphics, Sprite } from 'pixi.js'
+import { placement } from '../exported-help-functions'
 import { Button } from '../ui'
-import { setPixelPerfect } from '../exported-help-functions'
 import { loadMapParameters } from '../load-map-parameters'
 import MAP_CONFIGURATIONS from '../map-configurations'
 
@@ -28,27 +28,40 @@ class LevelSelectScene extends Container {
     splashscreen.drawRect(0, 0, WIDTH, HEIGHT)
     container.addChild(splashscreen)
 
-    const buttonLevelOne = Button(70, 20, Sprite.fromImage('images/ui/button-large/button-large-content-level-1.png'), () => {
-      showPopup()
-    }, null, null, 'large')
-    container.addChild(buttonLevelOne)
+    const worldMapBackground = Sprite.fromImage('images/world-map-3/beegame_map_clean.png')
+    container.addChild(worldMapBackground)
 
-    const buttonDimA = Sprite.fromImage('button-large/button-large-standard.png')
-    buttonDimA.position.x = 110
-    buttonDimA.position.y = 20
-    buttonDimA.alpha = 0.2
-    container.addChild(buttonDimA)
+    MAP_CONFIGURATIONS.filter(x => x.display === 'tutorial')
+      .forEach((_, idx) => {
+        const x = 70 + (idx * 20)
+        const button = Button(x, 20, Sprite.fromImage(`images/ui/button-large/button-large-content-level-${idx}.png`), () => {
+          showPopup()
+        }, null, null, 'large')
+        container.addChild(button)
+      })
 
-    const buttonDimB = Sprite.fromImage('button-large/button-large-standard.png')
-    buttonDimB.position.x = 150
-    buttonDimB.position.y = 20
-    buttonDimB.alpha = 0.2
-    container.addChild(buttonDimB)
+    MAP_CONFIGURATIONS.filter(x => x.display === 'campaign')
+      .forEach((_, idx) => {
+        const x = 70 + (idx * 50)
+        const button = Button(x, 110, Sprite.fromImage(`images/ui/button-large/button-large-content-level-${idx + 1}.png`), () => {
+          showPopup()
+        }, null, null, 'large')
+        if (idx > 0) {
+          button.alpha = 0.3
+          button.interactive = false
+          button.buttonMode = false
+        }
+        container.addChild(button)
+      })
 
-    const buttonLevelTwo = Button(70, 110, Sprite.fromImage('images/ui/button-large/button-large-content-level-1.png'), () => {
-      showPopup()
-    }, null, null, 'large')
-    container.addChild(buttonLevelTwo)
+    MAP_CONFIGURATIONS.filter(x => x.display === 'sandbox')
+      .forEach((_, idx) => {
+        const x = 70 + (idx * 50)
+        const button = Button(x, 110, Sprite.fromImage(`images/ui/button-large/button-large-content-level-${idx + 1}.png`), () => {
+          showPopup()
+        }, null, null, 'large')
+        container.addChild(button)
+      })
 
     const tutorialText = Sprite.fromImage('images/ui/text/tutorial.png')
     tutorialText.position.x = 80
@@ -103,12 +116,6 @@ class LevelSelectScene extends Container {
     preview.position.y = 166
     preview.scale.set(0.3, 0.3)
     popup.addChild(preview)
-
-    const textContent = new Text('TUTORIAL CAMPAIGN SANDBOX TUTORIAL CAMPAIGN SANDBOX TUTORIAL CAMPAIGN SANDBOX', { ...fontConfig, fill: '#262b44' })
-    setPixelPerfect(textContent)
-    textContent.position.x = 44
-    textContent.position.y = 94
-    container.addChild(textContent)
 
     function showPopup () {
       popup.visible = true
