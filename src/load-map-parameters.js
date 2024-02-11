@@ -1,7 +1,6 @@
 import {
   setCycles,
   setBlizzardWinter,
-  setLevelIndex,
   setCurrentCycleIndex,
   setCurrentCycle,
   setCurrentSeasonLength,
@@ -16,17 +15,29 @@ import {
   setBackgroundColor
 } from './game/pixi-elements'
 
-export function loadMapParameters (map, idx) {
-  setCycles(Array.from(map.cycles))
-  setBackgroundImage(map.backgroundImage)
-  setBackgroundColor(map.backgroundColor)
-  setBlizzardWinter(map.blizzardWinter)
-  setLevelIndex(idx)
+import MAP_CONFIGURATIONS from './map-configurations'
+
+export function loadMapParameters (name) {
+  const {
+    cycles,
+    backgroundImage,
+    backgroundColor,
+    blizzardWinter,
+    init,
+    seeds,
+    winterHungerMultiplier,
+    killNonPollinatedFlowers
+  } = MAP_CONFIGURATIONS.find(x => x.name === name)
+
+  setCycles(Array.from(cycles))
+  setBackgroundImage(backgroundImage)
+  setBackgroundColor(backgroundColor)
+  setBlizzardWinter(blizzardWinter)
   setCurrentCycleIndex(0)
-  setCurrentCycle(map.cycles[0])
-  setCurrentSeasonLength(map.cycles[0])
-  setCurrentMapInit(map.init)
-  setSeeds(map.seeds)
-  setWinterHungerMultiplier(map.winterHungerMultiplier)
-  setKillNonPollinatedFlowers(map.killNonPollinatedFlowers)
+  setCurrentCycle(cycles[0])
+  setCurrentSeasonLength(cycles[0])
+  setCurrentMapInit(init)
+  setSeeds(seeds)
+  setWinterHungerMultiplier(winterHungerMultiplier)
+  setKillNonPollinatedFlowers(killNonPollinatedFlowers)
 }

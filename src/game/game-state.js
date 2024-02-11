@@ -61,9 +61,6 @@ export const setHexGrid = hg => (hexGrid = hg)
 export let blizzardWinter = null
 export const setBlizzardWinter = bw => (blizzardWinter = bw)
 
-export let levelIndex = null
-export const setLevelIndex = li => (levelIndex = li)
-
 export let currentMapInit = null
 export const setCurrentMapInit = mi => (currentMapInit = mi)
 

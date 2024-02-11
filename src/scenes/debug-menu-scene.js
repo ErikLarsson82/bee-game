@@ -48,19 +48,12 @@ function setupDebugMenu () {
   loadingSecondLabel.alpha = 0
   container.addChild(loadingSecondLabel)
 
-  MAP_CONFIGURATIONS.forEach((map, idx) => {
+  MAP_CONFIGURATIONS.forEach(({ name }, idx) => {
     const callback = () => {
-      // scaler.alpha = 0
-      // hasClickedIdx = idx
-      // if (loading && !loadingDone) {
-      //   loadingSecondLabel.alpha = 1
-      //   return
-      // }
-      loadMapParameters(MAP_CONFIGURATIONS[idx], idx)
+      loadMapParameters(name)
       sceneManager.goToScene('game')
-      // startGame()
     }
-    const button = Button(Math.round(WIDTH / 2 / 2 / 2) - 50, 10 + (idx * 14), map.name, callback, null, null, 'huge')
+    const button = Button(Math.round(WIDTH / 2 / 2 / 2) - 50, 10 + (idx * 14), name, callback, null, null, 'huge')
     scaler.addChild(button)
   })
 

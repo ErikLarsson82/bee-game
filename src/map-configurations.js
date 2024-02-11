@@ -6,7 +6,7 @@ import { HEX_AMOUNT_HEIGHT, HEX_AMOUNT_WIDTH } from './hex'
 const MAP_CONFIGURATIONS = [
   {
     name: 'Level 1 - Green fields - EASY',
-    display: 'campaign',
+    display: 'debug',
     cycles: [6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1],
     seeds: 4,
     winterHungerMultiplier: 1,
@@ -46,7 +46,7 @@ const MAP_CONFIGURATIONS = [
   },
   {
     name: 'Level 1 - Green fields - MEDIUM',
-    display: 'campaign',
+    display: 'debug',
     cycles: [5, 2, 5, 2, 5, 2, 4, 3, 4, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],
     seeds: 1,
     winterHungerMultiplier: 1,
@@ -100,6 +100,8 @@ const MAP_CONFIGURATIONS = [
       createBee(parent, 'idle').setHunger(100)
       createBee(parent, 'idle').setHunger(100)
       createBee(parent, 'idle').setHunger(100)
+
+      replaceHex([5, 1], 'prepared', 'activate').instantlyPrepare()
 
       replaceHex([2, 3], 'pollen', 'activate').setPollen(60)
       replaceHex([2, 2], 'pollen', 'activate').setPollen(60)

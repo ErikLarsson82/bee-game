@@ -1,6 +1,5 @@
 import { WIDTH, HEIGHT } from '../config'
 import { Container, Graphics, Sprite } from 'pixi.js'
-import { placement } from '../exported-help-functions'
 import { Button } from '../ui'
 import { loadMapParameters } from '../load-map-parameters'
 import MAP_CONFIGURATIONS from '../map-configurations'
@@ -41,10 +40,10 @@ class LevelSelectScene extends Container {
       })
 
     MAP_CONFIGURATIONS.filter(x => x.display === 'campaign')
-      .forEach((_, idx) => {
+      .forEach((map, idx) => {
         const x = 70 + (idx * 50)
         const button = Button(x, 110, Sprite.fromImage(`images/ui/button-large/button-large-content-level-${idx + 1}.png`), () => {
-          showPopup()
+          showPopup(map)
         }, null, null, 'large')
         if (idx > 0) {
           button.alpha = 0.3
@@ -95,9 +94,10 @@ class LevelSelectScene extends Container {
     }, null, null, 'large')
     popup.addChild(buttonCancel)
 
+    let start = null
+
     const buttonPlay = Button(150, 215, Sprite.fromImage('images/ui/button-large/button-large-content-play.png'), () => {
-      loadMapParameters(MAP_CONFIGURATIONS[0], 0)
-      sceneManager.goToScene('game')
+      start()
     }, null, null, 'large')
     popup.addChild(buttonPlay)
 
@@ -106,18 +106,22 @@ class LevelSelectScene extends Container {
     objective.position.y = 62
     popup.addChild(objective)
 
-    const difficulty = Sprite.fromImage('images/ui/level-select/difficulty-medium.png')
-    difficulty.position.x = 72
+    const difficulty = Sprite.fromImage('images/ui/level-select/difficulty-easy.png')
+    difficulty.position.x = 82
     difficulty.position.y = 110
     popup.addChild(difficulty)
 
-    const preview = Sprite.fromImage('images/layout-preview/level-1.png')
-    preview.position.x = 75
+    const preview = Sprite.fromImage('images/layout-preview/level-2.png')
+    preview.position.x = 59
     preview.position.y = 166
     preview.scale.set(0.3, 0.3)
     popup.addChild(preview)
 
-    function showPopup () {
+    function showPopup (map) {
+      start = () => {
+        loadMapParameters(map.name)
+        sceneManager.goToScene('game')
+      }
       popup.visible = true
       dimmer.alpha = 0.8
     }
