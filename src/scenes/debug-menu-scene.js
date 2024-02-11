@@ -1,6 +1,6 @@
 import { Container, Text, Graphics } from 'pixi.js'
 import app from '../setup-pixi'
-import { VERSION, WIDTH, HEIGHT, fontConfig, smallFont } from '../config'
+import { WIDTH, HEIGHT } from '../config'
 import MAP_CONFIGURATIONS from '../map-configurations'
 import { Button } from '../ui'
 import { loadMapParameters } from '../load-map-parameters'
@@ -41,11 +41,6 @@ function setupDebugMenu () {
   scaler.scale.x = 2
   scaler.scale.y = 2
   container.addChild(scaler)
-
-  const versionLabel = new Text(VERSION, { ...fontConfig, ...smallFont, fill: 'black' })
-  versionLabel.position.x = 375
-  versionLabel.position.y = 310
-  container.addChild(versionLabel)
 
   const loadingSecondLabel = new Text('Loading', { fontFamily: 'verdana', fill: 'black', fontSize: 10 })
   loadingSecondLabel.position.x = 170

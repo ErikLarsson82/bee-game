@@ -353,8 +353,7 @@ function setupGame () {
   const jobs = ['idle', 'forager', 'nurser', 'worker']
 
   jobs.forEach((type, idx) => {
-    // eslint-disable-next-line new-cap
-    const jobCounterHex = new Sprite.fromImage('button-jobs/button-alt.png')
+    const jobCounterHex = Sprite.fromImage('button-jobs/button-alt.png')
     jobCounterHex.position.x = 63
     jobCounterHex.position.y = (idx * 38) + 3
     jobsPanel.addChild(jobCounterHex)
@@ -483,8 +482,7 @@ function setupGame () {
   createGameOverUI(sceneManager, ui)
 
   for (let i = winterHungerMultiplier; i > 0; i--) {
-    // eslint-disable-next-line new-cap
-    const snowball = new Sprite.fromImage('images/ui/snowball.png')
+    const snowball = Sprite.fromImage('images/ui/snowball.png')
     snowball.position.x = 244 - (i * 6)
     snowball.position.y = 5
     window.snowball = snowball

@@ -1,4 +1,4 @@
-import { WIDTH, HEIGHT } from '../config'
+import { VERSION, WIDTH, HEIGHT, fontConfig, smallFont } from '../config'
 import { Container, Text, Graphics, Sprite, Texture } from 'pixi.js'
 import Bezier from '../bezier'
 import { Button } from '../ui'
@@ -38,8 +38,12 @@ function setup () {
   const text = new Container()
   container.addChild(text)
 
-  // eslint-disable-next-line new-cap
-  const logo = new Sprite.fromImage('logo.png')
+  const versionLabel = new Text(VERSION, { ...fontConfig, ...smallFont, fill: 'black' })
+  versionLabel.position.x = 375
+  versionLabel.position.y = 310
+  container.addChild(versionLabel)
+
+  const logo = Sprite.fromImage('logo.png')
   logo.position.x = 10
   logo.position.y = 50
   container.addChild(logo)

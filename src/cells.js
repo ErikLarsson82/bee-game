@@ -232,7 +232,6 @@ function cellExperiment1 (x, y, parent) {
 }
 
 function cellConstruction (x, y, parent, options) {
-  console.log('will', options.willBecome)
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const underConstructionSprite = Sprite.fromImage('images/hex/under-construction/under-construction.png')
   makeHexagon(underConstructionSprite, x, y, 'construction')
