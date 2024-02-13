@@ -28,10 +28,10 @@ export function createFlowers (_flowerBed) {
   setFlowers([])
 
   // then, create flowers
-  for (let f = 1; f <= 3; f++) {
+  for (let f = 1; f <= seeds; f++) {
     const flower = Sprite.fromImage('flower.png')
 
-    const flipped = false // Math.random() < 0.5
+    const flipped = Math.random() < 0.5
 
     const exclamationTextures = {
       mild: Texture.fromImage('exclamation-warning-mild.png'),
@@ -126,7 +126,8 @@ export function createFlowers (_flowerBed) {
     makeOccupiable(subFlowerB)
     flowerBed.addChild(subFlowerB)
 
-    flower.subFlowers = [subFlowerA, subFlowerB]
+    flower.subFlowers = []
+    // flower.subFlowers = [subFlowerA, subFlowerB]
   }
 }
 

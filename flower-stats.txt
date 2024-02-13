@@ -1,0 +1,27 @@
+       speed    20       40
+extra
+	1			144 (5)  102 (4)
+
+	0           87 (3)   60 (2)
+
+
+15 bin, 3 blommor, 2 spots, speed 20, no
+300
+
+15 bin, 3 blommor, 2 spots, speed 20, boost
+860
+
+15 bin, 3 blommor, 0 spots, speed 40, no
+170
+
+15 bin, 3 blommor, 0 spots, speed 40, boost
+473
+
+15 bin, 10 blommor, 2 spots, speed 20, boost
+nektar 1340, pollen 1878
+
+15 bin, 10 blommor, 0 spots, speed 40, no
+nektar 650, pollen 830
+
+15 bin, 10 blommor, 0 spots, speed 40, boosted, no polled deposits
+nektar 1333 

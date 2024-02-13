@@ -217,6 +217,29 @@ const MAP_CONFIGURATIONS = [
     init: (parent) => {
       const m = 'test brood' //    <------ here
 
+      if (m === 'nectar test') {
+        // I want this to be the beginner level
+        for (let i = 0; i < 15; i++) {
+          createBee(parent, 'idle')
+        }
+        
+        for (let i = 0; i < 12; i++) {
+          for (let j = 0; j < 5; j++) {
+            replaceHex([j, i], 'nectar', 'activate')
+          }
+        }
+        for (let i = 6; i < 11; i++) {
+          replaceHex([5, i], 'experiment-1', 'activate')
+        }
+        for (let i = 6; i < 11; i++) {
+          for (let j = 6; j < 10; j++) {
+            replaceHex([j, i], 'pollen', 'activate')
+          }
+        }
+
+        return
+      }
+
       if (m === 'test brood') {
         // I want this to be the beginner level
         createBee(parent, 'idle').setHunger(40).setWax(100)
