@@ -5,7 +5,9 @@ import {
   addTicker,
   transferTo,
   adjacent,
-  activateAdjacent
+  activateAdjacent,
+  spawnCostHoney,
+  spawnInsufficientHoney
 } from './exported-help-functions'
 import { animateSprite } from './animate-sprite'
 import { makeSelectable, makeHexDetectable } from './sprite-factories'
@@ -24,9 +26,9 @@ import {
   gameover,
   setAngelBubbleTimer
 } from './game/game-state'
-import { ProgressBar } from './ui'
+import { ProgressBar, Button } from './ui'
 import { fontConfig, speeds } from './config'
-import { filterHexagon, getClosestHex } from './hex'
+import { filterHexagon, getClosestHex, pay } from './hex'
 import { queen, angelBubble, angelBubbleText } from './game/pixi-elements'
 
 export function createBee (parent, type, startPosition) {
@@ -344,7 +346,18 @@ export function createBee (parent, type, startPosition) {
     helper.position.y = contentOffsetY + 58
     container.addChild(helper)
 
+    const buttonUpgrade = Button(75, 75, 'Upgrade', () => {
+      if (pay(hexGrid, 20) === 'Insufficient honey') {
+        spawnInsufficientHoney(110, 50)
+      } else {
+        bee.setBoosted(true)
+        spawnCostHoney(110, 50)
+      }
+    })
+    container.addChild(buttonUpgrade)
+
     addTicker('ui', () => {
+      buttonUpgrade.visible = !bee.isBoosted()
       boostedPlusIcon.visible = bee.isBoosted()
       beeExclamationLabel.visible = bee.isHungry() && !bee.isDead()
       helper.text = helperText().toUpperCase()
