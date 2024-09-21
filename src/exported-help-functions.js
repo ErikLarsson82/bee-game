@@ -17,7 +17,7 @@ import {
 import { fontConfig } from './config'
 import { fps } from './framerate'
 import { panel, gameSpeedIcon, pauseFrame, hexForeground, hexBackground, foreground } from './game/pixi-elements'
-import { forEachHexagon, DIRECTIONS_FLAT_EVEN, DIRECTIONS_FLAT_ODD } from './hex'
+import { forEachHexagon, DIRECTIONS_FLAT_EVEN, DIRECTIONS_FLAT_ODD, pay } from './hex'
 import { something, notMe, isHoney, isNectar, isHoneyBuff, isNectarBuff, distance } from './pure-help-functions'
 import { cellEmpty, nameToFunction } from './cells'
 
@@ -168,6 +168,14 @@ function spawnBonusMinus (x, y) {
   spawnBonusIcon(x, y, 'bonus-minus.png')
 }
 
+export function spawnCostHoney (x, y) {
+  spawnBonusIcon(x, y, 'minus-20-honey.png')
+}
+
+export function spawnInsufficientHoney (x, y) {
+  spawnBonusIcon(x, y, 'insufficient-honey.png')
+}
+
 function sortHexForeground () {
   hexForeground.children.sort((a, b) => b.index.x - a.index.x)
   hexForeground.children.sort(
@@ -302,6 +310,11 @@ export function isDayBeforeWinter () {
 const isIdle = (b) => b.type === 'idle'
 
 export function jobs (addOrRemove, type) {
+  if (pay(hexGrid, 10) === 'Insufficient honey') {
+    spawnInsufficientHoney(110, 50)
+    return
+  }
+  spawnCostHoney(110, 50)
   const aliveBees = bees.filter((bee) => !bee.isDead() && !bee.isDying())
   const availableBees = aliveBees.filter(
     addOrRemove === 'add' ? isIdle : (x) => x.type === type

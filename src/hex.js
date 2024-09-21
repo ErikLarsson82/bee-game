@@ -109,3 +109,28 @@ export const getClosestHex = (hexes, bee, distance) => {
 
   return closestHex
 }
+
+export const pay = (hexGrid, _amount) => {
+  let amount = _amount
+  const hexes = filterHexagon(hexGrid, hex => hex.type === 'honey')
+
+  const sumTotal = hexes.reduce((acc, curr) => curr.honey + acc, 0)
+
+  if (sumTotal < amount) return 'Insufficient honey'
+
+  // Traverse all hexagons and pay the amount
+  hexes.forEach(hex => {
+    if (amount === 0) return
+    if (hex.honey > 0) {
+      if (hex.honey >= amount) {
+        hex.honey -= amount
+        amount = 0
+      } else {
+        amount -= hex.honey
+        hex.honey = 0
+      }
+    }
+  })
+
+  return `-${_amount} honey`
+}
