@@ -22,7 +22,11 @@ import {
   flowers,
   hexGrid,
   gameover,
-  setAngelBubbleTimer
+  setAngelBubbleTimer,
+  statisticsNectarCollected,
+  setStatisticsNectarCollected,
+  statisticsHoneyProduced,
+  setStatisticsHoneyProduced,
 } from './game/game-state'
 import { ProgressBar } from './ui'
 import { fontConfig, speeds } from './config'
@@ -495,6 +499,8 @@ export function createBee (parent, type, startPosition) {
     targetHex.nectar += transferTo(rate).inSeconds(5)
     targetHex.nectar = cap(0, targetHex.NECTAR_CAPACITY)(targetHex.nectar)
 
+    setStatisticsNectarCollected(statisticsNectarCollected + transferTo(rate).inSeconds(5))
+
     return true
   }
 
@@ -800,6 +806,7 @@ export function createBee (parent, type, startPosition) {
     const rateB = bee.HONEY_SACK_CAPACITY
     bee.honeySack += transferTo(rateB).inSeconds(duration)
     bee.honeySack = cap(0, bee.HONEY_SACK_CAPACITY)(bee.honeySack)
+    setStatisticsHoneyProduced(statisticsHoneyProduced + transferTo(rateB).inSeconds(duration))
 
     const rateC = bee.HONEY_SACK_CAPACITY * 1.5
     hex.nectar -= transferTo(rateC).inSeconds(duration)
@@ -812,8 +819,10 @@ export function createBee (parent, type, startPosition) {
 
       if (ad.length > 0) {
         const target = ad[0]
-        target.honey += transferTo(target.HONEY_HEX_CAPACITY / 6).inSeconds(5)
+        const rateD = target.HONEY_HEX_CAPACITY / 6
+        target.honey += transferTo(rateD).inSeconds(5)
         target.honey = cap(0, target.HONEY_HEX_CAPACITY)(target.honey)
+        setStatisticsHoneyProduced(statisticsHoneyProduced + transferTo(rateD).inSeconds(5))
       }
     }
 

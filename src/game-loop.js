@@ -24,7 +24,11 @@ import {
   setPreviousSeasonLength,
   setGameSpeed,
   tickers,
-  setTickers
+  setTickers,
+  statisticsNectarCollected,
+  setStatisticsNectarCollected,
+  statisticsHoneyProduced,
+  setStatisticsHoneyProduced,
 } from './game/game-state'
 import { panel, backgroundScene, sun } from './game/pixi-elements'
 import { createFlowers, resolveWinterFlowers } from './single-function-files/create-flowers'
@@ -87,6 +91,10 @@ export function gameloop (delta, manualTick) {
           sun.winterSun.visible = false
           sun.summerSun.visible = true
         } else {
+          console.log('Nectar collected in the summer:', statisticsNectarCollected.toFixed(0))
+          setStatisticsNectarCollected(0)
+          console.log('Honey produced in the summer:', statisticsHoneyProduced.toFixed(0))
+          setStatisticsHoneyProduced(0)
           backgroundScene.texture = Texture.fromImage('background-winter.png')
           resolveWinterFlowers()
           killBroodlings()

@@ -206,6 +206,45 @@ const MAP_CONFIGURATIONS = [
   }
   */
   {
+    name: 'Branch specific testing',
+    cycles: [3, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1],
+    seeds: 4,
+    winterHungerMultiplier: 1,
+    backgroundImage: 'background-summer',
+    blizzardWinter: false,
+    killNonPollinatedFlowers: false,
+    backgroundColor: 0x2ce8f5,
+    // winConditions: [makeOneHoney, hatchOneBee, surviveOneWinter],
+    init: (parent) => {
+      // The most beginner level i can think of
+      //createBee(parent, 'idle').setHunger(40)
+      //createBee(parent, 'idle').setHunger(42)
+      //createBee(parent, 'idle').setHunger(50)
+      //createBee(parent, 'idle').setHunger(80)
+      //createBee(parent, 'idle').setHunger(100)
+      //createBee(parent, 'idle').setHunger(100)
+      createBee(parent, 'idle').setHunger(100)
+      createBee(parent, 'idle').setHunger(100)
+      createBee(parent, 'idle').setHunger(100)
+      createBee(parent, 'idle').setHunger(100)
+
+      replaceHex([5, 7], 'prepared', 'activate').instantlyPrepare()
+      replaceHex([6, 7], 'prepared', 'activate').instantlyPrepare()
+      replaceHex([6, 10], 'prepared', 'activate').instantlyPrepare()
+      replaceHex([7, 9], 'prepared', 'activate').instantlyPrepare()
+
+      replaceHex([4, 4], 'honey', 'activate').setHoney(30)
+      replaceHex([4, 5], 'honey', 'activate').setHoney(30)
+      replaceHex([5, 4], 'honey', 'activate').setHoney(30)
+      replaceHex([5, 5], 'honey', 'activate').setHoney(30)
+
+      replaceHex([5, 8], 'prepared', 'activate').instantlyPrepare()
+      replaceHex([6, 8], 'wax', 'activate')
+      replaceHex([6, 9], 'wax', 'activate')
+      replaceHex([7, 8], 'prepared', 'activate').instantlyPrepare()
+    }
+  },
+  {
     // Give players many many empty hexagons to choose from
     name: 'Playground',
     cycles: [2, 1, 5, 2, 5, 2, 4, 3, 4, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],

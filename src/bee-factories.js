@@ -36,6 +36,7 @@ export function makeFlyable (sprite) {
 
     const distFactor = distanceFactor(sprite, targetSprite)
 
+    const CAP_OUTSIDE_OF_HIVE = 0.02
     let maxSpeed = 0.28
 
     const overburdenedFactor = sprite.isOverburdened() && !sprite.isBoosted() ? 0.3 : 1
@@ -48,7 +49,10 @@ export function makeFlyable (sprite) {
 
     let velocity = new Point(sprite.vx, sprite.vy)
 
-    const sum = maxSpeed * gameSpeed * overburdenedFactor * boostFactor
+    let sum = maxSpeed * gameSpeed * overburdenedFactor * boostFactor
+    if (sprite.position.y > 211 && !sprite.isBoosted()) {
+      sum = CAP_OUTSIDE_OF_HIVE * gameSpeed
+    }
 
     if (magnitude(velocity) > sum) {
       velocity = new Point(normalize(Point, velocity).x * sum, normalize(Point, velocity).y * sum)
