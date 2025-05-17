@@ -206,6 +206,75 @@ const MAP_CONFIGURATIONS = [
   }
   */
   {
+    name: 'Level 1337 - cost-experiment',
+    cycles: [6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1],
+    seeds: 4,
+    winterHungerMultiplier: 1,
+    backgroundImage: 'background-summer',
+    blizzardWinter: false,
+    killNonPollinatedFlowers: false,
+    backgroundColor: 0x2ce8f5,
+    // winConditions: [makeOneHoney, hatchOneBee, surviveOneWinter],
+    init: (parent) => {
+      // The most beginner level i can think of
+      createBee(parent, 'idle').setType('forager').setHunger(100)
+      createBee(parent, 'idle').setType('forager').setHunger(100)
+      createBee(parent, 'idle').setType('nurser').setHunger(100)
+      createBee(parent, 'idle').setType('nurser').setHunger(100)
+      createBee(parent, 'idle').setType('worker').setHunger(100)
+      createBee(parent, 'idle').setType('worker').setHunger(100)
+      // createBee(parent, 'idle').setHunger(100)
+      // createBee(parent, 'idle').setHunger(100)
+      // createBee(parent, 'idle').setHunger(100)
+      // createBee(parent, 'idle').setHunger(100)
+      // createBee(parent, 'idle').setHunger(100)
+
+      replaceHex([5, 7], 'prepared', 'activate').instantlyPrepare()
+      replaceHex([6, 7], 'prepared', 'activate').instantlyPrepare()
+      replaceHex([6, 10], 'prepared', 'activate').instantlyPrepare()
+      replaceHex([7, 9], 'prepared', 'activate').instantlyPrepare()
+
+      replaceHex([4, 4], 'honey', 'activate').setHoney(30)
+      replaceHex([4, 5], 'honey', 'activate').setHoney(30)
+      replaceHex([5, 4], 'honey', 'activate').setHoney(30)
+      replaceHex([5, 5], 'honey', 'activate').setHoney(30)
+
+      replaceHex([5, 8], 'prepared', 'activate').instantlyPrepare()
+      // replaceHex([6, 8], 'wax', 'activate')
+      // replaceHex([6, 9], 'wax', 'activate')
+      replaceHex([7, 8], 'prepared', 'activate').instantlyPrepare()
+    }
+  },
+  {
+    name: 'Level 1338 - Desert haze',
+    cycles: [5, 2, 5, 2, 5, 2, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3],
+    seeds: 3,
+    winterHungerMultiplier: 1,
+    backgroundImage: 'background-desert',
+    blizzardWinter: false,
+    killNonPollinatedFlowers: true,
+    backgroundColor: 0x2ce8f5,
+    init: (parent) => {
+      createBee(parent, 'idle').setHunger(100).setType('forager')
+      createBee(parent, 'idle').setHunger(100).setType('nurser')
+      createBee(parent, 'idle').setHunger(100).setType('worker')
+
+      replaceHex([4, 2], 'blocked', 'no-activation')
+      replaceHex([3, 2], 'blocked', 'no-activation')
+      replaceHex([5, 2], 'blocked', 'no-activation')
+      replaceHex([2, 3], 'blocked', 'no-activation')
+      replaceHex([6, 3], 'blocked', 'no-activation')
+      replaceHex([2, 4], 'blocked', 'no-activation')
+      replaceHex([6, 4], 'blocked', 'no-activation')
+      replaceHex([2, 5], 'blocked', 'no-activation')
+      replaceHex([6, 5], 'blocked', 'no-activation')
+      replaceHex([3, 4], 'honey', 'activate').setHoney(30)
+      replaceHex([5, 4], 'honey', 'activate').setHoney(30)
+      replaceHex([4, 4], 'wax', 'activate')
+      replaceHex([4, 5], 'wax', 'activate')
+    }
+  },
+  {
     // Give players many many empty hexagons to choose from
     name: 'Playground',
     cycles: [2, 1, 5, 2, 5, 2, 4, 3, 4, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 24, 24, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],

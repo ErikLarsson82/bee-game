@@ -201,6 +201,7 @@ export function createBee (parent, type, startPosition) {
       droneBody.texture = Texture.fromImage('bee-drone-body-' + type + '.png')
     }
     bee.idle = getIdlePosition(type)
+    return bee
   }
 
   bee.showBee = () => {
