@@ -697,10 +697,10 @@ export function createBee (parent, type, startPosition) {
     if (bee.feedBee()) return
     if (boost()) return
     if (refillPollen()) return
-    if (broodsAreDoneForTheSeason()) {
-      if (pollinateFlower()) return
-      if (flyToFlowerToPollinate()) return
-    }
+    //if (broodsAreDoneForTheSeason()) {
+    //  if (pollinateFlower()) return
+    //  if (flyToFlowerToPollinate()) return
+    //}
     if (nurseBroodling()) return
     if (season !== 'summer') {
       if (cleanBrood()) return

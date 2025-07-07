@@ -15,7 +15,9 @@ class LoadingScene extends Container {
     const sceneManager = this.sceneManager
     loader.add('ironchest-bee.ttf')
     loader.add('sheet', 'spritesheet.json')
-    loader.load(() => sceneManager.goToScene('splash'))
+    loader.add('test-image', 'temp-images/test.png')  
+    loader.add('ui-box', 'temp-images/ui-box.png')  
+    loader.load(() => sceneManager.goToScene('splash-deux'))
     // loader.load(step2)
 
     // function step2 () {

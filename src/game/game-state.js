@@ -79,8 +79,8 @@ export const setAngelBubbleTimer = b => (angelBubbleTimer = b)
 export let angels = null
 export const setAngels = a => (angels = a)
 
-export let statisticsNectarCollected = null
+export let statisticsNectarCollected = 0
 export const setStatisticsNectarCollected = n => (statisticsNectarCollected = n)
 
-export let statisticsHoneyProduced = null
+export let statisticsHoneyProduced = 0
 export const setStatisticsHoneyProduced = h => (statisticsHoneyProduced = h)

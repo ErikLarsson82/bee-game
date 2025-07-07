@@ -206,8 +206,8 @@ const MAP_CONFIGURATIONS = [
   }
   */
   {
-    name: 'Branch specific testing',
-    cycles: [3, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1],
+    name: 'ELLIOTS BARBIE HOUSE',
+    cycles: [4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1],
     seeds: 4,
     winterHungerMultiplier: 1,
     backgroundImage: 'background-summer',
@@ -216,17 +216,12 @@ const MAP_CONFIGURATIONS = [
     backgroundColor: 0x2ce8f5,
     // winConditions: [makeOneHoney, hatchOneBee, surviveOneWinter],
     init: (parent) => {
-      // The most beginner level i can think of
-      //createBee(parent, 'idle').setHunger(40)
-      //createBee(parent, 'idle').setHunger(42)
-      //createBee(parent, 'idle').setHunger(50)
-      //createBee(parent, 'idle').setHunger(80)
-      //createBee(parent, 'idle').setHunger(100)
-      //createBee(parent, 'idle').setHunger(100)
-      createBee(parent, 'idle').setHunger(100)
-      createBee(parent, 'idle').setHunger(100)
-      createBee(parent, 'idle').setHunger(100)
-      createBee(parent, 'idle').setHunger(100)
+      createBee(parent, 'idle').setHunger(100).setAge(0).setType('forager')
+      createBee(parent, 'idle').setHunger(100).setAge(5).setType('forager')
+      createBee(parent, 'idle').setHunger(100).setAge(10).setType('worker')
+      createBee(parent, 'idle').setHunger(100).setAge(15).setType('worker')
+      createBee(parent, 'idle').setHunger(100).setAge(25).setType('forager')
+      createBee(parent, 'idle').setHunger(100).setAge(35).setType('forager')
 
       replaceHex([5, 7], 'prepared', 'activate').instantlyPrepare()
       replaceHex([6, 7], 'prepared', 'activate').instantlyPrepare()

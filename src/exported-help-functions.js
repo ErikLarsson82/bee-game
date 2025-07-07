@@ -250,6 +250,7 @@ export function updateSelected (item) {
 }
 
 export function addJobsButtons (jobsPanel) {
+  window.unlockJobs = false
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < 2; j++) {
       const button = new Sprite()
@@ -291,6 +292,10 @@ export function addJobsButtons (jobsPanel) {
         button.texture = textureB
       }
       jobsPanel.addChild(button)
+
+      addTicker('ui', time => {
+        button.visible = !!window.unlockJobs
+      })
     }
   }
 }

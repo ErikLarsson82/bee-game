@@ -504,6 +504,7 @@ export function cellBrood (x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
   const broodSprite = Sprite.fromImage('brood/cell-brood-empty.png')
   makeHexagon(broodSprite, x, y, 'brood')
+  broodSprite.beeWillBecome = 'forager'
   const disabledSprite = Sprite.fromImage('brood/cell-brood-disabled.png')
   disabledSprite.visible = false
 
@@ -524,6 +525,7 @@ export function cellBrood (x, y, parent) {
   const hatchingCompleteCallback = () => {
     broodSprite.setContents('empty')
     createBee(beeContainer, 'idle', { x: broodSprite.position.x, y: broodSprite.position.y - 12 })
+      .setType(broodSprite.beeWillBecome)
     hatchingAnimation.pause()
   }
   const hatchingAnimation = animateSprite(hatchContainer, 'hex/hatching.png', 35, 19, 24, false, hatchingCompleteCallback, false)
@@ -651,7 +653,29 @@ export function cellBrood (x, y, parent) {
     }, null, null, 'large')
     container.addChild(buttonDelete)
 
+    const beeWillBecomeButton = Sprite.fromImage('button-huge/button-huge-standard.png')
+    beeWillBecomeButton.position.x = -30
+    beeWillBecomeButton.position.y = 60
+    beeWillBecomeButton.interactive = true
+    beeWillBecomeButton.mouseup = function (e) {
+      if (broodSprite.beeWillBecome === 'forager') {
+        broodSprite.beeWillBecome = 'nurser'
+      } else if (broodSprite.beeWillBecome === 'nurser') {
+        broodSprite.beeWillBecome = 'worker'
+      } else {
+        broodSprite.beeWillBecome = 'forager'
+      }
+    }
+    container.addChild(beeWillBecomeButton)
+
+    const nextBeeText = new Text('-', { ...fontConfig, ...smallFont, fill: 'white' })
+    nextBeeText.position.x = -20
+    nextBeeText.position.y = 62
+    container.addChild(nextBeeText)
+
     addTicker('ui', () => {
+      nextBeeText.text = broodSprite.beeWillBecome
+
       const isDead = broodSprite.content === 'dead'
       const isEmpty = broodSprite.content === 'empty'
       const isEgg = broodSprite.content === 'egg'
@@ -751,6 +775,7 @@ export function cellPollen (x, y, parent) {
     container.addChild(buttonDelete)
 
     const buttonUpgrade = Button(9, 0, Sprite.fromImage('button-large/button-large-content-upgrade-b.png'), () => {
+      if (pollenSprite.pollen < pollenSprite.POLLEN_HEX_CAPACITY - 5) return
       replaceHex([x, y], 'experiment-1')
       updateSelected(null)
     }, null, null, 'large')
