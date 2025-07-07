@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "npm run build && npm run webpack-watch",
+    "temp-images": "mkdir dist/temp-images; cp temp-images/* dist/temp-images/",
     "build": "sh build.sh",
     "start": "npx serve dist/",
     "webpack": "npx webpack",
