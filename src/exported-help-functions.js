@@ -117,9 +117,9 @@ function calculateAdjacencyBonuses () {
           bonusType: 'nectar-buff',
           modifier
         })
-        hex.NECTAR_CAPACITY = hex.NECTAR_CAPACITY_BASELINE * modifier
+        hex.NECTAR_HEX_CAPACITY = hex.NECTAR_HEX_CAPACITY_BASELINE * modifier
       } else {
-        hex.NECTAR_CAPACITY = hex.NECTAR_CAPACITY_BASELINE
+        hex.NECTAR_HEX_CAPACITY = hex.NECTAR_HEX_CAPACITY_BASELINE
       }
 
       const previousNectarBonus = previousBonuses.find(isNectarBuff)
@@ -307,14 +307,20 @@ export function isDayBeforeWinter () {
   return currentCycle === 1 && season === 'summer'
 }
 
+export function isTwoDaysBeforeWinter () {
+  return currentCycle === 2 && season === 'summer'
+}
+
 const isIdle = (b) => b.type === 'idle'
 
 export function jobs (addOrRemove, type) {
-  if (pay(hexGrid, 10) === 'Insufficient honey') {
-    spawnInsufficientHoney(110, 50)
-    return
+  if (addOrRemove === 'remove') {
+    if (pay(hexGrid, 20) === 'Insufficient honey') {
+      spawnInsufficientHoney(110, 50)
+      return
+    }
+    spawnCostHoney(110, 50)
   }
-  spawnCostHoney(110, 50)
   const aliveBees = bees.filter((bee) => !bee.isDead() && !bee.isDying())
   const availableBees = aliveBees.filter(
     addOrRemove === 'add' ? isIdle : (x) => x.type === type
@@ -416,7 +422,7 @@ export function freezeNectar () {
 }
 
 export function snapTo (a, b) {
-  const threshold = gameSpeed > 4 ? 4 : 2.5
+  const threshold = gameSpeed > 4 ? 3 : 2.5
   if (
     distance(a.position.x, a.position.y, b.position.x, b.position.y) < threshold
   ) {

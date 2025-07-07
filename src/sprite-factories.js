@@ -1,4 +1,4 @@
-import { Sprite } from 'pixi.js'
+import { Sprite, Text } from 'pixi.js'
 import {
   hoveredCells,
   setHoveredCells,
@@ -51,34 +51,94 @@ export function makeUpgradeable (sprite) {
 }
 
 export function makeOccupiable (parent) {
-  const spotClaimed = Sprite.fromImage('spot-claimed.png')
-  spotClaimed.visible = false
-  parent.addChild(spotClaimed)
+  // const text = new Text('debug hex', { fill: 0xffffff, fontSize: '8px' })
+  // text.position.set(0, -50)
+  // parent.addChild(text)
 
-  parent.slot = null
-  parent.slotCounter = 0
+  parent.slot = [
+    { bee: null, counter: null },
+    { bee: null, counter: null }
+  ]
+
+  const offsets = [
+    { x: 0, y: 0 },
+    { x: 0, y: -10 }
+  ]
+
+  const isEmpty = x => x.counter === null
+
+  parent.setSlots = x => {
+    if (x === 1) {
+      parent.slot = [
+        { bee: null, counter: null }
+      ]
+      return
+    }
+    if (x === 2) {
+      parent.slot = [
+        { bee: null, counter: null },
+        { bee: null, counter: null }
+      ]
+      return
+    }
+    throw new Error('Unsupported amount')
+  }
+
+  parent.isFirstInLine = bee => {
+    return parent.slot[0].bee === bee
+  }
+
+  parent.getSpotPositionOffset = bee => {
+    const isMe = x => x.bee === bee
+    const index = parent.slot.findIndex(isMe)
+    if (index === -1) throw new Error('Unable to find index - this should not happen')
+    return offsets[index]
+  }
 
   parent.isUnclaimed = attemptee => {
     if (!attemptee) {
       console.error('Needs input')
       return
     }
-    return parent.slot === null || parent.slot === attemptee
+    const isMe = x => x.bee === attemptee
+    if (parent.slot.filter(isMe).length > 0) return true
+    if (parent.slot.filter(isEmpty).length > 0) return true
+    return false
   }
 
-  parent.claimSlot = item => {
-    parent.slot = item
-    parent.slotCounter = secondsToTicks(1)
+  parent.claimSlot = bee => {
+    const isMe = x => x.bee === bee
+    const indexMe = parent.slot.findIndex(isMe)
+    if (indexMe !== -1) {
+      parent.slot[indexMe].bee = bee
+      parent.slot[indexMe].counter = secondsToTicks(1)
+      return
+    }
+    const indexFree = parent.slot.findIndex(isEmpty)
+    if (indexFree === -1) throw new Error('Unable to find index - this should not happen')
+    parent.slot[indexFree].bee = bee
+    parent.slot[indexFree].counter = secondsToTicks(1)
   }
 
   addTicker('game-stuff', time => {
-    if (parent.slot) {
-      parent.slotCounter = parent.slotCounter - gameSpeed
-      if (parent.slotCounter <= 0) {
-        parent.slot = null
+    // if (parent.slot.length === 1) text.text = `1 slot = ${parent.slot[0].bee ? 'bee' : '-'} - ${parent.slot[0].counter}`
+    // if (parent.slot.length === 2) text.text = `2 slots = ${parent.slot[0].bee ? 'bee' : '-'} - ${parent.slot[0].counter} | ${parent.slot[1].bee ? 'bee' : '-'} - ${parent.slot[1].counter}`
+    parent.slot.forEach((slot, idx) => {
+      if (slot.counter === null) return
+      parent.slot[idx].counter = parent.slot[idx].counter - gameSpeed
+      if (parent.slot[idx].counter <= 0) {
+        parent.slot[idx].bee = null
+        parent.slot[idx].counter = null
       }
-    }
-    // spotClaimed.visible = !!parent.slot // enable for debug
+      // Shuffle
+      // if (parent.slot.length > 2) throw new Error('this function only supports length 2')
+      if (parent.slot.length === 2 && parent.slot[1].bee !== null && parent.slot[0].bee === null) {
+        parent.slot[0].bee = parent.slot[1].bee
+        parent.slot[0].counter = parent.slot[1].counter
+        parent.slot[1].bee = null
+        parent.slot[1].counter = null
+      }
+    })
   })
 }
 

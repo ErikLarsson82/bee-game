@@ -1,9 +1,9 @@
 import { Texture, Sprite, Container, Text } from 'pixi.js'
-import { flowers, setFlowers, seeds, setSeeds, selected, season, hour, killNonPollinatedFlowers } from '../game/game-state'
+import { flowers, setFlowers, seeds, setSeeds, selected, season, killNonPollinatedFlowers } from '../game/game-state'
 import { makeOccupiable, makeSelectable } from '../sprite-factories'
-import { addTicker, updateSelected, isDayBeforeWinter } from '../exported-help-functions'
+import { addTicker, updateSelected } from '../exported-help-functions'
 import { WIDTH, fontConfig } from '../config'
-import { ProgressBar } from '../ui'
+import { ProgressBar, Button } from '../ui'
 
 let flowerBed = null
 
@@ -29,9 +29,11 @@ export function createFlowers (_flowerBed) {
   // then, create flowers
   for (let f = 1; f <= seeds; f++) {
     const flower = Sprite.fromImage('flower.png')
+    flower.id = `flower-${f}`
 
     const flipped = Math.random() < 0.5
 
+    /*
     const exclamationTextures = {
       mild: Texture.fromImage('exclamation-warning-mild.png'),
       severe: Texture.fromImage('exclamation-warning-severe.png')
@@ -41,6 +43,7 @@ export function createFlowers (_flowerBed) {
     flowerExclamation.position.y = -20
     flowerExclamation.visible = false
     flower.addChild(flowerExclamation)
+    */
 
     makeOccupiable(flower)
     makeSelectable(flower, 'flower')
@@ -85,24 +88,32 @@ export function createFlowers (_flowerBed) {
       textDescription.position.y = -16
       container.addChild(textDescription)
 
+      const buttonFlip = Button(-20, 40, Sprite.fromImage('button-large/button-large-standard.png'), () => {
+        flower.slot.length === 1 ? flower.setSlots(2) : flower.setSlots(1)
+      }, null, null, 'large')
+      container.addChild(buttonFlip)
+
       return container
     }
 
     addTicker('game-stuff', () => {
-      flowerExclamation.visible = isDayBeforeWinter() && !flower.isPollinated()
-      flowerExclamation.texture = flowers.filter(flower => flower.isPollinated()).length === 0 && killNonPollinatedFlowers ? exclamationTextures.severe : exclamationTextures.mild
+      // flowerExclamation.visible = isDayBeforeWinter() && !flower.isPollinated()
+      // flowerExclamation.texture = flowers.filter(flower => flower.isPollinated()).length === 0 && killNonPollinatedFlowers ? exclamationTextures.severe : exclamationTextures.mild
 
       if (season === 'summer' && !flower.visible) {
         flower.visible = true
       }
 
       if (season === 'winter') {
+        flower.visible = false
+        /*
         if (!flower.isPollinated()) {
           flower.texture = texture.dead
         }
         if (hour > 8 && flower.visible) {
           flower.visible = false
         }
+        */
       } else {
         if (flower.isPollinated()) {
           flower.texture = texture.pollinated

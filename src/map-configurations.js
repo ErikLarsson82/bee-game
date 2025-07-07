@@ -208,7 +208,7 @@ const MAP_CONFIGURATIONS = [
   {
     name: 'Level 1337 - cost-experiment',
     cycles: [6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1],
-    seeds: 4,
+    seeds: 3,
     winterHungerMultiplier: 1,
     backgroundImage: 'background-summer',
     blizzardWinter: false,
@@ -219,30 +219,75 @@ const MAP_CONFIGURATIONS = [
       // The most beginner level i can think of
       createBee(parent, 'idle').setType('forager').setHunger(100)
       createBee(parent, 'idle').setType('forager').setHunger(100)
+      // createBee(parent, 'idle').setType('forager').setHunger(100)
+      // createBee(parent, 'idle').setType('forager').setHunger(100)
+      // createBee(parent, 'idle').setType('forager').setHunger(100)
+      // createBee(parent, 'idle').setType('forager').setHunger(100)
+      // createBee(parent, 'idle').setType('forager').setHunger(100)
+      // createBee(parent, 'idle').setType('forager').setHunger(100)
+      // createBee(parent, 'idle').setType('forager').setHunger(100)
+      // createBee(parent, 'idle').setType('forager').setHunger(100)
+      // createBee(parent, 'idle').setType('forager').setHunger(100)
+      // createBee(parent, 'idle').setType('forager').setHunger(100)
+      // createBee(parent, 'idle').setType('forager').setHunger(100)
       createBee(parent, 'idle').setType('nurser').setHunger(100)
       createBee(parent, 'idle').setType('nurser').setHunger(100)
+      // createBee(parent, 'idle').setType('nurser').setHunger(100)
       createBee(parent, 'idle').setType('worker').setHunger(100)
       createBee(parent, 'idle').setType('worker').setHunger(100)
+      // createBee(parent, 'idle').setType('worker').setHunger(100)
+      // createBee(parent, 'idle').setType('worker').setHunger(100)
+      // createBee(parent, 'idle').setType('worker').setHunger(100)
+      // createBee(parent, 'idle').setType('worker').setHunger(100)
+      // createBee(parent, 'idle').setType('worker').setHunger(100)
+      // createBee(parent, 'idle').setType('worker').setHunger(100)
       // createBee(parent, 'idle').setHunger(100)
       // createBee(parent, 'idle').setHunger(100)
       // createBee(parent, 'idle').setHunger(100)
       // createBee(parent, 'idle').setHunger(100)
       // createBee(parent, 'idle').setHunger(100)
 
-      replaceHex([5, 7], 'prepared', 'activate').instantlyPrepare()
-      replaceHex([6, 7], 'prepared', 'activate').instantlyPrepare()
-      replaceHex([6, 10], 'prepared', 'activate').instantlyPrepare()
-      replaceHex([7, 9], 'prepared', 'activate').instantlyPrepare()
+      // replaceHex([2, 2], 'prepared', 'activate').instantlyPrepare()
+      // replaceHex([7, 2], 'prepared', 'activate').instantlyPrepare()
+      // replaceHex([2, 12], 'prepared', 'activate').instantlyPrepare()
+      // replaceHex([7, 12], 'prepared', 'activate').instantlyPrepare()
 
-      replaceHex([4, 4], 'honey', 'activate').setHoney(30)
-      replaceHex([4, 5], 'honey', 'activate').setHoney(30)
-      replaceHex([5, 4], 'honey', 'activate').setHoney(30)
-      replaceHex([5, 5], 'honey', 'activate').setHoney(30)
+      // replaceHex([4, 4], 'honey', 'activate').setHoney(30)
+      // replaceHex([4, 5], 'honey', 'activate').setHoney(30)
+      // replaceHex([5, 4], 'honey', 'activate').setHoney(30)
+      // replaceHex([5, 5], 'honey', 'activate').setHoney(30)
 
-      replaceHex([5, 8], 'prepared', 'activate').instantlyPrepare()
+      // replaceHex([5, 8], 'prepared', 'activate').instantlyPrepare()
       // replaceHex([6, 8], 'wax', 'activate')
       // replaceHex([6, 9], 'wax', 'activate')
-      replaceHex([7, 8], 'prepared', 'activate').instantlyPrepare()
+      // replaceHex([7, 8], 'prepared', 'activate').instantlyPrepare()
+
+      for (let i = 0; i < HEX_AMOUNT_HEIGHT; i++) {
+        for (let j = 0; j < HEX_AMOUNT_WIDTH; j++) {
+          replaceHex([j, i], 'experiment-3')
+        }
+      }
+
+      replaceHex([8, 2], 'empty')
+      replaceHex([8, 3], 'empty')
+      replaceHex([9, 2], 'empty')
+
+      replaceHex([5, 4], 'empty')
+      replaceHex([5, 5], 'prepared', 'activate').instantlyPrepare()
+      replaceHex([5, 6], 'prepared', 'activate').instantlyPrepare()
+
+      replaceHex([9, 8], 'prepared', 'activate').instantlyPrepare()
+      replaceHex([8, 8], 'prepared', 'activate').instantlyPrepare()
+
+      replaceHex([3, 9], 'empty')
+      replaceHex([4, 9], 'empty')
+      replaceHex([5, 9], 'empty')
+
+      replaceHex([3, 10], 'prepared', 'activate').instantlyPrepare()
+      replaceHex([4, 10], 'prepared', 'activate').instantlyPrepare()
+      replaceHex([5, 10], 'prepared', 'activate').instantlyPrepare()
+
+      replaceHex([4, 11], 'prepared', 'activate').instantlyPrepare()
     }
   },
   {

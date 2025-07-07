@@ -134,6 +134,16 @@ function cellPrepared (x, y, parent) {
       const contentBrood = Sprite.fromImage('button-large/button-large-content-brood.png')
       const contentPollen = Sprite.fromImage('button-large/button-large-content-pollen.png')
       const contentNectar = Sprite.fromImage('button-large/button-large-content-nectar.png')
+      const contentExperiment2 = Sprite.fromImage('button-large/button-large-content-upgrade-b.png')
+      const contentAssembler = Sprite.fromImage('button-large-content-assembler')
+
+      /*
+      const buttonUpgrade = Button(9, 0, Sprite.fromImage('button-large/button-large-content-upgrade-b.png'), () => {
+      replaceHex([x, y], 'experiment-1')
+      updateSelected(null)
+    }, null, null, 'large')
+    container.addChild(buttonUpgrade)
+    */
 
       container.addChild(Button(-11, -28, contentHoney, () => {
         replaceSelectedHex('honey')
@@ -149,6 +159,14 @@ function cellPrepared (x, y, parent) {
       }, null, null, 'large'))
       container.addChild(Button(-11, 16, contentBrood, () => {
         replaceSelectedHex('brood')
+        updateSelected(null)
+      }, null, null, 'large'))
+      container.addChild(Button(-40, -17, contentExperiment2, () => {
+        replaceSelectedHex('experiment-2')
+        updateSelected(null)
+      }, null, null, 'large'))
+      container.addChild(Button(-40, 5, contentAssembler, () => {
+        replaceSelectedHex('assembler')
         updateSelected(null)
       }, null, null, 'large'))
     } else {
@@ -229,6 +247,54 @@ function cellExperiment1 (x, y, parent) {
 
   parent.addChild(experimentOneSprite)
   return experimentOneSprite
+}
+
+function cellExperiment2 (x, y, parent) {
+  const pixelCoordinate = toLocalCoordinateFlat({ x, y })
+  const experimentTwoSprite = Sprite.fromImage('experiment2.png')
+  makeHexagon(experimentTwoSprite, x, y, 'experiment-2')
+  makeOccupiable(experimentTwoSprite)
+  experimentTwoSprite.position.x = pixelCoordinate.x
+  experimentTwoSprite.position.y = pixelCoordinate.y
+
+  experimentTwoSprite.panelContent = () => {
+    return new Container()
+  }
+
+  parent.addChild(experimentTwoSprite)
+  return experimentTwoSprite
+}
+
+function cellExperiment3 (x, y, parent) {
+  const pixelCoordinate = toLocalCoordinateFlat({ x, y })
+  const experimentThreeSprite = Sprite.fromImage('experiment3.png')
+  experimentThreeSprite.visible = false
+  makeHexagon(experimentThreeSprite, x, y, 'experiment-3')
+  experimentThreeSprite.position.x = pixelCoordinate.x
+  experimentThreeSprite.position.y = pixelCoordinate.y
+
+  experimentThreeSprite.panelContent = () => {
+    return new Container()
+  }
+
+  parent.addChild(experimentThreeSprite)
+  return experimentThreeSprite
+}
+
+function cellAssembler (x, y, parent) {
+  const pixelCoordinate = toLocalCoordinateFlat({ x, y })
+  const assemblerSprite = Sprite.fromImage('assembler')
+  makeHexagon(assemblerSprite, x, y, 'assembler')
+  makeOccupiable(assemblerSprite)
+  assemblerSprite.position.x = pixelCoordinate.x
+  assemblerSprite.position.y = pixelCoordinate.y
+
+  assemblerSprite.panelContent = () => {
+    return new Container()
+  }
+
+  parent.addChild(assemblerSprite)
+  return assemblerSprite
 }
 
 function cellHoney (x, y, parent) {
@@ -313,7 +379,7 @@ function cellHoney (x, y, parent) {
     container.addChild(buttonDelete)
 
     const button = Button(9, 0, Sprite.fromImage('button-large/button-large-content-wax.png'), () => {
-      if (honeySprite.honey >= (honeySprite.HONEY_HEX_CAPACITY * 0.9)) {
+      if (honeySprite.honey >= 30) { /* (honeySprite.HONEY_HEX_CAPACITY * 0.9) */
         replaceHex([x, y], 'wax')
         updateSelected(null)
       } else {
@@ -321,6 +387,11 @@ function cellHoney (x, y, parent) {
       }
     }, null, null, 'large')
     container.addChild(button)
+
+    const buttonFlip = Button(-20, 40, Sprite.fromImage('button-large/button-large-standard.png'), () => {
+      honeySprite.slot.length === 1 ? honeySprite.setSlots(2) : honeySprite.setSlots(1)
+    }, null, null, 'large')
+    container.addChild(buttonFlip)
 
     return container
   }
@@ -407,11 +478,11 @@ export function cellNectar (x, y, parent) {
   nectarSprite.hitArea = generateHitArea()
   nectarSprite.position.x = pixelCoordinate.x
   nectarSprite.position.y = pixelCoordinate.y
-  nectarSprite.NECTAR_CAPACITY_BASELINE = 15
-  nectarSprite.NECTAR_CAPACITY = 15
+  nectarSprite.NECTAR_HEX_CAPACITY_BASELINE = 20
+  nectarSprite.NECTAR_HEX_CAPACITY = 20
   nectarSprite.nectar = 0
-  nectarSprite.setNectar = amount => { nectarSprite.nectar = cap(0, nectarSprite.NECTAR_CAPACITY)(amount); return nectarSprite }
-  nectarSprite.isNectarFull = () => nectarSprite.nectar >= nectarSprite.NECTAR_CAPACITY
+  nectarSprite.setNectar = amount => { nectarSprite.nectar = cap(0, nectarSprite.NECTAR_HEX_CAPACITY)(amount); return nectarSprite }
+  nectarSprite.isNectarFull = () => nectarSprite.nectar >= nectarSprite.NECTAR_HEX_CAPACITY
   nectarSprite.isNectarEmpty = () => nectarSprite.nectar <= 0
 
   nectarSprite.panelLabel = () => false
@@ -425,7 +496,7 @@ export function cellNectar (x, y, parent) {
     content.position.y = -37
     container.addChild(content)
 
-    container.addChild(ProgressBar2(-20, -26, 'nectar', () => nectarSprite.nectar, nectarSprite.NECTAR_CAPACITY))
+    container.addChild(ProgressBar2(-20, -26, 'nectar', () => nectarSprite.nectar, nectarSprite.NECTAR_HEX_CAPACITY))
 
     const buttonDelete = Button(-20, 11, Sprite.fromImage('button-large/button-large-content-delete.png'), () => {
       replaceHex([x, y], 'prepared').instantlyPrepare()
@@ -437,6 +508,11 @@ export function cellNectar (x, y, parent) {
       nectarSprite.addUpgrade('converter-adjacent-feed')
     }, null, null, 'large')
     container.addChild(buttonUpgrade)
+
+    const buttonFlip = Button(-20, 40, Sprite.fromImage('button-large/button-large-standard.png'), () => {
+      nectarSprite.slot.length === 1 ? nectarSprite.setSlots(2) : nectarSprite.setSlots(1)
+    }, null, null, 'large')
+    container.addChild(buttonFlip)
 
     const upgradesText = new Text('-', { ...fontConfig })
     upgradesText.scale.set(0.15, 0.15)
@@ -479,17 +555,17 @@ export function cellNectar (x, y, parent) {
       nectarSprite.texture = Texture.fromImage('nectar/cell-nectar-ice.png')
       return
     }
-    if (nectarSprite.nectar > nectarSprite.NECTAR_CAPACITY * 0.9) {
+    if (nectarSprite.nectar > nectarSprite.NECTAR_HEX_CAPACITY * 0.9) {
       nectarSprite.texture = Texture.fromImage('nectar/cell-nectar-full.png')
-    } else if (nectarSprite.nectar > nectarSprite.NECTAR_CAPACITY * 0.72) {
+    } else if (nectarSprite.nectar > nectarSprite.NECTAR_HEX_CAPACITY * 0.72) {
       nectarSprite.texture = Texture.fromImage('nectar/cell-nectar-a.png')
-    } else if (nectarSprite.nectar > nectarSprite.NECTAR_CAPACITY * 0.66) {
+    } else if (nectarSprite.nectar > nectarSprite.NECTAR_HEX_CAPACITY * 0.66) {
       nectarSprite.texture = Texture.fromImage('nectar/cell-nectar-b.png')
-    } else if (nectarSprite.nectar > nectarSprite.NECTAR_CAPACITY * 0.5) {
+    } else if (nectarSprite.nectar > nectarSprite.NECTAR_HEX_CAPACITY * 0.5) {
       nectarSprite.texture = Texture.fromImage('nectar/cell-nectar-c.png')
-    } else if (nectarSprite.nectar > nectarSprite.NECTAR_CAPACITY * 0.25) {
+    } else if (nectarSprite.nectar > nectarSprite.NECTAR_HEX_CAPACITY * 0.25) {
       nectarSprite.texture = Texture.fromImage('nectar/cell-nectar-d.png')
-    } else if (nectarSprite.nectar > nectarSprite.NECTAR_CAPACITY * 0.05) {
+    } else if (nectarSprite.nectar > nectarSprite.NECTAR_HEX_CAPACITY * 0.05) {
       nectarSprite.texture = Texture.fromImage('nectar/cell-nectar-e.png')
     } else {
       nectarSprite.texture = Texture.fromImage('nectar/cell-nectar-empty.png')
@@ -756,6 +832,11 @@ export function cellPollen (x, y, parent) {
     }, null, null, 'large')
     container.addChild(buttonUpgrade)
 
+    const buttonFlip = Button(-20, 40, Sprite.fromImage('button-large/button-large-standard.png'), () => {
+      pollenSprite.slot.length === 1 ? pollenSprite.setSlots(2) : pollenSprite.setSlots(1)
+    }, null, null, 'large')
+    container.addChild(buttonFlip)
+
     /*
     const buttonUpgrade2 = Button(-49, 0, Sprite.fromImage('button-large/button-large-content-forager-resting-place.png'), () => {
       replaceHex([x, y], 'forager-resting-place')
@@ -831,7 +912,10 @@ export const nameToFunction = (input) => {
     prepared: cellPrepared,
     empty: cellEmpty,
     blocked: cellBlocked,
+    assembler: cellAssembler,
     'experiment-1': cellExperiment1,
+    'experiment-2': cellExperiment2,
+    'experiment-3': cellExperiment3,
     'forager-resting-place': cellForagerRestingPlace
   }[input]
 }

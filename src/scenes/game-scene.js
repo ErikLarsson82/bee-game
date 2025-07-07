@@ -2,9 +2,9 @@ import { Container, Text, Graphics, Sprite, Texture } from 'pixi.js'
 import app from '../setup-pixi'
 import { WIDTH, HEIGHT, fontConfig, smallFont, colors } from '../config'
 import { fps, setFps } from '../framerate'
-import { forEachHexagon, HEX_AMOUNT_HEIGHT, HEX_AMOUNT_WIDTH } from '../hex'
+import { forEachHexagon, HEX_AMOUNT_HEIGHT, HEX_AMOUNT_WIDTH, pay } from '../hex'
 import { cellDisabled } from '../cells'
-import { ProgressBar2 } from '../ui'
+import { ProgressBar2, Button } from '../ui'
 import {
   setTickers,
   setBees,
@@ -35,7 +35,9 @@ import {
   hexGrid,
   setHexGrid,
   setHoveredCells,
-  setAngels
+  setAngels,
+  setSeeds,
+  seeds
 } from '../game/game-state'
 import {
   updateSelected,
@@ -271,7 +273,7 @@ function setupGame () {
     }
 
     summaryLabel('honey', 40, '#feae34', hex => hex.honey, hex => hex.HONEY_HEX_CAPACITY)
-    summaryLabel('nectar', 50, '#2ce8f5', hex => hex.nectar, hex => hex.NECTAR_CAPACITY)
+    summaryLabel('nectar', 50, '#2ce8f5', hex => hex.nectar, hex => hex.NECTAR_HEX_CAPACITY)
     summaryLabel('pollen', 60, '#fee761', hex => hex.pollen, hex => hex.POLLEN_HEX_CAPACITY)
     summaryLabel('wax', 70, '#e8b796', hex => hex.wax, hex => hex.WAX_HEX_CAPACITY)
 
@@ -478,6 +480,15 @@ function setupGame () {
   createQueen(beeContainer)
   currentMapInit(beeContainer)
   createFlowers(flowerBed)
+
+  {
+    const pollinateButton = Button(340, 100, Sprite.fromImage('button-large/button-large-standard.png'), () => {
+      setSeeds(seeds + 1)
+      pay(hexGrid, 60)
+      console.log('adding one seed')
+    }, null, null, 'large')
+    container.addChild(pollinateButton)
+  }
 
   createGameOverUI(sceneManager, ui)
 

@@ -3,6 +3,7 @@ export const setSelected = s => (selected = s)
 
 export let bees = null
 export const setBees = b => (bees = b)
+window.bees = () => bees
 
 export let seeds = null
 export const setSeeds = s => (seeds = s)

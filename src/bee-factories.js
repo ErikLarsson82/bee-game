@@ -3,30 +3,39 @@ import { Point, Sprite } from 'pixi.js'
 import { snapTo, transferTo, addTicker } from './exported-help-functions'
 import { getClosestHex, filterHexagon } from './hex'
 import { distance, distanceFactor, cap, magnitude, normalize } from './pure-help-functions'
-import { hiveHole, foreground } from './game/pixi-elements'
+import { /* hiveHole, */ foreground } from './game/pixi-elements'
 import { gameSpeed, season, blizzardWinter, winterHungerMultiplier, hexGrid } from './game/game-state'
 import { fps } from './framerate'
 
 export function makeFlyable (sprite) {
   sprite.vx = 0
   sprite.vy = 0
-  sprite.flyTo = targetSprite => {
-    if (!targetSprite) {
-      targetSprite = {
-        position: {
-          x: sprite.idle.x,
-          y: sprite.idle.y
-        }
-      }
+  sprite.flyTo = spritePrime => {
+    const target = { position: { x: null, y: null } }
+    if (spritePrime === null) {
+      target.position.x = sprite.idle.x
+      target.position.y = sprite.idle.y
+    } else {
+      target.position.x = spritePrime.position.x
+      target.position.y = spritePrime.position.y
     }
 
-    if ((sprite.position.y < hiveHole.position.y && targetSprite.position.y > hiveHole.position.y) ||
-        (sprite.position.y > hiveHole.position.y && targetSprite.position.y < hiveHole.position.y)) {
-      targetSprite = hiveHole
+    /*
+    if ((sprite.position.y < hiveHole.position.y && target.position.y > hiveHole.position.y) ||
+        (sprite.position.y > hiveHole.position.y && target.position.y < hiveHole.position.y)) {
+      target.position.x = hiveHole.position.x
+      target.position.y = hiveHole.position.y
+    }
+    */
+
+    if (spritePrime && spritePrime.getSpotPositionOffset && !sprite.type === 'queen') {
+      const { x: xP, y: yP } = spritePrime.getSpotPositionOffset(sprite)
+      target.position.x += xP
+      target.position.y += yP
     }
 
-    const x = targetSprite.position.x - sprite.position.x
-    const y = targetSprite.position.y - sprite.position.y
+    const x = target.position.x - sprite.position.x
+    const y = target.position.y - sprite.position.y
 
     sprite.setShadowPosition()
     if (x === 0 && y === 0) return
@@ -34,7 +43,7 @@ export function makeFlyable (sprite) {
     sprite.vx += direction.x * 0.030 * (gameSpeed * 5)
     sprite.vy += direction.y * 0.030 * (gameSpeed * 5)
 
-    const distFactor = distanceFactor(sprite, targetSprite)
+    const distFactor = distanceFactor(sprite, target)
 
     let maxSpeed = 0.28
 
@@ -58,10 +67,11 @@ export function makeFlyable (sprite) {
 
     sprite.position.x += sprite.vx
     sprite.position.y += sprite.vy
-    snapTo(sprite, targetSprite)
+    snapTo(sprite, target)
 
     sprite.setShadowPosition()
   }
+
   sprite.isMoving = () => {
     return sprite.vx !== 0 || sprite.vy !== 0
   }

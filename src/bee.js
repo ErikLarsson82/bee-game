@@ -4,7 +4,7 @@ import {
   goIdle,
   addTicker,
   transferTo,
-  adjacent,
+  // adjacent,
   activateAdjacent,
   spawnCostHoney,
   spawnInsufficientHoney
@@ -140,6 +140,8 @@ export function createBee (parent, type, startPosition) {
   bee.HONEY_SACK_CAPACITY = 10
   bee.WAX_SACK_CAPACITY = 10
   bee.DEAD_AT_AGE = Math.round(80 + (Math.random() * 40))
+  bee.rendezvousTimeout = 0
+  bee.rendezvousPosition = null
 
   bee.dying = {
     direction: {
@@ -228,6 +230,10 @@ export function createBee (parent, type, startPosition) {
     bee.removeParticleTicker()
     bee.removeChild(beeExclamation)
     parent.removeChild(bee)
+  }
+  bee.setFlyToRendezvous = (rendezX, rendezY) => {
+    bee.rendezvousTimeout = 10
+    bee.rendezvousPosition = { x: rendezX, y: rendezY }
   }
 
   const isPollenSackFull = () => bee.pollenSack >= bee.POLLEN_SACK_CAPACITY
@@ -370,7 +376,7 @@ export function createBee (parent, type, startPosition) {
   function collectFlowerResources () {
     const flower = bee.isAtType('flower')
     const needsResource = !(isPollenSackFull() && isNectarSackFull())
-    if (flower && needsResource && season === 'summer') {
+    if (flower && needsResource && season === 'summer' && flower.isFirstInLine(bee)) {
       flower.claimSlot(bee)
 
       bee.pollenSack += transferTo(bee.POLLEN_SACK_CAPACITY).inSeconds(40)
@@ -398,6 +404,7 @@ export function createBee (parent, type, startPosition) {
     return false
   }
 
+  /*
   function flyToFlowerToPollinate () {
     if (isPollenSackEmpty() || season === 'winter') return false
     const needsPollination = flower => flower.pollinationLevel < flower.POLLINATION_REQUIREMENT
@@ -408,7 +415,9 @@ export function createBee (parent, type, startPosition) {
     bee.flyTo(flower)
     return true
   }
+  */
 
+  /*
   function pollinateFlower () {
     const flower = bee.isAtType('flower')
     if (!flower || season === 'winter') return false
@@ -424,10 +433,12 @@ export function createBee (parent, type, startPosition) {
     bee.pollenSack = cap(0, bee.POLLEN_SACK_CAPACITY)(bee.pollenSack)
     return true
   }
+  */
 
   function depositPollen () {
     const hex = bee.isAtType('pollen')
     if (!hex) return false
+    if (!hex.isFirstInLine(bee)) return false
     hex.claimSlot(bee)
 
     const duration = bee.isBoosted() ? 15 : 30
@@ -447,6 +458,7 @@ export function createBee (parent, type, startPosition) {
   function refillPollen () {
     const hex = bee.isAtType('pollen')
     if (!hex) return false
+    if (!hex.isFirstInLine(bee)) return false
     hex.claimSlot(bee)
 
     const rate = bee.POLLEN_SACK_CAPACITY
@@ -464,6 +476,7 @@ export function createBee (parent, type, startPosition) {
   function refillWax () {
     const hex = bee.isAtType('wax')
     if (!hex) return false
+    if (!hex.isFirstInLine(bee)) return false
     hex.claimSlot(bee)
 
     const rate = bee.WAX_SACK_CAPACITY
@@ -478,10 +491,28 @@ export function createBee (parent, type, startPosition) {
     return true
   }
 
+  function refillNectar () {
+    const hex = bee.isAtType('nectar')
+    if (!hex) return false
+    if (!hex.isFirstInLine(bee)) return false
+    hex.claimSlot(bee)
+
+    const rate = bee.NECTAR_SACK_CAPACITY
+    bee.nectarSack += transferTo(rate).inSeconds(30)
+    bee.nectarSack = cap(0, bee.NECTAR_SACK_CAPACITY)(bee.nectarSack)
+    hex.nectar -= transferTo(rate).inSeconds(30)
+    hex.nectar = cap(0, hex.NECTAR_HEX_CAPACITY)(hex.nectar)
+
+    if (isNectarSackFull() || hex.isNectarEmpty()) {
+      bee.position.y = hex.position.y - 5
+    }
+    return true
+  }
+
   function depositHoney () {
     const targetHex = bee.isAtType('honey')
     if (!targetHex) return false
-    const valid = !isHoneySackEmpty() && !targetHex.isHoneyFull()
+    const valid = !isHoneySackEmpty() && !targetHex.isHoneyFull() && targetHex.isFirstInLine(bee)
     if (!valid) return false
 
     targetHex.claimSlot(bee)
@@ -499,7 +530,7 @@ export function createBee (parent, type, startPosition) {
   function depositNectar () {
     const targetHex = bee.isAtType('nectar')
     if (!targetHex) return false
-    const valid = !isNectarSackEmpty() && !targetHex.isNectarFull()
+    const valid = !isNectarSackEmpty() && !targetHex.isNectarFull() && targetHex.isFirstInLine(bee)
     if (!valid) return false
     targetHex.claimSlot(bee)
 
@@ -507,7 +538,7 @@ export function createBee (parent, type, startPosition) {
     bee.nectarSack -= transferTo(rate).inSeconds(5)
     bee.nectarSack = cap(0, bee.NECTAR_SACK_CAPACITY)(bee.nectarSack)
     targetHex.nectar += transferTo(rate).inSeconds(5)
-    targetHex.nectar = cap(0, targetHex.NECTAR_CAPACITY)(targetHex.nectar)
+    targetHex.nectar = cap(0, targetHex.NECTAR_HEX_CAPACITY)(targetHex.nectar)
 
     return true
   }
@@ -663,12 +694,14 @@ export function createBee (parent, type, startPosition) {
     }
   }
 
+  /*
   function broodsAreDoneForTheSeason () {
     const isDone = hex => ['dead', 'puppa'].includes(hex.content)
     const unfinishedHexes = filterHexagon(hexGrid, hex => hex.type === 'brood' && !isDone(hex) && hex.paused === false)
 
     return unfinishedHexes.length === 0
   }
+  */
 
   function idle () {
     if (dying()) return
@@ -692,6 +725,7 @@ export function createBee (parent, type, startPosition) {
     if (collectFlowerResources()) return
     if (depositPollen()) return
     if (depositNectar()) return
+    if (flyToRendezvous()) return
     if (flyToNectarToDeposit()) return
     if (flyToPollenToDeposit()) return
     if (flyToFlowerToCollect()) return
@@ -705,10 +739,10 @@ export function createBee (parent, type, startPosition) {
     if (bee.feedBee()) return
     if (boost()) return
     if (refillPollen()) return
-    if (broodsAreDoneForTheSeason()) {
-      if (pollinateFlower()) return
-      if (flyToFlowerToPollinate()) return
-    }
+    // if (broodsAreDoneForTheSeason()) {
+    //  if (pollinateFlower()) return
+    //  if (flyToFlowerToPollinate()) return
+    // }
     if (nurseBroodling()) return
     if (season !== 'summer') {
       if (cleanBrood()) return
@@ -723,7 +757,8 @@ export function createBee (parent, type, startPosition) {
     if (dying()) return
     if (ageBee()) return
     if (boost()) return
-    if (convertNectar()) return
+    // if (convertNectar()) return
+    if (convertNectarInAssembler()) return
     if (depositHoney()) return
     if (flyToHoneyToDeposit()) return
     if (season === 'summer') {
@@ -732,10 +767,15 @@ export function createBee (parent, type, startPosition) {
       if (bee.feedBee()) return
     }
     if (refillWax()) return
+    if (refillNectar()) return
     if (prepareCell()) return
     if (flyToPrepareCell()) return
     if (flyToWax()) return
-    if (flyToNectarToConvert()) return
+    if (flyToNectar()) return
+    if (flyToAssembler()) return
+    // if (flyToNectarToConvert()) return
+    // if (meet()) return
+    // if (flyToExperimentToConvert()) return
     bee.flyTo(null)
   }
 
@@ -797,6 +837,7 @@ export function createBee (parent, type, startPosition) {
     return true
   }
 
+  /*
   function convertNectar () {
     const hex = bee.isAtType('nectar')
     if (!hex || isHoneySackFull()) return false
@@ -809,15 +850,15 @@ export function createBee (parent, type, startPosition) {
       bee.nectarSack -= transferTo(rateA).inSeconds(duration)
       bee.nectarSack = cap(0, bee.NECTAR_SACK_CAPACITY)(bee.nectarSack)
       hex.nectar += transferTo(rateA).inSeconds(duration)
-      hex.nectar = cap(0, hex.NECTAR_CAPACITY)(hex.nectar)
+      hex.nectar = cap(0, hex.NECTAR_HEX_CAPACITY)(hex.nectar)
     }
-    const rateB = bee.HONEY_SACK_CAPACITY
+    const rateB = bee.HONEY_SACK_CAPACITY / 3
     bee.honeySack += transferTo(rateB).inSeconds(duration)
     bee.honeySack = cap(0, bee.HONEY_SACK_CAPACITY)(bee.honeySack)
 
     const rateC = bee.HONEY_SACK_CAPACITY * 1.5
     hex.nectar -= transferTo(rateC).inSeconds(duration)
-    hex.nectar = cap(0, hex.NECTAR_CAPACITY)(hex.nectar)
+    hex.nectar = cap(0, hex.NECTAR_HEX_CAPACITY)(hex.nectar)
 
     if (hex.hasUpgrade('converter-adjacent-feed')) {
       const ad = adjacent(hex.index.x, hex.index.y)
@@ -837,6 +878,80 @@ export function createBee (parent, type, startPosition) {
     }
     return true
   }
+  */
+
+  function convertNectarInAssembler () {
+    const hex = bee.isAtType('assembler')
+    if (!hex || isHoneySackFull() || isNectarSackEmpty()) return false
+    hex.claimSlot(bee)
+
+    const duration = bee.isBoosted() ? 15 : 30
+
+    const rateA = bee.NECTAR_SACK_CAPACITY
+    bee.nectarSack -= transferTo(rateA).inSeconds(duration)
+    bee.nectarSack = cap(0, bee.NECTAR_SACK_CAPACITY)(bee.nectarSack)
+
+    const rateB = bee.HONEY_SACK_CAPACITY / 3
+    bee.honeySack += transferTo(rateB).inSeconds(duration)
+    bee.honeySack = cap(0, bee.HONEY_SACK_CAPACITY)(bee.honeySack)
+
+    // const rateC = bee.HONEY_SACK_CAPACITY * 1.5
+    // hex.nectar -= transferTo(rateC).inSeconds(duration)
+    // hex.nectar = cap(0, hex.NECTAR_HEX_CAPACITY)(hex.nectar)
+
+    /*
+    if (hex.hasUpgrade('converter-adjacent-feed')) {
+      const ad = adjacent(hex.index.x, hex.index.y)
+        .filter(({ type }) => type === 'honey')
+        .filter(hex => !hex.isHoneyFull())
+
+      if (ad.length > 0) {
+        const target = ad[0]
+        target.honey += transferTo(target.HONEY_HEX_CAPACITY / 6).inSeconds(5)
+        target.honey = cap(0, target.HONEY_HEX_CAPACITY)(target.honey)
+      }
+    }
+    */
+
+    bee.eat()
+    if (isHoneySackFull() || isNectarSackEmpty()) {
+      bee.position.y = hex.position.y - 5
+    }
+    return true
+  }
+
+  function flyToRendezvous () {
+    if (bee.flyToRendezvous >= 0) {
+      bee.flyToRendezvous -= 1
+      bee.position.x += 1
+      bee.position.y -= 1
+      return true
+    }
+    return false
+  }
+
+  /*
+  function meet () {
+    const nectarBees = bees.filter(bee => bee.nectarSack >= bee.NECTAR_SACK_CAPACITY && bee.type !== 'worker')
+    if (nectarBees.length > 0) {
+      nectarBees[0].setFlyToRendezvous(100, 100)
+      bee.position.x += 1
+      bee.position.y -= 1
+      return true
+    }
+    return false
+  }
+  */
+
+  /*
+  function flyToExperimentToConvert () {
+    const experimentHex = filterHexagon(hexGrid, hex => hex.type === 'experiment-2' && hex.isUnclaimed(bee))
+    if (experimentHex.length === 0) return false
+    const closest = getClosestHex(experimentHex, bee, distance)
+    closest.claimSlot(bee)
+    bee.flyTo(closest)
+    return true
+  }
 
   function flyToNectarToConvert () {
     const nectarHex = filterHexagon(hexGrid, hex => hex.type === 'nectar' && hex.isUnclaimed(bee) && (!hex.isNectarEmpty() || !isNectarSackEmpty()))
@@ -846,11 +961,30 @@ export function createBee (parent, type, startPosition) {
     bee.flyTo(closest)
     return true
   }
+  */
+
+  function flyToAssembler () {
+    const assemblerHex = filterHexagon(hexGrid, hex => hex.type === 'assembler' && hex.isUnclaimed(bee))
+    if (assemblerHex.length === 0 || isHoneySackFull() || isNectarSackEmpty()) return false
+    const closest = getClosestHex(assemblerHex, bee, distance)
+    closest.claimSlot(bee)
+    bee.flyTo(closest)
+    return true
+  }
 
   function flyToWax () {
     const waxHex = filterHexagon(hexGrid, hex => hex.type === 'wax' && hex.isUnclaimed(bee) && !hex.isWaxEmpty())
     if (waxHex.length === 0 || isWaxSackFull()) return false
     const closest = getClosestHex(waxHex, bee, distance)
+    closest.claimSlot(bee)
+    bee.flyTo(closest)
+    return true
+  }
+
+  function flyToNectar () {
+    const nectarHex = filterHexagon(hexGrid, hex => hex.type === 'nectar' && hex.isUnclaimed(bee) && !hex.isNectarEmpty())
+    if (nectarHex.length === 0 || isNectarSackFull()) return false
+    const closest = getClosestHex(nectarHex, bee, distance)
     closest.claimSlot(bee)
     bee.flyTo(closest)
     return true
