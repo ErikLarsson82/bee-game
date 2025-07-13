@@ -16,11 +16,6 @@ class LoadingScene extends Container {
     loader.add('ironchest-bee.ttf')
     loader.add('sheet', 'spritesheet.json')
 
-    loader.add('experiment-2', 'experiment2.png')
-    loader.add('experiment-3', 'experiment3.png')
-    loader.add('assembler', 'assembler.png')
-    loader.add('button-large-content-assembler', 'button-large-content-assembler.png')
-
     loader.load(() => sceneManager.goToScene('splash'))
     // loader.load(step2)
 

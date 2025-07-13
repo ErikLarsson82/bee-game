@@ -135,7 +135,7 @@ function cellPrepared (x, y, parent) {
       const contentPollen = Sprite.fromImage('button-large/button-large-content-pollen.png')
       const contentNectar = Sprite.fromImage('button-large/button-large-content-nectar.png')
       const contentExperiment2 = Sprite.fromImage('button-large/button-large-content-upgrade-b.png')
-      const contentAssembler = Sprite.fromImage('button-large-content-assembler')
+      const contentAssembler = Sprite.fromImage('button-large/button-large-content-assembler.png')
 
       /*
       const buttonUpgrade = Button(9, 0, Sprite.fromImage('button-large/button-large-content-upgrade-b.png'), () => {
@@ -251,7 +251,7 @@ function cellExperiment1 (x, y, parent) {
 
 function cellExperiment2 (x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
-  const experimentTwoSprite = Sprite.fromImage('experiment2.png')
+  const experimentTwoSprite = Sprite.fromImage('experiment-2.png')
   makeHexagon(experimentTwoSprite, x, y, 'experiment-2')
   makeOccupiable(experimentTwoSprite)
   experimentTwoSprite.position.x = pixelCoordinate.x
@@ -267,7 +267,7 @@ function cellExperiment2 (x, y, parent) {
 
 function cellExperiment3 (x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
-  const experimentThreeSprite = Sprite.fromImage('experiment3.png')
+  const experimentThreeSprite = Sprite.fromImage('experiment-3.png')
   experimentThreeSprite.visible = false
   makeHexagon(experimentThreeSprite, x, y, 'experiment-3')
   experimentThreeSprite.position.x = pixelCoordinate.x
@@ -283,7 +283,7 @@ function cellExperiment3 (x, y, parent) {
 
 function cellAssembler (x, y, parent) {
   const pixelCoordinate = toLocalCoordinateFlat({ x, y })
-  const assemblerSprite = Sprite.fromImage('assembler')
+  const assemblerSprite = Sprite.fromImage('assembler/assembler.png')
   makeHexagon(assemblerSprite, x, y, 'assembler')
   makeOccupiable(assemblerSprite)
   assemblerSprite.position.x = pixelCoordinate.x
