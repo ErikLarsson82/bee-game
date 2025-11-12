@@ -101,11 +101,8 @@ function setup () {
   scaler.scale.y = 2
   container.addChild(scaler)
 
-  const buttonA = Button(Math.round(WIDTH / 2 / 2 / 2) - 20, 100 + (12 * 1), '  Play', () => sceneManager.goToScene('level-select'))
-  scaler.addChild(buttonA)
-
-  const buttonB = Button(Math.round(WIDTH / 2 / 2 / 2) - 20, 100 + (12 * 2), 'Debug menu', () => sceneManager.goToScene('debug-menu'))
-  scaler.addChild(buttonB)
+  const playButton = Button(Math.round(WIDTH / 2 / 2 / 2) - 20, 90 + (12 * 1), 'Play', () => sceneManager.goToScene('debug-menu'))
+  scaler.addChild(playButton)
 }
 
 export default SplashScene

@@ -5,6 +5,8 @@ import MAP_CONFIGURATIONS from '../map-configurations'
 import { Button } from '../ui'
 import { loadMapParameters } from '../load-map-parameters'
 
+const DEBUG = false
+
 class DebugMenuScene extends Container {
   constructor (sceneManager) {
     super()
@@ -53,7 +55,11 @@ function setupDebugMenu () {
   loadingSecondLabel.alpha = 0
   container.addChild(loadingSecondLabel)
 
-  MAP_CONFIGURATIONS.forEach((map, idx) => {
+  MAP_CONFIGURATIONS
+    .filter(x => {
+      return !(DEBUG === false && x.name === 'Playground')
+    })
+    .forEach((map, idx) => {
     const callback = () => {
       // scaler.alpha = 0
       // hasClickedIdx = idx
@@ -65,7 +71,7 @@ function setupDebugMenu () {
       sceneManager.goToScene('game')
       // startGame()
     }
-    const button = Button(Math.round(WIDTH / 2 / 2 / 2) - 50, 10 + (idx * 14), map.name, callback, null, null, 'huge')
+    const button = Button(Math.round(WIDTH / 2 / 2 / 2) - 60, 30 + (idx * 14), map.name, callback, null, null, 'huge')
     scaler.addChild(button)
   })
 
